@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, 
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app import app, db
-
+from flask_login import UserMixin
 
 class VaiTro(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -48,7 +48,7 @@ class PhuongThucThanhToan(db.Model):
     don_hang = relationship('DonHang', backref='phuong_thuc_thanh_toan', lazy=True)
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ho = Column(String(50), nullable=False)
     ten = Column(String(50), nullable=False)
