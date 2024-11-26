@@ -76,7 +76,7 @@ class Sach(db.Model):
     the_loai_id = Column(Integer, ForeignKey(TheLoai.id), nullable=False)
     tac_gia_id = Column(Integer, ForeignKey(TacGia.id), nullable=False)
 
-    hoa_don_ban_sach = relationship('ChiTierHoaDon', backref='sach')
+    hoa_don_ban_sach = relationship('ChiTietHoaDon', backref='sach')
     so_luong_cuon_con_lai = relationship('SoLuongCuonConLai', backref='sach', lazy=True)
     phieu_nhap_sach = relationship('ChiTietPhieuNhapSach', backref='sach')
     don_hang = relationship('ChiTietDonHang', backref='sach')
@@ -112,9 +112,9 @@ class PhieuNhapSach(db.Model):
     sach = relationship('ChiTietPhieuNhapSach', backref='phieu_nhap_sach')
 
 
-class ChiTietNhapSach(db.Model):
+class ChiTietPhieuNhapSach(db.Model):
     phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id), primary_key=True)
-    sach_id = Column(Integer, ForeignKey(User.id), primary_key=True)
+    sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False)
 
