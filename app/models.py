@@ -113,7 +113,7 @@ class PhieuNhapSach(db.Model):
 
 
 class ChiTietPhieuNhapSach(db.Model):
-    phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id), primary_key=True)
+    phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id), primary_key=True)#Chỗ này tôi nghỉ phieu_nhap_sach_id và sach_id nên là ForeignKey thôi rồi cho ChiTietPhieuNhapSach 1 primary key riêng ?
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False)
@@ -137,7 +137,7 @@ class ThongTinNhanHang(db.Model):
 
 
 class ChiTietDonHang(db.Model):
-    don_hang_id = Column(Integer, ForeignKey(DonHang.id), primary_key=True)
+    don_hang_id = Column(Integer, ForeignKey(DonHang.id), primary_key=True) #Chỗ này tôi nghỉ don_hang_id và sach_id nên là ForeignKey thôi rồi cho Chitietdonhang 1 primary key riêng ?
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False, default=0)
