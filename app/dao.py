@@ -1,7 +1,7 @@
 from datetime import datetime
 from xmlrpc.client import DateTime
 
-from app import app,db
+from app import db
 import hashlib
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
@@ -89,6 +89,18 @@ def create_chitietdonhang(don_hang_id,sach_id,so_luong,tong_tien):
     db.session.add(new_chitietdonhang)
     db.session.commit()
 
-# if __name__ == "__main__":
-#      with app.app_context():
+def get_user_by_id(user_id):
+    return User.query.get(user_id)
 
+
+def auth_user(username,password,role):
+    password=str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+
+    user=User.query.filter(User.username.__eq__(username.strip()),
+                              User.password.__eq__(password.strip()))
+    
+    if role:
+        role=VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__(role.strip())).first()
+        user=user.filter(User.vai_tro_id==role.id)
+
+    return user.first()

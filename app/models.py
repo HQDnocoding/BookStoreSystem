@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 from datetime import date
 
 from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint
@@ -6,6 +7,7 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from app import app, db
 from flask_login import UserMixin
+
 
 class VaiTro(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -27,12 +29,16 @@ class TacGia(db.Model):
     ten_tac_gia = Column(String(225), nullable=False)
     sach = relationship('Sach', backref='tac_gia', lazy=True)
 
+    def __str__(self):
+        return self.ten_tac_gia
 
 class TheLoai(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_the_loai = Column(String(225), nullable=False, unique=True)
     sach = relationship('Sach', backref='the_loai', lazy=True)
 
+    def __str__(self):
+        return self.ten_the_loai
 
 class TrangThaiDonHang(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -70,8 +76,9 @@ class HoaDonBanSach(db.Model):
 
 class Sach(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
-    tenSach = Column(String(100), nullable=False)
-    donGia = Column(Float, nullable=False)
+    ten_sach = Column(String(100), nullable=False)
+    don_gia = Column(Float, nullable=False)
+    bia_sach = Column(String(225))
 
     the_loai_id = Column(Integer, ForeignKey(TheLoai.id), nullable=False)
     tac_gia_id = Column(Integer, ForeignKey(TacGia.id), nullable=False)
@@ -113,7 +120,8 @@ class PhieuNhapSach(db.Model):
 
 
 class ChiTietPhieuNhapSach(db.Model):
-    phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id), primary_key=True)#Chỗ này tôi nghỉ phieu_nhap_sach_id và sach_id nên là ForeignKey thôi rồi cho ChiTietPhieuNhapSach 1 primary key riêng ?
+    phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id),
+                                primary_key=True)  # Chỗ này tôi nghỉ phieu_nhap_sach_id và sach_id nên là ForeignKey thôi rồi cho ChiTietPhieuNhapSach 1 primary key riêng ?
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False)
@@ -137,7 +145,8 @@ class ThongTinNhanHang(db.Model):
 
 
 class ChiTietDonHang(db.Model):
-    don_hang_id = Column(Integer, ForeignKey(DonHang.id), primary_key=True) #Chỗ này tôi nghỉ don_hang_id và sach_id nên là ForeignKey thôi rồi cho Chitietdonhang 1 primary key riêng ?
+    don_hang_id = Column(Integer, ForeignKey(DonHang.id),
+                         primary_key=True)  # Chỗ này tôi nghỉ don_hang_id và sach_id nên là ForeignKey thôi rồi cho Chitietdonhang 1 primary key riêng ?
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False, default=0)
@@ -146,6 +155,25 @@ class ChiTietDonHang(db.Model):
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()
+        # db.drop_all()
+        # db.create_all()
+        # db.session.commit()
+
+        # vt1=VaiTro(ten_vai_tro='QUANLY')
+        # vt2=VaiTro(ten_vai_tro='NHANVIEN')
+        # vt3=VaiTro(ten_vai_tro='QUANLYKHO')
+        # vt4=VaiTro(ten_vai_tro='KHACHHANG')
+        # db.session.add_all([vt1,vt2,vt3,vt4])
+
+        # db.session.query(User).delete()
+
+        # pw=str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+        #
+        # admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
+        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
+        #
+        # db.session.add_all([admin,nhan_vien])
+        #
+        #
 
         db.session.commit()
