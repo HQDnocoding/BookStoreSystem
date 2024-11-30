@@ -6,9 +6,11 @@ from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai
 from flask_login import current_user, logout_user
 from flask import redirect
 from app.models import VaiTro
-from flask_admin.form import ImageUploadField
-from wtforms import SubmitField
+from flask_wtf import FlaskForm
+from wtforms import StringField,FileField,SelectField
 from wtforms.validators import DataRequired
+from markupsafe import Markup
+from flask_admin.form import SecureForm
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 class MyView(BaseView):
@@ -23,8 +25,8 @@ class AuthenticatedView(ModelView):
 
 
 class QuyDinhView(AuthenticatedView):
-    can_create = False
-    can_delete = False
+    can_create = True
+    can_edit = True
 
 
 class StatsView(MyView):
@@ -40,11 +42,36 @@ class Logout(MyView):
         return redirect("/admin")
 #
 
+
+
+class SachForm(FlaskForm):
+    ten_sach=StringField('Tên sách',validators=[DataRequired()])
+    don_gia=StringField('Đơn giá',validators=[DataRequired()])
+    tac_gia_id=SelectField('Tác giả',coerce=int)
+    the_loai_id=SelectField('Thể loại',coerce=int)
+    bia_sach=FileField('Bìa sách')
+
 class SachView(AuthenticatedView):
 
+    can_edit = True
     can_view_details=True
+    form=SachForm
 
-    form_excluded_columns=['hoa_don_ban_sach','phieu_nhap_sach','don_hang','hoa_don_ban_sach','so_luong_cuon_con_lai']# fields bị loại bỏ trong form
+    def create_form(self):
+        form = super().create_form()
+        form.tac_gia_id.choices=[(a.id,a.ten_tac_gia) for a in TacGia.query.all()]
+        form.the_loai_id.choices=[(a.id,a.ten_the_loai) for a in TheLoai.query.all()]
+
+        return form
+
+    def edit_form(self, obj):
+        form = super().edit_form(obj)  # Gọi phương thức gốc
+        form.tac_gia_id.choices = [(a.id, a.ten_tac_gia) for a in TacGia.query.all()]  # Thêm danh sách tác giả
+        form.the_loai_id.choices=[(a.id,a.ten_the_loai) for a in TheLoai.query.all()]
+
+        return form
+
+    # form_excluded_columns=['hoa_don_ban_sach','phieu_nhap_sach','don_hang','hoa_don_ban_sach','so_luong_cuon_con_lai']# fields bị loại bỏ trong form
 
     column_list = ['id', 'ten_sach', 'don_gia', 'so_luong_cuon_con_lai'] #cot hiển thị
 
@@ -57,33 +84,36 @@ class SachView(AuthenticatedView):
         'so_luong_cuon_con_lai':'Số lượng',
         'bia_sach':'Bìa sách'
     }
-
-    form_overrides = {
-        'bia_sach': ImageUploadField,  # cho upload file
-        'the_loai_id':QuerySelectField
+    #
+    # form_overrides = {
+    #     'bia_sach': ImageUploadField,  # cho upload file
+    #     'the_loai_id':QuerySelectField
+    # }
+    #
+    # form_args = {
+    #     'bia_sach':{
+    #             'label':'Upload image'
+    #     },
+    #     'the_loai_id': {
+    #         'label':'Thể loại',
+    #         'query_factory': lambda: TheLoai.query.all(),  # Truy vấn tất cả thể loại
+    #         'get_label': 'ten_the_loai',  # Hiển thị tên thể loại trong dropdown
+    #         'allow_blank': False  # Không cho phép bỏ trống trường này
+    #     },
+    #     'tac_gia_id': {
+    #         'label':'Tác giả',
+    #         'query_factory': lambda: TacGia.query.all(),
+    #         'get_label': 'ten_tac_gia',
+    #         'allow_blank': False
+    #     }
+    # }
+    #
+    column_formatters_detail = {
+        'bia_sach': lambda v, c, m, p: Markup(
+            f'<img src="{m.bia_sach}" style="max-width: 200px; max-height: 150px;" alt="Bìa sách">'
+        ) if m.bia_sach else Markup('<p>No Image</p>')
     }
 
-    form_args = {
-        'bia_sach':{
-                'label':'Upload image'
-        },
-        'the_loai_id': {
-            'label':'Thể loại',
-            'query_factory': lambda: TheLoai.query.all(),  # Truy vấn tất cả thể loại
-            'get_label': 'ten_the_loai',  # Hiển thị tên thể loại trong dropdown
-            'allow_blank': False  # Không cho phép bỏ trống trường này
-        },
-        'tac_gia_id': {
-            'label':'Tác giả',
-            'query_factory': lambda: TacGia.query.all(),
-            'get_label': 'ten_tac_gia',
-            'allow_blank': False
-        }
-    }
-
-    column_formatters = {
-        'bia_sach': lambda v, c, m, p: f'<img src="{m.bia_sach}" width="100" />' if m.bia_sach else 'No Image'
-    }
 
     def on_model_change(self, form, model, is_created):
         file_data=form.bia_sach.data
@@ -94,22 +124,25 @@ class SachView(AuthenticatedView):
 
             upload_result=cloudinary.uploader.upload(file_data,folder="upload/bia_sach")
             model.bia_sach=upload_result.get('secure_url')
-
+        model.tac_gia_id=form.tac_gia_id.data
         return super().on_model_change(form,model,is_created)
 
 
 
 class TacGiaView(AuthenticatedView):
+
+
+    form_excluded_columns = ['sach']
     column_list=['id','ten_tac_gia']
     column_labels={
         'id':'Mã tác giả',
         'ten_tac_gia':'Tên tác giả'
     }
-    can_view_details=True
 
 
 class TheLoaiView(AuthenticatedView):
-    can_view_details = True
+    form_excluded_columns = ['sach']
+    column_list = ['id','ten_the_loai']
     column_labels={
         'id':'Mã thể loại',
         'ten_the_loai':'Tên thể loại'
