@@ -24,6 +24,9 @@ def login_admin_process():
     user=dao.auth_user(username=username,password=password,role='QUANLY')
     if user:
         login_user(user)
+    else:
+        user=dao.auth_user(username=username,password=password,role='QUANLYKHO')
+        login_user(user)
     return redirect('/admin')
 
 
