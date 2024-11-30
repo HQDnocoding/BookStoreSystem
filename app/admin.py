@@ -29,10 +29,16 @@ class QuyDinhView(AuthenticatedView):
     can_edit = True
 
 
-class StatsView(MyView):
+class RevenueStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/stats.html")
+        return self.render("admin/revenue-stats.html")
+
+
+class FrequencyStatsView(MyView):
+    @expose("/")
+    def index(self):
+        return self.render("admin/frequency-stats.html")
 
 
 class Logout(MyView):
@@ -51,7 +57,7 @@ class SachForm(Form):
     tac_gia_id = SelectField('Tác giả', coerce=int, validators=[DataRequired()])
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
     bia_sach = FileField('Bìa sách', validators=[
-        DataRequired(),FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!") ])
+        DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
 
 
 class SachView(AuthenticatedView):
@@ -161,5 +167,6 @@ admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Q
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 
-admin.add_view(StatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
+admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
+admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
 admin.add_view(Logout(name="Đăng xuất"))
