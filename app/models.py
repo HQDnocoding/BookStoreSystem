@@ -3,7 +3,7 @@ import hashlib
 from datetime import date
 
 from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from datetime import datetime
 from app import app, db
 from flask_login import UserMixin
@@ -32,6 +32,7 @@ class TacGia(db.Model):
     def __str__(self):
         return self.ten_tac_gia
 
+
 class TheLoai(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_the_loai = Column(String(225), nullable=False, unique=True)
@@ -39,6 +40,7 @@ class TheLoai(db.Model):
 
     def __str__(self):
         return self.ten_the_loai
+
 
 class TrangThaiDonHang(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -167,13 +169,14 @@ if __name__ == "__main__":
 
         # db.session.query(User).delete()
 
-        # pw=str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+        # pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
         #
         # admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
         # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
         #
         # db.session.add_all([admin,nhan_vien])
         #
-        #
 
+        # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
+        # db.session.add(qlk)
         db.session.commit()
