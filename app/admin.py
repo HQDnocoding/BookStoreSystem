@@ -210,7 +210,7 @@ admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Q
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 
-admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))
+admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))#
 
 admin.add_view(StatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(Logout(name="Đăng xuất"))
