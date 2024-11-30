@@ -185,5 +185,4 @@ admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống 
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
 admin.add_view(NhapSach(name='Nhập sách'))
 
-admin.add_view(StatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(Logout(name="Đăng xuất"))
