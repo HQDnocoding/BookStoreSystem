@@ -3,6 +3,8 @@ import wtforms
 from flask_admin import Admin, BaseView, expose
 from app import admin, db
 from flask_admin.contrib.sqla import ModelView
+
+from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai
 from flask_login import current_user, logout_user
 from flask import redirect
@@ -22,6 +24,12 @@ class AuthenticatedView(ModelView):
     def is_accessible(self):
         quan_ly_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLY')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
+
+class AuthenticatedQuanLyKhoView(BaseView):
+    def is_accessible(self):
+        qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
+        return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
+
 
 
 class QuyDinhView(AuthenticatedView):
@@ -161,6 +169,12 @@ class TheLoaiView(AuthenticatedView):
         'ten_the_loai': 'Tên thể loại'
     }
 
+class NhapSach(AuthenticatedQuanLyKhoView):
+    @expose("/")
+    def index(self):
+        return self.render("admin/bookimport.html")
+
+
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
@@ -169,4 +183,7 @@ admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
+admin.add_view(NhapSach(name='Nhập sách'))
+
+admin.add_view(StatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(Logout(name="Đăng xuất"))

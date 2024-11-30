@@ -1,7 +1,7 @@
 from datetime import datetime
 from xmlrpc.client import DateTime
 
-from app import db
+from app import db, admin
 import hashlib
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
@@ -89,6 +89,10 @@ def create_chitietdonhang(don_hang_id,sach_id,so_luong,tong_tien):
     db.session.add(new_chitietdonhang)
     db.session.commit()
 
+def get_role_name_by_role_id(role_id):
+    vai_tro = VaiTro.query.get(role_id)
+    return vai_tro.ten_vai_tro
+
 def get_user_by_id(user_id):
     return User.query.get(user_id)
 
@@ -104,3 +108,4 @@ def auth_user(username,password,role):
         user=user.filter(User.vai_tro_id==role.id)
 
     return user.first()
+
