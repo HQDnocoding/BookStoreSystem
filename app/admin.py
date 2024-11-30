@@ -1,9 +1,12 @@
 import cloudinary.uploader
 import wtforms
 from flask_admin import Admin, BaseView, expose
+from sqlalchemy import false
+from sqlalchemy.testing import fails
+from wtforms.fields.datetime import DateField
+
 from app import admin, db
 from flask_admin.contrib.sqla import ModelView
-
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai
 from flask_login import current_user, logout_user
@@ -25,7 +28,8 @@ class AuthenticatedView(ModelView):
         quan_ly_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLY')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
 
-class AuthenticatedQuanLyKhoView(BaseView):
+
+class AuthenticatedQuanLyKhoView(ModelView):
     def is_accessible(self):
         qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
@@ -54,9 +58,6 @@ class Logout(MyView):
     def index(self):
         logout_user()
         return redirect("/admin")
-
-
-#
 
 
 class SachForm(Form):
@@ -160,6 +161,7 @@ class TacGiaView(AuthenticatedView):
     }
 
 
+
 class TheLoaiView(AuthenticatedView):
     column_searchable_list = ['ten_the_loai']
     form_excluded_columns = ['sach']
@@ -169,17 +171,59 @@ class TheLoaiView(AuthenticatedView):
         'ten_the_loai': 'Tên thể loại'
     }
 
+class UserView(AuthenticatedView):
+    column_searchable_list = ['id','ho','ten','username']
+    can_edit = True
+    can_create = True
+    form_widget_args = {
+        'ngay_tao': {
+            'disabled': True
+        }
+    }
+
+
+class PhieuNhapSachForm(Form):
+    ngay_nhap = DateField('Ngày nhập')
+    user = SelectField('Người quản lý kho',coerce=int)
+
+class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
+    column_list = ['id','quan_ly_kho_id','ngay_nhap']
+    form_excluded_columns = ['sach']
+    can_view_details = True
+    column_searchable_list = ['id','quan_ly_kho_id']
+    can_edit = False
+    can_create = True
+
+
+    form_widget_args = {
+        'ngay_nhap':{
+            'disabled' : True
+        },
+        'user':{
+                 'disabled': True
+    }
+
+    }
+    column_labels = {
+        'id': 'Mã phiếu',
+        'quan_ly_kho_id': 'Mã người quản lý kho',
+        'ngay_nhap': 'Ngày nhập'
+    }
+
+
 class NhapSach(AuthenticatedQuanLyKhoView):
     @expose("/")
     def index(self):
         return self.render("admin/bookimport.html")
 
 
-
+admin.add_view(UserView(User,db.session,name='Quản lý User'))
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
+
+admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))#
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
