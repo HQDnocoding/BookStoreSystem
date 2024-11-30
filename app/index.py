@@ -10,7 +10,7 @@ from flask_login import login_user, logout_user
 
 @app.route("/")
 def hello_world():
-    return "Hello World"
+    return 'Hello world'
 
 @login.user_loader
 def load_user(user_id):
