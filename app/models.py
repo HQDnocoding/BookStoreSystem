@@ -13,7 +13,8 @@ class VaiTro(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_vai_tro = Column(String(50), nullable=True, unique=True)
     user = relationship('User', backref='vai_tro', lazy=True)
-
+    def __str__(self):
+        return self.ten_vai_tro
 
 class QuyDinh(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)

@@ -174,15 +174,8 @@ class TheLoaiView(AuthenticatedView):
         'ten_the_loai': 'Tên thể loại'
     }
 
-class UserView(AuthenticatedView):
-    column_searchable_list = ['id','ho','ten','username']
-    can_edit = True
-    can_create = True
-    form_widget_args = {
-        'ngay_tao': {
-            'disabled': True
-        }
-    }
+
+
 
 
 
@@ -234,23 +227,26 @@ class ChiTietPhieuNhapSachView(AuthenticatedQuanLyKhoView):
         'so_luong' : 'số lượng'
     }
 
+class VaitroView(AuthenticatedView):
+    can_create = True
+    can_edit = True
+
+
+
 class UserView(AuthenticatedView):
     column_searchable_list = ['id','ho','ten','username']
-    can_edit = True
-    can_create = True
-    form_widget_args = {
-        'ngay_tao': {
-            'disabled': True
-        }
-    }
+    can_edit = False
+    can_create = False
 
 
 
-admin.add_view(UserView(User,db.session,name='Quản lý User'))
+
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
+admin.add_view(UserView(User,db.session,name='Quản lý User'))
+admin.add_view(VaitroView(VaiTro,db.session,name='Vai trò'))
 
 admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))#
 admin.add_view(ChiTietPhieuNhapSachView(ChiTietPhieuNhapSach,db.session,name='Chi tiết nhập sách',category='Nhập sách'))

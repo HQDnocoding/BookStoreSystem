@@ -21,14 +21,14 @@
                     <label for="sel_month">Chọn tháng</label>
                     <select name="sel_month" id="sel_month" class="form-control">
                         {% for m in months %}
-                        <option>{{y}}</option>
+                        <option>{{m}}</option>
                         {% endfor %}
                     </select>
     
                     <label for="the_loai">Thể loại</label>
                     <select name="the_loai" id="the_loai" class="form-control">
                         {% for t in tl %}
-                        <option>{{y}}</option>
+                        <option>{{t}}</option>
                         {% endfor %}
                     </select>
                     <button type="submit" class="mt-2 btn btn-primary">Lọc</button>
