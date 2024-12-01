@@ -223,6 +223,13 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     can_edit = False
     can_create = True
 
+    form_pns = PhieuNhapSachForm
+    # def create_form(self):
+    #     form_pns = super().create_form()
+    #
+    #     form_pns.user.choices = [(p.id, p.ho,p.ten) for p in User.query.all()]
+    #
+    #     return form_pns
 
     form_widget_args = {
         'ngay_nhap':{

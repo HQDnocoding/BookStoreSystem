@@ -68,6 +68,8 @@ class User(db.Model, UserMixin):
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
     don_hang = relationship('DonHang', backref='user', lazy=True)
 
+    def __str__(self):
+        return self.ten
 
 class HoaDonBanSach(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
