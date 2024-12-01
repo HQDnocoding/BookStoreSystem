@@ -8,7 +8,7 @@ from wtforms.fields.datetime import DateField
 from app import admin, db
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
-from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai
+from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, PhieuNhapSach,User
 from flask_login import current_user, logout_user
 from flask import redirect
 from app.models import VaiTro
