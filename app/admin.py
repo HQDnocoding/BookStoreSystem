@@ -1,14 +1,17 @@
+from email.policy import default
+
 import cloudinary.uploader
 import wtforms
 from flask_admin import Admin, BaseView, expose
 from sqlalchemy import false
 from sqlalchemy.testing import fails
 from wtforms.fields.datetime import DateField
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from app import admin, db
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
-from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach
+from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user
 from flask import redirect
 from app.models import VaiTro
@@ -182,38 +185,14 @@ class UserView(AuthenticatedView):
     }
 
 
-class PhieuNhapSachForm(Form):
-    ngay_nhap = DateField('Ngày nhập')
-    user = SelectField('Người quản lý kho',coerce=int)
 
-class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
-    column_list = ['id','quan_ly_kho_id','ngay_nhap']
-    form_excluded_columns = ['sach']
-    can_view_details = True
-    column_searchable_list = ['id','quan_ly_kho_id']
-    can_edit = False
-    can_create = True
-
-
-    form_widget_args = {
-        'ngay_nhap':{
-            'disabled' : True
-        },
-        'user':{
-                 'disabled': True
-    }
-
-    }
-    column_labels = {
-        'id': 'Mã phiếu',
-        'quan_ly_kho_id': 'Mã người quản lý kho',
-        'ngay_nhap': 'Ngày nhập'
-    }
 
 
 class PhieuNhapSachForm(Form):
     ngay_nhap = DateField('Ngày nhập')
-    user = SelectField('Người quản lý kho',coerce=int)
+    user = SelectField('Người quản lý kho',coerce=int,validators=[DataRequired()])
+
+
 
 class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     column_list = ['id','quan_ly_kho_id','ngay_nhap']
@@ -224,19 +203,19 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     can_create = True
 
     form_pns = PhieuNhapSachForm
-    # def create_form(self):
-    #     form_pns = super().create_form()
-    #
-    #     form_pns.user.choices = [(p.id, p.ho,p.ten) for p in User.query.all()]
-    #
-    #     return form_pns
+    def create_form(self):
+        form_pns = super().create_form()
+        form_pns.user.choices = [(p.id, p.ten) for p in User.query.filter(User.id.__eq__(3))]
+        form_pns.process()
+        return form_pns
+
 
     form_widget_args = {
         'ngay_nhap':{
             'disabled' : True
         },
         'user':{
-                 'disabled': True
+            'disabled': False
     }
 
     }
@@ -244,6 +223,15 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
         'id': 'Mã phiếu',
         'quan_ly_kho_id': 'Mã người quản lý kho',
         'ngay_nhap': 'Ngày nhập'
+    }
+
+
+class ChiTietPhieuNhapSachView(AuthenticatedQuanLyKhoView):
+    column_list = ['phieu_nhap_sach_id','sach_id','so_luong']
+    column_labels = {
+        'phieu_nhap_sach_id' : 'Mã sách',
+        'sach_id' : 'Sách',
+        'so_luong' : 'số lượng'
     }
 
 class UserView(AuthenticatedView):
@@ -265,6 +253,7 @@ admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quả
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 
 admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))#
+admin.add_view(ChiTietPhieuNhapSachView(ChiTietPhieuNhapSach,db.session,name='Chi tiết nhập sách',category='Nhập sách'))
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
