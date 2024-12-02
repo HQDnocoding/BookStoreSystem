@@ -13,7 +13,8 @@ class VaiTro(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_vai_tro = Column(String(50), nullable=True, unique=True)
     user = relationship('User', backref='vai_tro', lazy=True)
-
+    def __str__(self):
+        return self.ten_vai_tro
 
 class QuyDinh(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -68,6 +69,8 @@ class User(db.Model, UserMixin):
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
     don_hang = relationship('DonHang', backref='user', lazy=True)
 
+    def __str__(self):
+        return self.ten
 
 class HoaDonBanSach(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -90,6 +93,8 @@ class Sach(db.Model):
     phieu_nhap_sach = relationship('ChiTietPhieuNhapSach', backref='sach')
     don_hang = relationship('ChiTietDonHang', backref='sach')
 
+    def __str__(self):
+        return self.ten_sach
 
 class ChiTietHoaDon(db.Model):
     sach_id = Column(ForeignKey(Sach.id), primary_key=True)
@@ -120,6 +125,8 @@ class PhieuNhapSach(db.Model):
     quan_ly_kho_id = Column(Integer, ForeignKey(User.id), nullable=False)
     sach = relationship('ChiTietPhieuNhapSach', backref='phieu_nhap_sach')
 
+    def __int__(self):
+         return self.id
 
 class ChiTietPhieuNhapSach(db.Model):
     phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id),
@@ -127,6 +134,8 @@ class ChiTietPhieuNhapSach(db.Model):
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False)
+
+
 
 
 class DonHang(db.Model):

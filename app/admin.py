@@ -1,14 +1,17 @@
+from email.policy import default
+
 import cloudinary.uploader
 import wtforms
 from flask_admin import Admin, BaseView, expose
 from sqlalchemy import false
 from sqlalchemy.testing import fails
 from wtforms.fields.datetime import DateField
+from wtforms_sqlalchemy.fields import QuerySelectField
 
 from app import admin, db
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
-from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, PhieuNhapSach,User
+from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user
 from flask import redirect
 from app.models import VaiTro
@@ -211,22 +214,39 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     }
 
 
-# class NhapSach(AuthenticatedQuanLyKhoView):
-#     @expose("/")
-#     def index(self):
-#         return self.render("admin/bookimport.html")
+class ChiTietPhieuNhapSachView(AuthenticatedQuanLyKhoView):
+    column_list = ['phieu_nhap_sach_id','sach_id','so_luong']
+    column_labels = {
+        'phieu_nhap_sach_id' : 'Mã sách',
+        'sach_id' : 'Sách',
+        'so_luong' : 'số lượng'
+    }
+
+class VaitroView(AuthenticatedView):
+    can_create = True
+    can_edit = True
 
 
-admin.add_view(UserView(User,db.session,name='Quản lý User'))
+
+class UserView(AuthenticatedView):
+    column_searchable_list = ['id','ho','ten','username']
+    can_edit = False
+    can_create = False
+
+
+
+
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
+admin.add_view(UserView(User,db.session,name='Quản lý User'))
+admin.add_view(VaitroView(VaiTro,db.session,name='Vai trò'))
 
 admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))#
+admin.add_view(ChiTietPhieuNhapSachView(ChiTietPhieuNhapSach,db.session,name='Chi tiết nhập sách',category='Nhập sách'))
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
-# admin.add_view(NhapSach(name='Nhập sách'))
 
 admin.add_view(Logout(name="Đăng xuất"))
