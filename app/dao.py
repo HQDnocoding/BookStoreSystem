@@ -109,3 +109,8 @@ def auth_user(username,password,role):
 
     return user.first()
 
+
+def get_id_from_ten_vai_tro(ten_vai_tro):
+    vai_tro = VaiTro.query.filter_by(ten_vai_tro=ten_vai_tro).first()
+    return vai_tro.id if vai_tro else None
+
