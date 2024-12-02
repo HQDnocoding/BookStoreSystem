@@ -211,10 +211,10 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     }
 
 
-class NhapSach(AuthenticatedQuanLyKhoView):
-    @expose("/")
-    def index(self):
-        return self.render("admin/bookimport.html")
+# class NhapSach(AuthenticatedQuanLyKhoView):
+#     @expose("/")
+#     def index(self):
+#         return self.render("admin/bookimport.html")
 
 
 admin.add_view(UserView(User,db.session,name='Quản lý User'))
@@ -227,6 +227,6 @@ admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập s
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
-admin.add_view(NhapSach(name='Nhập sách'))
+# admin.add_view(NhapSach(name='Nhập sách'))
 
 admin.add_view(Logout(name="Đăng xuất"))

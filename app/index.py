@@ -20,12 +20,9 @@ def load_user(user_id):
 def login_admin_process():
     username=request.form.get('username')
     password=request.form.get('password')
-
-    user=dao.auth_user(username=username,password=password,role='QUANLY')
+    roles=['NHANVIEN','QUANLY','QUANLYKHO']
+    user=dao.auth_user(username=username,password=password,roles=roles)
     if user:
-        login_user(user)
-    else:
-        user=dao.auth_user(username=username,password=password,role='QUANLYKHO')
         login_user(user)
     return redirect('/admin')
 
