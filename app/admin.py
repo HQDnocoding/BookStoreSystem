@@ -1,19 +1,25 @@
+import hashlib
+from datetime import datetime
 from email.policy import default
+from xmlrpc.client import DateTime
 
 import cloudinary.uploader
+import flask_login
 import wtforms
 from flask_admin import Admin, BaseView, expose
+from app.dao import *
 from sqlalchemy import false
 from sqlalchemy.testing import fails
-from wtforms.fields.datetime import DateField
+from wtforms.fields.datetime import DateField, DateTimeField
+from wtforms.fields.simple import PasswordField
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from app import admin, db
+from app import admin, db, app
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
-from flask_login import current_user, logout_user
-from flask import redirect
+from flask_login import current_user, logout_user ,UserMixin
+from flask import redirect ,g
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
 from wtforms.validators import DataRequired
@@ -174,20 +180,16 @@ class TheLoaiView(AuthenticatedView):
         'ten_the_loai': 'Tên thể loại'
     }
 
-class UserView(AuthenticatedView):
-    column_searchable_list = ['id','ho','ten','username']
-    can_edit = True
-    can_create = True
-    form_widget_args = {
-        'ngay_tao': {
-            'disabled': True
-        }
-    }
-
 
 class PhieuNhapSachForm(Form):
-    ngay_nhap = DateField('Ngày nhập')
-    user = SelectField('Người quản lý kho',coerce=int)
+    ngay_nhap = DateTimeField('Ngày nhập', default=datetime.now(), format='%Y-%m-%d %H:%M:%S',
+                              validators=[DataRequired()])
+
+    # Trường này sẽ được tự động gán cho current_user.id khi tạo
+    quan_ly_kho_id = QuerySelectField('Quản lý kho', query_factory=lambda: User.query.all(),
+                              get_label='ten', allow_blank=False)
+
+
 
 class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     column_list = ['id','quan_ly_kho_id','ngay_nhap']
@@ -198,13 +200,26 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     can_create = True
 
 
+    form = PhieuNhapSachForm
+    def create_form(self):
+        form = super().create_form()
+        form.ngay_nhap = datetime.now()
+        form.quan_ly_kho_id.data = current_user.get_id()
+        return form
+
+    def on_model_change(self, form, model, is_created):
+        if is_created:
+            form.ngay_nhap = datetime.now()
+            model.quan_ly_kho_id = current_user.get_id()
+        super().on_model_change(form, model, is_created)
+
     form_widget_args = {
         'ngay_nhap':{
             'disabled' : True
         },
-        'user':{
-                 'disabled': True
-    }
+        'quan_ly_kho_id':{
+            'disabled': True,
+        }
 
     }
     column_labels = {
@@ -217,23 +232,71 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
 class ChiTietPhieuNhapSachView(AuthenticatedQuanLyKhoView):
     column_list = ['phieu_nhap_sach_id','sach_id','so_luong']
     column_labels = {
-        'phieu_nhap_sach_id' : 'Mã sách',
+        'phieu_nhap_sach_id' : 'Mã phiếu nhập sách',
         'sach_id' : 'Sách',
         'so_luong' : 'số lượng'
+    }
+    form_widget_args = {
+        'so_luong': {
+            'min': 150,
+            'step': 1
+        }
     }
 
 class VaitroView(AuthenticatedView):
     can_create = True
     can_edit = True
 
-
+class UserForm(Form):
+    ho = StringField('Họ', validators=[DataRequired()])
+    ten = StringField('Tên', validators=[DataRequired()])
+    username = StringField('Tên đăng nhập', validators=[DataRequired()])
+    password = StringField('Mật khẩu', validators=[ DataRequired()])
+    ngay_tao = DateTimeField('Ngày tạo', default=datetime.now(), format='%Y-%m-%d %H:%M:%S')
+    avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
+    vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
+                              get_label='ten_vai_tro', allow_blank=False)
 
 class UserView(AuthenticatedView):
     column_searchable_list = ['id','ho','ten','username']
-    can_edit = False
-    can_create = False
+    form_excluded_columns = ['phieu_nhap_sach','don_hang']
+    can_edit = True
+    can_create = True
 
+    form = UserForm
 
+    def create_form(self):
+        form = super().create_form()
+        return form
+    def edit_form(self, obj):
+        form = super().edit_form(obj)
+        return form
+
+    def on_model_change(self, form, model, is_created):
+        model.ngay_tao = datetime.now()
+        model.vai_tro_id = form.vai_tro_id.data.id
+        file_data = form.avatar.data
+        if file_data:
+
+            if not file_data.content_type.startswith("image/"):
+                raise ValueError("Chỉ được upload hình ảnh (JPEG, PNG, GIF, v.v.)")
+
+            upload_result = cloudinary.uploader.upload(file_data, folder="upload/avatar")
+            model.avatar = upload_result.get('secure_url')
+        model.password = str(hashlib.md5(form.password.data.encode('utf-8')).hexdigest())
+
+        return super().on_model_change(form, model, is_created)
+
+    column_formatters_detail = {
+        'avatar': lambda v, c, m, p: Markup(
+            f'<img src="{m.avatar}" style="max-width: 200px; max-height: 150px;" alt="Bìa sách">'
+        ) if m.avatar else Markup('<p>No Image</p>')
+    }
+    form_widget_args = {
+        'avatar':{
+
+        }
+    }
 
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
