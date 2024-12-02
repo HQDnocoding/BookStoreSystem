@@ -198,7 +198,7 @@ class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
     form_pns = PhieuNhapSachForm
     def create_form(self):
         form_pns = super().create_form()
-        form_pns.user.choices = [(p.id, p.ten) for p in User.query.filter(User.id.__eq__(3))]
+        form_pns.user = current_user.get_id()
         form_pns.process()
         return form_pns
 
