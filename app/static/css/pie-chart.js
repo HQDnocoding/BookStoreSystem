@@ -5,10 +5,10 @@ const ctx = document.getElementById('myPieChart').getContext('2d');
 const myPieChart = new Chart(ctx, {
     type: 'pie',
     data: {
-        labels: chartData.labels, // Sử dụng dữ liệu từ Flask
+        labels: stats[1], // Sử dụng dữ liệu từ Flask
         datasets: [{
             label: 'Dataset 1',
-            data: chartData.data, // Sử dụng dữ liệu từ Flask
+            data: stats[2], // Sử dụng dữ liệu từ Flask
             backgroundColor: [
                 'rgba(255, 99, 132, 0.2)',
                 'rgba(54, 162, 235, 0.2)',

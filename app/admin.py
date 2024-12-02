@@ -53,13 +53,13 @@ class QuyDinhView(AuthenticatedView):
 class RevenueStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/revenue-stats.html",stats=get)
+        return self.render("admin/revenue-stats.html",tl=get_the_loai())
 
 
 class FrequencyStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/frequency-stats.html")
+        return self.render("admin/frequency-stats.html",tl=get_the_loai())
 
 
 class Logout(MyView):
