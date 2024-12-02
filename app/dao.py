@@ -1,6 +1,8 @@
 from datetime import datetime
 from xmlrpc.client import DateTime
 
+from sqlalchemy import func
+
 from app import db, admin
 import hashlib
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
@@ -134,3 +136,30 @@ def auth_user(username, password, roles):
             users = users.filter(User.vai_tro_id.in_(roleID))
 
     return users.first()
+
+
+# lấy tổng doanh của từng tựa sách thu từ hóa đơn theo tháng, năm
+def get_revenue_by_month_year(thang,nam):
+    
+     # Chuyển tháng, năm thành chuỗi tháng/năm
+    start_date = datetime(nam, thang, 1)
+    # Lấy ngày cuối tháng
+    end_date = datetime(nam, thang + 1, 1) if thang < 12 else datetime(nam + 1, 1, 1)
+    
+    ket_qua = db.session.query(
+        Sach.id.label('ma_sach'),
+        Sach.ten_sach,
+        func.sum(ChiTietHoaDon.so_luong).label('so_luong_ban'),
+        func.sum(ChiTietHoaDon.tong_tien).label('doanh_thu')
+    ).join(
+        ChiTietHoaDon, ChiTietHoaDon.sach_id == Sach.id
+    ).join(
+        HoaDonBanSach, HoaDonBanSach.id == ChiTietHoaDon.hoa_don_id
+    ).filter(
+        HoaDonBanSach.ngay_tao_hoa_don >= start_date,
+        HoaDonBanSach.ngay_tao_hoa_don < end_date
+    ).group_by(
+        Sach.id, Sach.ten_sach
+    ).all()
+
+    return ket_qua

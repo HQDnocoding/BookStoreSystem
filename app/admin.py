@@ -47,7 +47,7 @@ class QuyDinhView(AuthenticatedView):
 class RevenueStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/revenue-stats.html")
+        return self.render("admin/revenue-stats.html",stats=get)
 
 
 class FrequencyStatsView(MyView):
