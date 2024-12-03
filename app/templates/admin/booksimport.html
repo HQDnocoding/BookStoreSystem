@@ -1,0 +1,105 @@
+{% extends 'admin/master.html'%}
+
+
+{% block body %}
+
+<div class="container mt-3">
+    <h1>Nhập sách</h1>
+    <div class="row">
+        <div class="col">
+            <button type="button" class="btn btn-primary" mt-3>Tạo phiếu nhập sách</button>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="sel5">Phiếu</label>
+                <select class="form-control" id="sel5">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <div class="col">
+                <div class="form-group">
+                    <label for="sel4">Thể loại</label>
+                    <select class="form-control" id="sel4">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="col">
+                <div class="form-group">
+                    <label for="sel3">Tác giả:</label>
+                    <select class="form-control" id="sel3">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">Tên sách</div>
+        <div class="col">Tác giả</div>
+        <div class="col">Thể loại</div>
+        <div class="col">Số lượng</div>
+    </div>
+    <div class="row" style="border: 1px solid black;">
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col"></div>
+        <div class="col"></div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col">
+            <div class="form-group">
+                <label for="sel1">Chọn sách</label>
+                <select class="form-control" id="sel1">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                </select>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label for="usr">Số lượng</label>
+                <input type="number" class="form-control" id="usr">
+            </div>
+        </div>
+    </div>
+    <div class="card" style="width:400px">
+        <img class="card-img-top" src="https://down-vn.img.susercontent.com/file/vn-11134201-7r98o-lwhd667bf29n4d" alt="Card image">
+        <div class="card-body">
+        </div>
+    </div>
+
+    <button type="button" class="btn btn-primary btn-lg">Thêm</button>
+
+</div>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+      integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+
+
+{% endblock %}

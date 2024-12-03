@@ -38,7 +38,7 @@ class AuthenticatedView(ModelView):
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
 
 
-class AuthenticatedQuanLyKhoView(ModelView):
+class AuthenticatedQuanLyKhoView(BaseView):
     def is_accessible(self):
         qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
@@ -181,67 +181,7 @@ class TheLoaiView(AuthenticatedView):
     }
 
 
-class PhieuNhapSachForm(Form):
-    ngay_nhap = DateTimeField('Ngày nhập', default=datetime.now(), format='%Y-%m-%d %H:%M:%S',
-                              validators=[DataRequired()])
 
-    # Trường này sẽ được tự động gán cho current_user.id khi tạo
-    quan_ly_kho_id = QuerySelectField('Quản lý kho', query_factory=lambda: User.query.all(),
-                              get_label='ten', allow_blank=False)
-
-
-
-class PhieuNhapSachView(AuthenticatedQuanLyKhoView):
-    column_list = ['id','quan_ly_kho_id','ngay_nhap']
-    form_excluded_columns = ['sach']
-    can_view_details = True
-    column_searchable_list = ['id','quan_ly_kho_id']
-    can_edit = False
-    can_create = True
-
-
-    form = PhieuNhapSachForm
-    def create_form(self):
-        form = super().create_form()
-        form.ngay_nhap = datetime.now()
-        form.quan_ly_kho_id.data = current_user.get_id()
-        return form
-
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            form.ngay_nhap = datetime.now()
-            model.quan_ly_kho_id = current_user.get_id()
-        super().on_model_change(form, model, is_created)
-
-    form_widget_args = {
-        'ngay_nhap':{
-            'disabled' : True
-        },
-        'quan_ly_kho_id':{
-            'disabled': True,
-        }
-
-    }
-    column_labels = {
-        'id': 'Mã phiếu',
-        'quan_ly_kho_id': 'Mã người quản lý kho',
-        'ngay_nhap': 'Ngày nhập'
-    }
-
-
-class ChiTietPhieuNhapSachView(AuthenticatedQuanLyKhoView):
-    column_list = ['phieu_nhap_sach_id','sach_id','so_luong']
-    column_labels = {
-        'phieu_nhap_sach_id' : 'Mã phiếu nhập sách',
-        'sach_id' : 'Sách',
-        'so_luong' : 'số lượng'
-    }
-    form_widget_args = {
-        'so_luong': {
-            'min': 150,
-            'step': 1
-        }
-    }
 
 class VaitroView(AuthenticatedView):
     can_create = True
@@ -298,6 +238,11 @@ class UserView(AuthenticatedView):
         }
     }
 
+class NhapPhieuView(AuthenticatedQuanLyKhoView):
+    @expose("/")
+    def index(self):
+        return self.render("admin/booksimport.html")
+
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
@@ -306,8 +251,7 @@ admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 admin.add_view(UserView(User,db.session,name='Quản lý User'))
 admin.add_view(VaitroView(VaiTro,db.session,name='Vai trò'))
 
-admin.add_view(PhieuNhapSachView(PhieuNhapSach,db.session,name='Phiếu nhập sách',category='Nhập sách'))#
-admin.add_view(ChiTietPhieuNhapSachView(ChiTietPhieuNhapSach,db.session,name='Chi tiết nhập sách',category='Nhập sách'))
+admin.add_view(NhapPhieuView(name="Nhập sách"))
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
