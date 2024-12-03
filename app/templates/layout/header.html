@@ -1,42 +1,66 @@
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">BÁN HÀNG TRỰC TUYẾN</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Trang chủ</a>
-                </li>
-                {% for cate in categories %}
-                <li class="nav-item">
-                    <a class="nav-link" href="/?category_id={{ cate.id }}">{{ cate.name }}</a>
-                </li>
-                {% endfor %}
+<header id="header"
+        class="bsb-tpl-bg-50 sticky-top bsb-spacer-top-3 bsb-spacer-top-md-5 bsb-spacer-top-xl-6 bsb-tpl-header-sticky bsb-tpl-header-sticky-animation">
 
-                {% if current_user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link text-success" href="/">
-                        <img src="{{current_user.avatar}}" width="40" class="rounded-circle" alt="{{current_user.name}}"/>
-                        Chào <span class="text-info">{{current_user.name}}</span> </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="/logout">Đăng xuất </a>
-                </li>flask
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link text-success" href="/login">Đăng nhập</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="/register">Đăng ký</a>
-                </li>
-                {% endif %}
-            </ul>
-            <form class="d-flex" action="/">
-                <input class="form-control me-2" name="keyword" type="text" placeholder="Search">
-                <button class="btn btn-primary" type="submit">Tìm</button>
-            </form>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <!-- Navbar 1 - Bootstrap Brain Component -->
+                <nav class="navbar navbar-expand-lg bsb-navbar bsb-navbar-hover bsb-navbar-caret bsb-tpl-navbar-sticky bg-white border border-dark px-xl-3"
+                     data-bsb-sticky-target="#header">
+                    <div class="container">
+                        <a class="navbar-brand" href="index.html">
+                            <img src="./assets/img/branding/presta-logo.svg" class="bsb-tpl-logo" alt="">
+                        </a>
+                        <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                                 class="bi bi-list" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd"
+                                      d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </button>
+                        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
+                             aria-labelledby="offcanvasNavbarLabel">
+                            <div class="offcanvas-header">
+                                <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                        aria-label="Close"></button>
+                            </div>
+                            <div class="offcanvas-body">
+                                <ul class="navbar-nav justify-content-end flex-grow-1">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" aria-current="page" href="/">Home</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="shop.html">Mua sách</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="about.html"><i class="fas fa-shopping-cart"></i>
+                                            Giỏ hàng</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="contact.html"><i class="fas fa-search"></i>
+                                            Tìm kiếm</a>
+                                    </li>
+                                    {% if current_user.is_authenticated%}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/logout/">Đăng xuất</a>
+                                    </li>
+                                    {%else%}
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/login/">Đăng nhập</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="/register/">Đăng ký</a>
+                                    </li>
+                                    {%endif%}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
         </div>
     </div>
-</nav>
+
+</header>

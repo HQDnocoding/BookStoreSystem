@@ -1,46 +1,94 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
-<h1 class="text-center text-danger">ĐĂNG KÝ NGƯỜI DÙNG</h1>
+
 
 {% if err_msg %}
 <div class="alert alert-danger">
     {{err_msg}}
 </div>
 {% endif %}
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="container border border-dark my-5 py-3">
+        <div class="row"><h1 class="text-center">Đăng ký</h1></div>
+    <div class="row">
+        <form class="needs-validated" method="post" enctype="multipart/form-data" action="/register">
+        <div class="form-group mb-3 mt-3">
+            <label for="firstname">Tên:</label>
 
-<form method = "post" enctype="multipart/form-data" action="/register">
-    <div class="form-floating mb-3 mt-3">
-        <input type="text" class="form-control" required id="firstname" placeholder="Nhập tên" name="firstname">
-        <label for="firstname">Tên:</label>
+            <input type="text" class="form-control" required id="firstname" placeholder="Nhập tên" name="firstname">
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please fill out this field</div>
+        </div>
+        <div class="form-group mb-3 mt-3">
+            <label for="lastname">Họ:</label>
+
+            <input type="text" class="form-control" required id="lastname" placeholder="Nhập họ" name="lastname">
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please fill out this field</div>
+        </div>
+
+        <div class="form-group mb-3 mt-3">
+            <label for="username">Tài khoản:</label>
+
+            <input type="text" class="form-control" required id="username" placeholder="Nhập tài khoản" name="username">
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please fill out this field</div>
+        </div>
+
+        <div class="form-group mt-3 mb-3">
+            <label for="password">Mật khẩu:</label>
+
+            <input type="password" class="form-control" required id="password" placeholder="Nhập mật khẩu"
+                   name="password">
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please fill out this field</div>
+        </div>
+
+        <div class="form-group mt-3 mb-3">
+            <label for="confirm">Xác nhận mật khẩu:</label>
+
+            <input type="password" class="form-control" required id="confirm" placeholder="Nhập lại mật khẩu"
+                   name="confirm">
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please fill out this field</div>
+        </div>
+
+        <div class="form-group mt-3 mb-3">
+            <label for="avatar"> Ảnh đại diện: </label>
+            <input type="file" class="form-control" id="avatar" name="avatar">
+
+            <div class="valid-feedback">Valid</div>
+            <div class="invalid-feedback">Please choose a image</div>
+        </div>
+
+        <div>
+            <input type="submit" value="Đăng ký" class="btn btn-success">
+        </div>
+    </form>
     </div>
-    <div class="form-floating mb-3 mt-3">
-        <input type="text" class="form-control" required id="lastname" placeholder="Nhập họ" name="lastname">
-        <label for="lastname">Họ:</label>
     </div>
 
-    <div class="form-floating mb-3 mt-3">
-        <input type="text" class="form-control" required id="username" placeholder="Nhập tài khoản" name="username">
-        <label for="username">Tài khoản:</label>
-    </div>
 
-    <div class="form-floating mt-3 mb-3">
-        <input type="password" class="form-control" required id="password" placeholder="Nhập mật khẩu" name="password">
-        <label for="password">Mật khẩu:</label>
-    </div>
-
-    <div class="form-floating mt-3 mb-3">
-        <input type="password" class="form-control" required id="confirm" placeholder="Nhập lại mật khẩu" name="confirm">
-        <label for="confirm">Xác nhận mật khẩu:</label>
-    </div>
-
-    <div class="form-floating mt-3 mb-3">
-        <input type="file" class="form-control" id="avatar" name="avatar">
-        <label for="avatar"> Ảnh đại diện: </label>
-    </div>
-
-    <div>
-        <input type="submit" value="Đăng ký" class="btn btn-success">
-    </div>
-</form>
+</div>
+<script>
+    // Disable form submissions if there are invalid fields
+    (function() {
+      'use strict';
+      window.addEventListener('load', function() {
+        // Get the forms we want to add validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+        // Loop over them and prevent submission
+        var validation = Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+</script>
 {% endblock %}

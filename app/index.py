@@ -10,7 +10,7 @@ from flask_login import login_user, logout_user
 
 @app.route("/")
 def hello_world():
-    return 'Hello world'
+    return render_template('index.html')
 
 @login.user_loader
 def load_user(user_id):
@@ -65,7 +65,7 @@ def login_my_user():
         user = dao.auth_user(username, password)
         if user:
             login_user(user=user)
-            return redirect('/register')
+            return redirect('/')
 
     return render_template("login.html")
 

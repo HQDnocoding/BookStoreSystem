@@ -120,7 +120,7 @@ def get_user_by_id(user_id):
     return User.query.get(user_id)
 
 
-def auth_user(username, password, roles):
+def auth_user(username, password, roles=None):
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
 
     users = User.query.filter(User.username.__eq__(username.strip()),
