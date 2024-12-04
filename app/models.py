@@ -5,12 +5,13 @@ from datetime import date
 from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from app import app, db
+from app import app, db, dao
 
 from flask_login import UserMixin
 
 
 class VaiTro(db.Model):
+    __tablename__ = 'vai_tro'
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_vai_tro = Column(String(50), nullable=True, unique=True)
     user = relationship('User', backref='vai_tro', lazy=True)
@@ -190,7 +191,7 @@ if __name__ == "__main__":
         # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
         #
         # db.session.add_all([admin,nhan_vien,qlk,u])
-        #
+
 
         # pt1=PhuongThucThanhToan(ten_phuong_thuc='ONLINE')
         # pt2=PhuongThucThanhToan(ten_phuong_thuc='AT_STORE')
@@ -200,4 +201,5 @@ if __name__ == "__main__":
         # tt3=TrangThaiDonHang(ten_trang_thai='CANCELED')
         # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
         # db.session.add(qlk)
+        dao.create_user("fsf","sdfs","aaa","123","đffs","ADMIN")
         db.session.commit()

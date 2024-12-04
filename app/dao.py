@@ -3,7 +3,7 @@ from xmlrpc.client import DateTime
 
 from sqlalchemy import func
 
-from app import db, admin
+from app import db, admin, app
 import hashlib
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
@@ -137,7 +137,6 @@ def auth_user(username, password, roles=None):
 
     return users.first()
 
-    return user.first()
 
 
 # lấy tổng doanh của từng tựa sách thu từ hóa đơn theo tháng, năm
@@ -213,4 +212,22 @@ def get_id_from_ten_vai_tro(ten_vai_tro):
 
 
 def get_the_loai():
-    return TheLoai.query.all()
+    return TheLoai.query.order_by('id').all()
+
+def load_products(cate_id=None, kw=None, page=1):
+    query = Sach.query
+
+    if kw:
+        query = query.filter(Sach.ten_sach.contains(kw))
+
+    # if cate_id:
+    #     query = query.filter(Sach.the_loai_id == cate_id)
+    #
+    page_size = app.config.get('PAGE_SIZE')
+    start = (page - 1) * page_size
+    query = query.slice(start, start + page_size)
+
+    return query.all()
+
+def count_sach():
+    return Sach.query.count()

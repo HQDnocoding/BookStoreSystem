@@ -1,5 +1,5 @@
 <header id="header"
-        class="bsb-tpl-bg-50 sticky-top bsb-spacer-top-3 bsb-spacer-top-md-5 bsb-spacer-top-xl-6 bsb-tpl-header-sticky bsb-tpl-header-sticky-animation">
+        class="bsb-tpl-bg-50 sticky-top bsb-spacer-top-3 bsb-spacer-top-md-5 bsb-spacer-top-xl-6 bsb-tpl-header-sticky bsb-tpl-header-sticky-animation fw-bold">
 
     <div class="container">
         <div class="row">
@@ -8,8 +8,9 @@
                 <nav class="navbar navbar-expand-lg bsb-navbar bsb-navbar-hover bsb-navbar-caret bsb-tpl-navbar-sticky bg-white border border-dark px-xl-3"
                      data-bsb-sticky-target="#header">
                     <div class="container">
-                        <a class="navbar-brand" href="index.html">
-                            <img src="./assets/img/branding/presta-logo.svg" class="bsb-tpl-logo" alt="">
+                        <a class="navbar-brand" href="/">
+                            <img src="https://res.cloudinary.com/dmbvjjg5a/image/upload/v1733314021/rb_2149325326_fzgk1t.png"
+                                 style="width: 100px; height: auto;" alt="Logo">
                         </a>
                         <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas"
                                 data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
@@ -32,28 +33,43 @@
                                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="shop.html">Mua sách</a>
+                                        <a class="nav-link" href="/shop">Mua sách</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="about.html"><i class="fas fa-shopping-cart"></i>
+                                        <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i>
                                             Giỏ hàng</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="contact.html"><i class="fas fa-search"></i>
-                                            Tìm kiếm</a>
+                                        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSearch"
+                                             aria-labelledby="offcanvasSearchLabel">
+                                            <div class="offcanvas-body">
+                                                <form action="/search" method="GET" id="search-form">
+                                                    <input type="text" name="kw" class="form-control"
+                                                           placeholder="Nhập từ khóa tìm kiếm..."
+                                                           value="{{ request.args.get('query', '') }}">
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+
                                     </li>
-                                    {% if current_user.is_authenticated%}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/logout/">Đăng xuất</a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-user"></i> Tài khoản
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="accountDropdown">
+                                            {% if current_user.is_authenticated %}
+                                            <!-- Đã đăng nhập -->
+                                            <li><a class="dropdown-item" href="/profile">Thông tin tài khoản</a></li>
+                                            <li><a class="dropdown-item" href="/logout">Đăng xuất</a></li>
+                                            {% else %}
+                                            <!-- Chưa đăng nhập -->
+                                            <li><a class="dropdown-item" href="/login">Đăng nhập</a></li>
+                                            <li><a class="dropdown-item" href="/register">Đăng ký</a></li>
+                                            {% endif %}
+                                        </ul>
                                     </li>
-                                    {%else%}
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/login/">Đăng nhập</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/register/">Đăng ký</a>
-                                    </li>
-                                    {%endif%}
                                 </ul>
                             </div>
                         </div>

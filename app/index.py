@@ -1,3 +1,5 @@
+import math
+
 from flask import render_template, redirect, request, session ,jsonify
 from app import app ,login
 from app.admin import *
@@ -52,7 +54,7 @@ def register():
             except:
                 err_msg='Hệ thống có lỗi'
         else:
-            err_msg='mật khẩu KHÔNG khớp'
+            err_msg='mật khẩu không khớp'
     return render_template("register.html", err_msg=err_msg)
 
 
@@ -74,6 +76,40 @@ def login_my_user():
 def logout_my_user():
     logout_user()
     return redirect('/login')
+
+
+
+@app.route('/shop/')
+def shopping():
+    the_loai=dao.get_the_loai()
+
+    the_loai_id=request.args.get('the_loai_id',1)
+    kw=request.args.get('kw')
+    page=request.args.get('page',1)
+
+    prods=dao.load_products(cate_id=the_loai_id,kw=kw,page=int(page))
+
+    page_size=app.config.get('PAGE_SIZE',2)
+    total=dao.count_sach()
+
+    return render_template('shop.html',products=prods,pages=math.ceil(total/page_size),cates=the_loai)
+
+@app.route('/search/')
+def search():
+    the_loai=dao.get_the_loai()
+
+    the_loai_id=request.args.get('the_loai_id',1)
+    kw=request.args.get('kw')
+
+    page=request.args.get('page',1)
+
+    prods=dao.load_products(cate_id=the_loai_id,kw=kw,page=int(page))
+
+    page_size=app.config.get('PAGE_SIZE',2)
+    total=dao.count_sach()
+
+    return render_template('search_results.html',products=prods,pages=math.ceil(total/page_size),cates=the_loai)
+
 
 
 if __name__ == "__main__":
