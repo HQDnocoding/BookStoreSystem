@@ -6,7 +6,6 @@ from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, 
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
 from app import app as my_app, db
-import app.dao as dao
 from flask_login import UserMixin
 
 
@@ -179,9 +178,9 @@ if __name__ == "__main__":
     with my_app.app_context():
         
         # db.drop_all()
-        # db.create_all()
+        db.create_all()
 
-        db.session.commit()
+        # db.session.commit()
         #
         # vt1=VaiTro(ten_vai_tro='QUANLY')
         # vt2=VaiTro(ten_vai_tro='NHANVIEN')
