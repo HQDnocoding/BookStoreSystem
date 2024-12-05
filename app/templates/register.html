@@ -3,14 +3,16 @@
 {% block content %}
 
 
-{% if err_msg %}
-<div class="alert alert-danger">
-    {{err_msg}}
-</div>
-{% endif %}
 <div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
     <div class="container border border-dark my-5 py-3">
         <div class="row"><h1 class="text-center">Đăng ký</h1></div>
+
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            {{err_msg}}
+        </div>
+        {% endif %}
+
         <div class="row">
             <form method="post" class="needs-validated" enctype="multipart/form-data" action="/register">
                 <div class="form-group mb-3 mt-3">

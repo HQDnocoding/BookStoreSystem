@@ -258,3 +258,5 @@ def load_sach(ten_the_loai = None, ten_tac_gia = None):
     # Thực thi truy vấn và trả về danh sách sách
     return query.all()
 
+def user_exists(username):
+    return db.session.query(User).filter_by(username=username).first() is not None

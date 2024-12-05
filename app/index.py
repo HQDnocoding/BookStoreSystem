@@ -52,23 +52,27 @@ def register():
 
             #save user
             try:
-                dao.create_user(ten=request.form['firstname'],
-                                ho=request.form['lastname'],
-                                username=request.form['username'],
-                                password=password,
-                                avatar=avatar,
-                                vai_tro=Role.KHACH_HANG.value)
-                return redirect('/login')
+                if dao.user_exists(request.form['username']):
+                    err_msg = 'Tài khoản đã tồn tại'
+                else:
+                    dao.create_user(ten=request.form['firstname'],
+                                    ho=request.form['lastname'],
+                                    username=request.form['username'],
+                                    password=password,
+                                    avatar=avatar,
+                                    vai_tro=Role.KHACH_HANG.value)
+                    return redirect('/login')
             except:
                 err_msg = 'Hệ thống có lỗi'
         else:
-            err_msg = 'mật khẩu không khớp'
+            err_msg = 'mật khẩu KHÔNG khớp'
     return render_template("register.html", err_msg=err_msg)
 
 
 @app.route('/login/', methods=['get', 'post'])
 # @annonymous_user
 def login_my_user():
+    err_msg = ''
     if request.method.__eq__('POST'):
         username = request.form['username']
         password = request.form['password']
@@ -76,8 +80,12 @@ def login_my_user():
         if user:
             login_user(user=user)
             return redirect('/')
-
-    return render_template("login.html")
+        else:
+            if not dao.user_exists(request.form['username']):
+                err_msg = 'Tài khoản KHÔNG tồn tại'
+            else:
+                err_msg = 'SAI mật khẩu'
+    return render_template("login.html", err_msg=err_msg)
 
 
 @app.route('/logout/')

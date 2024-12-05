@@ -6,6 +6,13 @@
         <div class="row">
             <h1 class="text-center">Đăng nhập</h1>
         </div>
+
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            {{err_msg}}
+        </div>
+        {% endif %}
+
         <div class="row">
             <form method="post" class="needs-validation"  action="/login">
                 <div class="form-group mb-3 mt-3">
