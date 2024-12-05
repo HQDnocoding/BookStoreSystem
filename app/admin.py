@@ -19,7 +19,7 @@ from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user ,UserMixin
-from flask import redirect ,g
+from flask import redirect, g, request
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
 from wtforms.validators import DataRequired
@@ -245,6 +245,7 @@ class NhapPhieuView(AuthenticatedQuanLyKhoView):
         tacgias = TacGia.query.all()
         sachs = Sach.query.all()
         return self.render("admin/booksimport.html",theloais = theloais,tacgias = tacgias,sachs=sachs)
+
 
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))

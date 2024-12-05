@@ -5,65 +5,7 @@
 
 <div class="container mt-3">
     <h1>Nhập sách</h1>
-    <div class="row">
-        <div class="col">
 
-        </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col">
-            <div class="col">
-                <div class="form-group">
-                    <label for="sel4">Thể loại</label>
-                    <select class="form-control" id="sel4">
-                        {% for theloai in theloais %}
-                        <option>{{theloai.ten_the_loai}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="col">
-            <div class="col">
-                <div class="form-group">
-                    <label for="sel3">Tác giả:</label>
-                    <select class="form-control" id="sel3">
-                        {% for tacgia in tacgias %}
-                        <option>{{tacgia.ten_tac_gia}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col">
-                <button type="button" class="btn btn-primary" mt-3>Tìm kiếm sách</button>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col">Ảnh bìa</div>
-        <div class="col">Tên sách</div>
-        <div class="col">Tác giả</div>
-        <div class="col">Thể loại</div>
-        <div class="col">Số lượng</div>
-    </div>
-    <div class="row" style="border: 1px solid black;">
-        {% for sach in sachs %}
-        <div class="col">
-            <div class="card" style="width:100px " >
-        <img class="card-img-top" src="{{sach.bia_sach}}"
-             alt="Card image">
-        <div class="card-body">
-        </div>
-    </div>
-        </div>
-        <div class="col">{{sach.ten_sach}}</div>
-        <div class="col">{{sach.tac_gia.ten_tac_gia}}</div>
-        <div class="col">{{sach.the_loai.ten_the_loai}}</div>
-        <div class="col">{{sach.so_luong_cuon_con_lai}}</div>
-        {% endfor %}
-    </div>
 
     <div class="row mt-4">
         <div class="col">
@@ -106,7 +48,30 @@
             <button type="button" class="btn btn-primary" mt-3>Tạo phiếu nhập sách</button>
         </div>
     </div>
+    <div class="row mt-3">
+        <div class="col">Ảnh bìa</div>
+        <div class="col">Tên sách</div>
+        <div class="col">Tác giả</div>
+        <div class="col">Thể loại</div>
+        <div class="col">Số lượng</div>
+    </div>
+    {% for sach in sachs %}
+    <div class="row" style="border: 1px solid black;">
 
+        <div class="col">
+            <div class="card" style="width: 50px; height: 80px;">
+                <img class="card-img-top" src="{{sach.bia_sach}}"
+                     alt="Card image">
+                <div class="card-body">
+                </div>
+            </div>
+        </div>
+        <div class="col">{{sach.ten_sach}}</div>
+        <div class="col">{{sach.tac_gia.ten_tac_gia}}</div>
+        <div class="col">{{sach.the_loai.ten_the_loai}}</div>
+        <div class="col">{{sach.so_luong_cuon_con_lai}}</div>
+    </div>
+    {% endfor %}
 
 </div>
 
