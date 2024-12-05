@@ -241,7 +241,10 @@ class UserView(AuthenticatedView):
 class NhapPhieuView(AuthenticatedQuanLyKhoView):
     @expose("/")
     def index(self):
-        return self.render("admin/booksimport.html")
+        theloais = TheLoai.query.all()
+        tacgias = TacGia.query.all()
+        sachs = Sach.query.all()
+        return self.render("admin/booksimport.html",theloais = theloais,tacgias = tacgias,sachs=sachs)
 
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))

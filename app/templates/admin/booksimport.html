@@ -7,18 +7,7 @@
     <h1>Nhập sách</h1>
     <div class="row">
         <div class="col">
-            <button type="button" class="btn btn-primary" mt-3>Tạo phiếu nhập sách</button>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="sel5">Phiếu</label>
-                <select class="form-control" id="sel5">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                </select>
-            </div>
+
         </div>
     </div>
     <div class="row mt-4">
@@ -27,10 +16,9 @@
                 <div class="form-group">
                     <label for="sel4">Thể loại</label>
                     <select class="form-control" id="sel4">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
+                        {% for theloai in theloais %}
+                        <option>{{theloai.ten_the_loai}}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -40,26 +28,41 @@
                 <div class="form-group">
                     <label for="sel3">Tác giả:</label>
                     <select class="form-control" id="sel3">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
+                        {% for tacgia in tacgias %}
+                        <option>{{tacgia.ten_tac_gia}}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
         </div>
+        <div class="row mt-3">
+            <div class="col">
+                <button type="button" class="btn btn-primary" mt-3>Tìm kiếm sách</button>
+            </div>
+        </div>
     </div>
     <div class="row mt-3">
+        <div class="col">Ảnh bìa</div>
         <div class="col">Tên sách</div>
         <div class="col">Tác giả</div>
         <div class="col">Thể loại</div>
         <div class="col">Số lượng</div>
     </div>
     <div class="row" style="border: 1px solid black;">
-        <div class="col"></div>
-        <div class="col"></div>
-        <div class="col"></div>
-        <div class="col"></div>
+        {% for sach in sachs %}
+        <div class="col">
+            <div class="card" style="width:100px " >
+        <img class="card-img-top" src="{{sach.bia_sach}}"
+             alt="Card image">
+        <div class="card-body">
+        </div>
+    </div>
+        </div>
+        <div class="col">{{sach.ten_sach}}</div>
+        <div class="col">{{sach.tac_gia.ten_tac_gia}}</div>
+        <div class="col">{{sach.the_loai.ten_the_loai}}</div>
+        <div class="col">{{sach.so_luong_cuon_con_lai}}</div>
+        {% endfor %}
     </div>
 
     <div class="row mt-4">
@@ -67,27 +70,43 @@
             <div class="form-group">
                 <label for="sel1">Chọn sách</label>
                 <select class="form-control" id="sel1">
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
+                    {% for sach in sachs %}
+                    <option>{{sach.ten_sach}}</option>
+                    {% endfor %}
                 </select>
             </div>
         </div>
         <div class="col">
             <div class="form-group">
                 <label for="usr">Số lượng</label>
-                <input type="number" class="form-control" id="usr">
+                <input type="number" class="form-control" id="usr" min="150">
             </div>
         </div>
     </div>
-    <div class="card" style="width:400px">
-        <img class="card-img-top" src="https://down-vn.img.susercontent.com/file/vn-11134201-7r98o-lwhd667bf29n4d" alt="Card image">
-        <div class="card-body">
+
+    <button type="button" class="btn btn-primary btn-lg mt-3">Thêm</button>
+    <div class="row">
+        <div class="col">
+            <div class="row mt-3">
+                <div class="col">Tên sách</div>
+                <div class="col">Tác giả</div>
+                <div class="col">Thể loại</div>
+                <div class="col">Số lượng</div>
+            </div>
+            <div class="row" style="border: 1px solid black;">
+                <div class="col"></div>
+                <div class="col"></div>
+                <div class="col"></div>
+                <div class="col"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <button type="button" class="btn btn-primary" mt-3>Tạo phiếu nhập sách</button>
         </div>
     </div>
 
-    <button type="button" class="btn btn-primary btn-lg">Thêm</button>
 
 </div>
 

@@ -114,6 +114,9 @@ class SoLuongCuonConLai(db.Model):
 
     sach_id = Column(Integer, ForeignKey(Sach.id), nullable=False)
 
+    def __int__(self):
+        return self.so_luong
+
 
 # class ChiTietChinhSuaQuyDinh(db.Model):
 #     quy_dinh_id=Column(Integer,ForeignKey(QuyDinh.id),primary_key=True)
