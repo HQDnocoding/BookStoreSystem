@@ -2,6 +2,8 @@ from datetime import datetime
 from xmlrpc.client import DateTime
 
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
+
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
     ThongTinNhanHang
@@ -232,3 +234,27 @@ def load_products(cate_id=None, kw=None, page=1):
 
 def count_sach():
     return Sach.query.count()
+
+def load_all_tacgia():
+    return TacGia.query.all()
+
+def load_all_theloai():
+    return TheLoai.query.all()
+
+def load_sach(ten_the_loai = None, ten_tac_gia = None):
+    query = Sach.query.options(
+        joinedload(Sach.the_loai),  # Tải trước thông tin thể loại
+        joinedload(Sach.tac_gia)  # Tải trước thông tin tác giả
+    )
+
+    # Lọc theo tên thể loại nếu có
+    if ten_the_loai:
+        query = query.join(TheLoai).filter(TheLoai.ten_the_loai == ten_the_loai)
+
+    # Lọc theo tên tác giả nếu có
+    if ten_tac_gia:
+        query = query.join(TacGia).filter(TacGia.ten_tac_gia == ten_tac_gia)
+
+    # Thực thi truy vấn và trả về danh sách sách
+    return query.all()
+

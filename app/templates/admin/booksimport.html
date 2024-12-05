@@ -48,6 +48,34 @@
             <button type="button" class="btn btn-primary" mt-3>Tạo phiếu nhập sách</button>
         </div>
     </div>
+    <form action="/admin/nhapphieuview/" method="GET">
+        <div class="row mt-5">
+            <div class="col">
+                <div class="form-group">
+                    <label for="sel1">Tác giả :</label>
+                    <select class="form-control" id="tacgia_search" name="tacgia_search">
+                        {% for tacgia in tacgias %}
+                        <option>{{ tacgia.ten_tac_gia }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="sel1">Thể loại : </label>
+                    <select class="form-control" id="theloai_search" name="theloai_search">
+                        {% for theloai in theloais %}
+                        <option>{{theloai.ten_the_loai}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </div>
+        </div>
+
+    </form>
     <div class="row mt-3">
         <div class="col">Ảnh bìa</div>
         <div class="col">Tên sách</div>

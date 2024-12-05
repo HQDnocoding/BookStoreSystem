@@ -241,9 +241,14 @@ class UserView(AuthenticatedView):
 class NhapPhieuView(AuthenticatedQuanLyKhoView):
     @expose("/")
     def index(self):
-        theloais = TheLoai.query.all()
-        tacgias = TacGia.query.all()
-        sachs = Sach.query.all()
+
+        ten_the_loai = request.args.get('theloai_search')
+        ten_tac_gia = request.args.get('tacgia_search')
+
+        theloais = load_all_theloai()
+        tacgias = load_all_tacgia()
+        sachs = load_sach(ten_the_loai = ten_the_loai , ten_tac_gia = ten_tac_gia)
+
         return self.render("admin/booksimport.html",theloais = theloais,tacgias = tacgias,sachs=sachs)
 
 
