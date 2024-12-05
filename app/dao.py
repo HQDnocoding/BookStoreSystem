@@ -11,7 +11,6 @@ from app import db, admin, app
 import hashlib
 
 
-
 def create_vaitro(ten_vai_tro):  # Da test
     new_vaitro = VaiTro(ten_vai_tro=ten_vai_tro)
     db.session.add(new_vaitro)
@@ -141,7 +140,6 @@ def auth_user(username, password, roles=None):
     return users.first()
 
 
-
 # lấy tổng doanh của từng tựa sách thu từ hóa đơn theo tháng, năm
 def get_revenue_by_month_year(thang, nam):
     # Chuyển tháng, năm thành chuỗi tháng/năm
@@ -217,6 +215,7 @@ def get_id_from_ten_vai_tro(ten_vai_tro):
 def get_the_loai():
     return TheLoai.query.order_by('id').all()
 
+
 def load_products(cate_id=None, kw=None, page=1):
     query = Sach.query
 
@@ -232,16 +231,20 @@ def load_products(cate_id=None, kw=None, page=1):
 
     return query.all()
 
+
 def count_sach():
     return Sach.query.count()
+
 
 def load_all_tacgia():
     return TacGia.query.all()
 
+
 def load_all_theloai():
     return TheLoai.query.all()
 
-def load_sach(ten_the_loai = None, ten_tac_gia = None):
+
+def load_sach(ten_the_loai=None, ten_tac_gia=None):
     query = Sach.query.options(
         joinedload(Sach.the_loai),  # Tải trước thông tin thể loại
         joinedload(Sach.tac_gia)  # Tải trước thông tin tác giả
@@ -258,5 +261,19 @@ def load_sach(ten_the_loai = None, ten_tac_gia = None):
     # Thực thi truy vấn và trả về danh sách sách
     return query.all()
 
+
 def user_exists(username):
     return db.session.query(User).filter_by(username=username).first() is not None
+
+
+def get_sach_for_detail_by_id(sach_id):
+    sach = Sach.query.get(sach_id)
+    if sach:
+        return {
+            'ten_sach': sach.ten_sach,
+            'don_gia': sach.don_gia,
+            'bia_sach': sach.bia_sach,
+            'tac_gia': sach.tac_gia.ten_tac_gia if sach.tac_gia else None,  # Lấy tên tác giả
+            'the_loai': sach.the_loai.ten_the_loai if sach.the_loai else None  # Lấy tên thể loại
+        }
+    return None

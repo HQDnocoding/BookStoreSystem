@@ -1,0 +1,38 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="container border border-dark my-5 py-3">
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <img src="{{sach.bia_sach}}" class="img-fluid" alt="{{sach.ten_sach}}"
+                     style="width: 100%; height: auto; object-fit: cover; border: 1px; border-radius: 5px;">
+            </div>
+            <div class="col-md-8 col-sm-12">
+                <h1 style="margin-bottom: 20px;">{{sach.ten_sach}}</h1>
+                <p>
+                    <i class="fa-solid fa-user"></i>
+                    Tác giả: {{sach.tac_gia}}
+                </p>
+                <p>
+                    <i class="fa-solid fa-tag"></i>
+                    Thể loại: {{sach.the_loai}}
+                </p>
+                <h4 style="color: green; font-weight: bold;">{{ "{:,.0f}".format(sach.don_gia) }} ₫</h4>
+
+                <hr>
+
+                <a href="#!" class="btn btn-accent mt-4 align-items-center gap-2"
+                   style="border: 1px solid green; border-radius: 5px; padding: 5px 10px; color: green;
+font-weight: bold;">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span>Thêm vô giỏ hàng</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

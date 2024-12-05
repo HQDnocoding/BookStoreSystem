@@ -127,6 +127,12 @@ def search():
     return render_template('search_results.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai)
 
 
+@app.route('/books/<int:sach_id>')
+def details(sach_id):
+    sach = dao.get_sach_for_detail_by_id(sach_id)
+    return render_template('book_details.html', sach = sach)
+
+
 if __name__ == "__main__":
     with app.app_context():
 
