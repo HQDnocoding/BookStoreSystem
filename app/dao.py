@@ -2,12 +2,12 @@ from datetime import datetime
 from xmlrpc.client import DateTime
 
 from sqlalchemy import func
-
-from app import db, admin, app
-import hashlib
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
     ThongTinNhanHang
+from app import db, admin, app
+import hashlib
+
 
 
 def create_vaitro(ten_vai_tro):  # Da test
@@ -46,9 +46,10 @@ def create_phuongthucthanhtoan(ten_phuong_thuc):  # Da test
     db.session.commit()
 
 
-def create_user(ho, ten, username, password, avatar, vai_tro_id):  # Da test
+def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
     password = str(hashlib.md5(password.encode('utf-8')).hexdigest())  # Bâm mật khẩu
-    new_user = User(ho=ho, ten=ten, username=username, password=password, avatar=avatar, vai_tro_id=vai_tro_id)
+    vt = VaiTro.query.filter(VaiTro.ten_vai_tro == vai_tro.strip()).with_entities(VaiTro.id).scalar()
+    new_user = User(ho=ho, ten=ten, username=username, password=password, avatar=avatar, vai_tro_id=vt)
     db.session.add(new_user)
     db.session.commit()
 

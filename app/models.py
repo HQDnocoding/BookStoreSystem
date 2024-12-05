@@ -5,8 +5,8 @@ from datetime import date
 from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from app import app, db, dao
-
+from app import app as my_app, db
+import app.dao as dao
 from flask_login import UserMixin
 
 
@@ -168,12 +168,17 @@ class ChiTietDonHang(db.Model):
     tong_tien = Column(Integer, nullable=False, default=0)
 
 
+
+
+
+
 if __name__ == "__main__":
-    with app.app_context():
+    with my_app.app_context():
         
         # db.drop_all()
         # db.create_all()
-        # db.session.commit()
+
+        db.session.commit()
         #
         # vt1=VaiTro(ten_vai_tro='QUANLY')
         # vt2=VaiTro(ten_vai_tro='NHANVIEN')
@@ -201,5 +206,4 @@ if __name__ == "__main__":
         # tt3=TrangThaiDonHang(ten_trang_thai='CANCELED')
         # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
         # db.session.add(qlk)
-        dao.create_user("fsf","sdfs","aaa","123","đffs","ADMIN")
-        db.session.commit()
+        # db.session.commit()
