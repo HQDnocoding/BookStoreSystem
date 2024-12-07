@@ -135,19 +135,6 @@ def details(sach_id):
 
 @app.route('/cart/')
 def cart():
-    session['cart'] = {
-        "1": {
-            "id": "1",
-            "ten_sach": "abc",
-            "don_gia": 120000,
-            "so_luong": 1
-        },"2": {
-            "id": "2",
-            "ten_sach": "abcdd",
-            "don_gia": 155000,
-            "so_luong": 2
-        }
-    }
     return render_template('cart.html')
 
 
@@ -173,6 +160,32 @@ def add_to_cart():
         }
 
     session[key] = cart
+    return jsonify(utils.cart_stats(cart=cart))
+
+
+@app.route('/api/cart/<product_id>', methods=['put'])
+def update_cart(product_id):
+    key = app.config['CART_KEY']
+    cart = session.get(key)
+
+    if cart and product_id in cart:
+        cart[product_id]['so_luong'] = int(request.json['so_luong'])
+
+    session[key] = cart
+
+    return jsonify(utils.cart_stats(cart=cart))
+
+
+@app.route('/api/cart/<product_id>', methods=['delete'])
+def delete_cart(product_id):
+    key = app.config['CART_KEY']
+    cart = session.get(key)
+
+    if cart and product_id in cart:
+        del cart[product_id]
+
+    session[key] = cart
+
     return jsonify(utils.cart_stats(cart=cart))
 
 
