@@ -133,6 +133,11 @@ def details(sach_id):
     return render_template('book_details.html', sach = sach)
 
 
+@app.route('/cart')
+def cart():
+    render_template('cart.html')
+
+
 if __name__ == "__main__":
     with app.app_context():
 
