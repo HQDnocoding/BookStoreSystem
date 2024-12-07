@@ -15,6 +15,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['BABEL_DEFAULT_LOCALE'] = 'vi'  # Đặt ngôn ngữ mặc định là tiếng Việt
 app.config["PAGE_SIZE"] = 4
 app.config['DEBUG'] = True
+app.config['CART_KEY'] = 'cart'
 
 babel = Babel(app)
 

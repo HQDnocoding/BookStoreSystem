@@ -1,7 +1,7 @@
 import math
 
 from flask import render_template, redirect, request, session, jsonify
-from app import app, login
+from app import app, login, utils
 from app.admin import *
 import os
 import app.dao as dao
@@ -44,13 +44,13 @@ def register():
         password = request.form.get('password')
         confirm = request.form.get('confirm')
         if password.__eq__(confirm):
-            #avatar
+            # avatar
             avatar = ''
             if request.files.get('avatar'):
                 res = cloudinary.uploader.upload(request.files.get('avatar'))
                 avatar = res.get('secure_url')
 
-            #save user
+            # save user
             try:
                 if dao.user_exists(request.form['username']):
                     err_msg = 'Tài khoản đã tồn tại'
@@ -130,15 +130,58 @@ def search():
 @app.route('/books/<int:sach_id>')
 def details(sach_id):
     sach = dao.get_sach_for_detail_by_id(sach_id)
-    return render_template('book_details.html', sach = sach)
+    return render_template('book_details.html', sach=sach)
 
 
-@app.route('/cart')
+@app.route('/cart/')
 def cart():
-    render_template('cart.html')
+    session['cart'] = {
+        "1": {
+            "id": "1",
+            "ten_sach": "abc",
+            "don_gia": 120000,
+            "so_luong": 1
+        },"2": {
+            "id": "2",
+            "ten_sach": "abcdd",
+            "don_gia": 155000,
+            "so_luong": 2
+        }
+    }
+    return render_template('cart.html')
 
+
+@app.route('/api/cart', methods=['post'])
+def add_to_cart():
+
+    data = request.json
+    id = str(data['id'])
+
+    key = app.config['CART_KEY']
+    cart = session[key] if key in session else {}
+    if id in cart:
+        cart[id]['so_luong']+=1
+    else:
+        ten_sach = data['ten_sach']
+        don_gia = data['don_gia']
+
+        cart[id] = {
+            "id": id,
+            "ten_sach": ten_sach,
+            "don_gia": don_gia,
+            "so_luong": 1
+        }
+
+    session[key] = cart
+    return jsonify(utils.cart_stats(cart=cart))
+
+
+@app.context_processor
+def common_attr():
+    return {
+        'cart': utils.cart_stats(session.get(app.config['CART_KEY']))
+    }
 
 if __name__ == "__main__":
     with app.app_context():
-
         app.run(debug=True)
