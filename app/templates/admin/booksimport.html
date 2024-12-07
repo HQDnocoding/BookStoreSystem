@@ -6,54 +6,57 @@
 <div class="container mt-3">
     <h1>Nhập sách</h1>
 
-
-    <div class="row mt-4">
-        <div class="col">
-            <div class="form-group">
-                <label for="sel1">Chọn sách</label>
-                <select class="form-control" id="sel1">
+    <form id="add-book-form">
+        <div class="row mt-4">
+            <!-- Dropdown chọn sách -->
+            <div class="col">
+                <label for="sach_nhap">Chọn sách:</label>
+                <select class="form-control" id="sach_nhap" name="sach_nhap">
                     {% for sach in sachs %}
-                    <option>{{sach.ten_sach}}</option>
+                    <option>{{ sach.ten_sach }}</option>
                     {% endfor %}
                 </select>
             </div>
-        </div>
-        <div class="col">
-            <div class="form-group">
-                <label for="usr">Số lượng</label>
-                <input type="number" class="form-control" id="usr" min="150">
+            <!-- Input số lượng -->
+            <div class="col">
+                <label for="soluong_nhap">Số lượng:</label>
+                <input type="number" class="form-control" id="soluong_nhap" min="150" value="150">
             </div>
         </div>
+        <!-- Nút thêm -->
+        <div class="mt-3">
+            <button type="button" class="btn btn-primary" id="add-book-button">Thêm</button>
+        </div>
+    </form>
+
+    <div class="mt-4">
+        <h3>Danh sách sách đã chọn:</h3>
+        <table class="table table-bordered" id="books-table">
+            <thead>
+            <tr>
+                <th>Tên sách</th>
+                <th>Số lượng</th>
+                <th>Thao tác</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Hàng dữ liệu sẽ được thêm vào đây -->
+            </tbody>
+        </table>
+        <form action="/admin/nhapphieuview/create" method="POST">
+            <input type="hidden" name="books_data" id="books_data">
+            <button type="submit" class="btn btn-success">Tạo phiếu nhập sách</button>
+        </form>
     </div>
 
-    <button type="button" class="btn btn-primary btn-lg mt-3">Thêm</button>
-    <div class="row">
-        <div class="col">
-            <div class="row mt-3">
-                <div class="col">Tên sách</div>
-                <div class="col">Tác giả</div>
-                <div class="col">Thể loại</div>
-                <div class="col">Số lượng</div>
-            </div>
-            <div class="row" style="border: 1px solid black;">
-                <div class="col"></div>
-                <div class="col"></div>
-                <div class="col"></div>
-                <div class="col"></div>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-3">
-        <div class="col">
-            <button type="button" class="btn btn-primary" mt-3>Tạo phiếu nhập sách</button>
-        </div>
-    </div>
+
     <form action="/admin/nhapphieuview/" method="GET">
         <div class="row mt-5">
             <div class="col">
                 <div class="form-group">
                     <label for="sel1">Tác giả :</label>
                     <select class="form-control" id="tacgia_search" name="tacgia_search">
+                        <option>{{ None }}</option>
                         {% for tacgia in tacgias %}
                         <option>{{ tacgia.ten_tac_gia }}</option>
                         {% endfor %}
@@ -64,6 +67,7 @@
                 <div class="form-group">
                     <label for="sel1">Thể loại : </label>
                     <select class="form-control" id="theloai_search" name="theloai_search">
+                        <option>{{ None }}</option>
                         {% for theloai in theloais %}
                         <option>{{theloai.ten_the_loai}}</option>
                         {% endfor %}
@@ -97,12 +101,57 @@
         <div class="col">{{sach.ten_sach}}</div>
         <div class="col">{{sach.tac_gia.ten_tac_gia}}</div>
         <div class="col">{{sach.the_loai.ten_the_loai}}</div>
-        <div class="col">{{sach.so_luong_cuon_con_lai}}</div>
+        <div class="col">{{sach.so_luong_cuon_con_lai.so_luong}}</div>
     </div>
     {% endfor %}
 
 </div>
+<script>
+    // Lưu trữ dữ liệu tạm thời
+    let booksList = [];
 
+    // Xử lý sự kiện khi bấm nút "Thêm"
+    document.getElementById('add-book-button').addEventListener('click', function() {
+        const tenSach = document.getElementById('sach_nhap').value;
+        const soLuong = document.getElementById('soluong_nhap').value;
+
+        if (!tenSach || soLuong <= 0) {
+            alert("Vui lòng chọn tên sách và nhập số lượng hợp lệ.");
+            return;
+        }
+
+        // Thêm dữ liệu vào danh sách tạm thời
+        booksList.push({ ten_sach: tenSach, so_luong: parseInt(soLuong) });
+
+        // Cập nhật bảng
+        updateBooksTable();
+    });
+
+    // Cập nhật bảng HTML
+    function updateBooksTable() {
+        const tbody = document.getElementById('books-table').querySelector('tbody');
+        tbody.innerHTML = ''; // Xóa bảng cũ
+
+        booksList.forEach((book, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${book.ten_sach}</td>
+                <td>${book.so_luong}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeBook(${index})">Xóa</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Cập nhật dữ liệu ẩn để gửi đi
+        document.getElementById('books_data').value = JSON.stringify(booksList);
+    }
+
+    // Xóa sách khỏi danh sách
+    function removeBook(index) {
+        booksList.splice(index, 1); // Xóa phần tử
+        updateBooksTable(); // Cập nhật bảng
+    }
+</script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
       integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">

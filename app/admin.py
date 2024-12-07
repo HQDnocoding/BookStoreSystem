@@ -1,4 +1,5 @@
 import hashlib
+import json
 from datetime import datetime
 from email.policy import default
 from xmlrpc.client import DateTime
@@ -7,6 +8,8 @@ import cloudinary.uploader
 import flask_login
 import wtforms
 from flask_admin import Admin, BaseView, expose
+from unicodedata import category
+
 from app.dao import *
 from sqlalchemy import false
 from sqlalchemy.testing import fails
@@ -19,7 +22,7 @@ from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user ,UserMixin
-from flask import redirect, g, request
+from flask import redirect, g, request, flash, url_for
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
 from wtforms.validators import DataRequired
@@ -38,12 +41,15 @@ class AuthenticatedView(ModelView):
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
 
 
-class AuthenticatedQuanLyKhoView(BaseView):
+class AuthenticatedQuanLyKhoViewBV(BaseView):
     def is_accessible(self):
         qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
 
-
+class AuthenticatedQuanLyKhoViewMV(ModelView):
+    def is_accessible(self):
+        qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
+        return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
 
 class QuyDinhView(AuthenticatedView):
     can_create = True
@@ -238,7 +244,19 @@ class UserView(AuthenticatedView):
         }
     }
 
-class NhapPhieuView(AuthenticatedQuanLyKhoView):
+class XemPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
+    can_view_details = True
+    can_create = False
+    can_edit = False
+    can_delete = False
+class XemChiTietPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
+    can_view_details = True
+    can_create = False
+    can_edit = False
+    can_delete = False
+
+
+class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
     @expose("/")
     def index(self):
 
@@ -249,8 +267,47 @@ class NhapPhieuView(AuthenticatedQuanLyKhoView):
         tacgias = load_all_tacgia()
         sachs = load_sach(ten_the_loai = ten_the_loai , ten_tac_gia = ten_tac_gia)
 
+
+
         return self.render("admin/booksimport.html",theloais = theloais,tacgias = tacgias,sachs=sachs)
 
+    @expose("/create", methods=["POST"])
+    def create_invoice(self):
+        # Lấy dữ liệu từ form
+        books_data = request.form.get("books_data")
+        if not books_data:
+            flash("Danh sách sách trống!", "error")
+            return redirect(url_for(".index"))
+
+        try:
+            books = json.loads(books_data)
+
+            # Tạo phiếu nhập mới
+            phieu_nhap = PhieuNhapSach(quan_ly_kho_id = current_user.get_id())
+            db.session.add(phieu_nhap)
+            db.session.commit()
+
+            # Thêm sách vào phiếu nhập
+            for book in books:
+                sach = Sach.query.filter_by(ten_sach=book["ten_sach"]).first()
+                if sach:
+                    chi_tiet = ChiTietPhieuNhapSach(
+                        phieu_nhap_sach_id=phieu_nhap.id,
+                        sach_id=sach.id,
+                        so_luong=book["so_luong"]
+                    )
+
+                    update_or_add_so_luong(so_luong = book["so_luong"],sach_id = sach.id)
+
+                    db.session.add(chi_tiet)
+
+            db.session.commit()
+            flash("Tạo phiếu nhập sách thành công!", "success")
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Đã xảy ra lỗi: {e}", "error")
+
+        return redirect(url_for(".index"))
 
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
@@ -261,6 +318,8 @@ admin.add_view(UserView(User,db.session,name='Quản lý User'))
 admin.add_view(VaitroView(VaiTro,db.session,name='Vai trò'))
 
 admin.add_view(NhapPhieuView(name="Nhập sách"))
+admin.add_view(XemPhieuNhapSach(PhieuNhapSach,db.session,name="Xem Phiếu Nhập sách",category="XEM PHIẾU NHẬP"))
+admin.add_view(XemPhieuNhapSach(ChiTietPhieuNhapSach,db.session,name="Xem Chi Tiết Phiếu",category="XEM PHIẾU NHẬP"))
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))

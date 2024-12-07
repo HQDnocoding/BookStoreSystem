@@ -245,17 +245,20 @@ def load_all_theloai():
 
 
 def load_sach(ten_the_loai=None, ten_tac_gia=None):
+    if ten_the_loai == 'None' and  ten_tac_gia == 'None':
+        return Sach.query.all()
+
     query = Sach.query.options(
         joinedload(Sach.the_loai),  # Tải trước thông tin thể loại
         joinedload(Sach.tac_gia)  # Tải trước thông tin tác giả
     )
 
     # Lọc theo tên thể loại nếu có
-    if ten_the_loai:
+    if ten_the_loai and ten_tac_gia == 'None':
         query = query.join(TheLoai).filter(TheLoai.ten_the_loai == ten_the_loai)
 
     # Lọc theo tên tác giả nếu có
-    if ten_tac_gia:
+    if ten_tac_gia and ten_the_loai == 'None':
         query = query.join(TacGia).filter(TacGia.ten_tac_gia == ten_tac_gia)
 
     # Thực thi truy vấn và trả về danh sách sách
@@ -277,3 +280,20 @@ def get_sach_for_detail_by_id(sach_id):
             'the_loai': sach.the_loai.ten_the_loai if sach.the_loai else None  # Lấy tên thể loại
         }
     return None
+
+def update_or_add_so_luong(sach_id, so_luong):
+    # Tìm bản ghi có sach_id tương ứng
+    so_luong_con_lai = SoLuongCuonConLai.query.filter_by(sach_id=sach_id).first()
+
+    # Nếu bản ghi đã tồn tại, cập nhật so_luong
+    if so_luong_con_lai:
+        so_luong_con_lai.so_luong += so_luong  # Cộng thêm so_luong mới vào giá trị hiện tại
+        so_luong_con_lai.thoi_diem = datetime.now()  # Cập nhật thời điểm
+
+    # Nếu không có bản ghi nào, tạo bản ghi mới
+    else:
+        so_luong_con_lai = SoLuongCuonConLai(sach_id=sach_id, so_luong=so_luong)
+        db.session.add(so_luong_con_lai)
+
+    # Lưu thay đổi vào cơ sở dữ liệu
+    db.session.commit()
