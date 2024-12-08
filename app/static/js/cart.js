@@ -1,10 +1,11 @@
-function addToCart(id, ten_sach, don_gia) {
+function addToCart(id, ten_sach, don_gia, bia_sach) {
     fetch('/api/cart', {
         method: "post",
         body: JSON.stringify({
             "id": id,
             "ten_sach": ten_sach,
-            "don_gia": don_gia
+            "don_gia": don_gia,
+            "bia_sach": bia_sach
         }),
         headers: {
             "Content-Type": "application/json"
@@ -15,6 +16,7 @@ function addToCart(id, ten_sach, don_gia) {
         for (let i = 0; i<d.length;i++)
             d[i].innerText = data.total_quantity
     })
+    console.info(bia_sach)
 }
 
 function updateCart(productId, obj){
@@ -56,5 +58,21 @@ function deleteCart(productId){
             c.style.display="none"
         }).catch(err => console.info(err))
     }
+}
 
+function changeQuantity(productId, delta, quantityInput) {
+    let currentQuantity = parseInt(quantityInput.value);
+
+    // Tính toán số lượng mới
+    let newQuantity = currentQuantity + delta;
+
+    // Lấy giá trị min và max từ các thuộc tính của input
+    let minQuantity = parseInt(quantityInput.min);
+    let maxQuantity = parseInt(quantityInput.max);
+
+    // Kiểm tra các giới hạn
+    if (newQuantity >= minQuantity && newQuantity <= maxQuantity) {
+        quantityInput.value = newQuantity; // Cập nhật giá trị mới cho ô nhập liệu
+        updateCart(productId, quantityInput)
+    }
 }

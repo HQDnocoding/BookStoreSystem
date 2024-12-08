@@ -1,0 +1,4 @@
+.input-text.qty {
+    width: 50px; /* Thay đổi chiều rộng cho phù hợp với 3 chữ số */
+    text-align: center; /* Căn giữa nội dung */
+}

@@ -151,12 +151,14 @@ def add_to_cart():
     else:
         ten_sach = data['ten_sach']
         don_gia = data['don_gia']
+        bia_sach = data['bia_sach']
 
         cart[id] = {
             "id": id,
             "ten_sach": ten_sach,
             "don_gia": don_gia,
-            "so_luong": 1
+            "so_luong": 1,
+            "bia_sach": bia_sach
         }
 
     session[key] = cart
