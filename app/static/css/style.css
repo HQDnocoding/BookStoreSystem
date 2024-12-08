@@ -1,4 +1,22 @@
 .input-text.qty {
-    width: 50px; /* Thay đổi chiều rộng cho phù hợp với 3 chữ số */
-    text-align: center; /* Căn giữa nội dung */
+    width: 50px;
+    text-align: center;
+}
+
+.order-layout{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fixed-order {
+    position: fixed;
+    top: 250px; /* Khoảng cách từ trên cùng của viewport */
+    right: 20px; /* Hoặc bên trái tùy thuộc vào cách bạn muốn hiển thị */
+    width: 300px; /* Chỉnh sửa chiều rộng nếu cần */
+    background-color: white; /* Đặt màu nền cho dễ nhìn */
+    z-index: 1000; /* Đảm bảo phần này nằm trên top của các phần khác */
+    padding: 10px; /* Thêm padding cho độ thoải mái */
+    border: 1px solid #ccc; /* Tùy chọn: thêm viền */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tùy chọn: thêm bóng đổ */
 }

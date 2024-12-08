@@ -36,7 +36,7 @@ function updateCart(productId, obj){
 
         let d2 = document.getElementsByClassName("cart-amount")
         for (let i = 0; i<d2.length;i++)
-            d2[i].innerText = data.total_amount.toLocaleString("en-US")
+            d2[i].innerText = data.total_amount.toLocaleString("en-US") + "₫"
     })
 }
 
