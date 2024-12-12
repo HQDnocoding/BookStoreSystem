@@ -249,6 +249,8 @@ class XemPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
     can_create = False
     can_edit = False
     can_delete = False
+   # column_list = ['id','ngay_nhap','quan_ly_kho_id']
+
 class XemChiTietPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
     can_view_details = True
     can_create = False
