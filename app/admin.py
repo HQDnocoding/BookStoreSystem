@@ -2,6 +2,7 @@ import hashlib
 import json
 from datetime import datetime
 from email.policy import default
+from math import trunc
 from xmlrpc.client import DateTime
 
 import cloudinary.uploader
@@ -311,6 +312,18 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
 
         return redirect(url_for(".index"))
 
+class PhuongThucThanhToanView(AuthenticatedView):
+    can_view_details = True
+    can_edit = False
+    can_create = True
+    form_excluded_columns = ['don_hang']
+    form_choices = {
+        'ten_phuong_thuc': [
+            ('ONLINE', 'ONLINE'),
+            ('TIỀN MẶT', 'TIỀN MẶT')
+        ]
+    }
+
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
@@ -318,6 +331,8 @@ admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quả
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 admin.add_view(UserView(User,db.session,name='Quản lý User'))
 admin.add_view(VaitroView(VaiTro,db.session,name='Vai trò'))
+
+admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan,db.session,name='Phương thức thanh toán'))
 
 admin.add_view(NhapPhieuView(name="Nhập sách"))
 admin.add_view(XemPhieuNhapSach(PhieuNhapSach,db.session,name="Xem Phiếu Nhập sách",category="XEM PHIẾU NHẬP"))
