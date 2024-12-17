@@ -197,6 +197,8 @@ def common_attr():
         'cart': utils.cart_stats(session.get(app.config['CART_KEY']))
     }
 
+
+
 if __name__ == "__main__":
     with app.app_context():
-        app.run(debug=True)
+        app.run(debug=True,port=5001)

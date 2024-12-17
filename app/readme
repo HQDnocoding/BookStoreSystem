@@ -1,0 +1,3 @@
+#tạo url expose ra internet để đăng ký vnpay
+npm install -g localtunnel
+lt --port 5001 --subdomain huymanhdatbookstoresystemdemo
