@@ -4,7 +4,6 @@ import time
 import urllib
 
 import random
-import requests
 from flask import render_template, redirect, request, session, jsonify
 from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_API_KEY, VNPAY_PAYMENT_URL
 from app.admin import *
@@ -149,10 +148,13 @@ def add_to_cart():
     data = request.json
     id = str(data['id'])
 
+    # Lấy số lượng từ dữ liệu JSON, mặc định là 1 nếu không có số lượng được cung cấp
+    so_luong_moi = data.get('so_luong', 1)
+
     key = app.config['CART_KEY']
     cart = session[key] if key in session else {}
     if id in cart:
-        cart[id]['so_luong']+=1
+        cart[id]['so_luong']+=so_luong_moi
     else:
         ten_sach = data['ten_sach']
         don_gia = data['don_gia']

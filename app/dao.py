@@ -271,8 +271,10 @@ def user_exists(username):
 
 def get_sach_for_detail_by_id(sach_id):
     sach = Sach.query.get(sach_id)
+    #vai_tro = VaiTro.query.get(role_id)
     if sach:
         return {
+            'id': sach.id,
             'ten_sach': sach.ten_sach,
             'don_gia': sach.don_gia,
             'bia_sach': sach.bia_sach,
