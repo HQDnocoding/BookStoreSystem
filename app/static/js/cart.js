@@ -1,5 +1,11 @@
 function addToCart(id, ten_sach, don_gia, bia_sach, quantity = 1) {
-    console.info(bia_sach);
+    console.log({
+    "id": id,
+    "ten_sach": ten_sach,
+    "don_gia": don_gia,
+    "bia_sach": bia_sach,
+    "so_luong": quantity
+});
     fetch('/api/cart', {
         method: "post",
         body: JSON.stringify({

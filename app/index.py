@@ -164,7 +164,7 @@ def add_to_cart():
             "id": id,
             "ten_sach": ten_sach,
             "don_gia": don_gia,
-            "so_luong": 1,
+            "so_luong": so_luong_moi,
             "bia_sach": bia_sach
         }
 
