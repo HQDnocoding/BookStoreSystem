@@ -233,16 +233,14 @@ def generate_vnpay_url(amount, order_id, order_info):
     print(sorted_data)
     query_string = "&".join(f"{key}={urllib.parse.quote(str(value))}" for key, value in sorted_data)
 
-    # Tạo chữ ký HMAC SHA256
+
     hmac_hash = hmac.new(VNPAY_API_KEY.encode(), query_string.encode(), hashlib.sha256)
     secure_hash = hmac_hash.hexdigest()
-    data["vnp_SecureHash"] = secure_hash
 
     # Tạo URL thanh toán
     query_string += f"&vnp_SecureHash={secure_hash}"
     payment_url = f"{VNPAY_PAYMENT_URL}?{query_string}"
 
-    print(query_string)
     # Trả về URL thanh toán
     return payment_url
 
@@ -277,7 +275,7 @@ def vnpay_return():
     query_string = "&".join(f"{key}={value}" for key, value in sorted_data)
 
     # Tạo chữ ký HMAC SHA512 từ các tham số
-    hmac_hash = hmac.new(VNPAY_API_KEY.encode(), query_string.encode(), hashlib.sha512)
+    hmac_hash = hmac.new(VNPAY_API_KEY.encode(), query_string.encode(), hashlib.sha256)
     secure_hash = hmac_hash.hexdigest()
 
     # Kiểm tra xem chữ ký có hợp lệ không
