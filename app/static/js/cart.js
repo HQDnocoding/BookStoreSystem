@@ -1,22 +1,27 @@
-function addToCart(id, ten_sach, don_gia, bia_sach) {
+function addToCart(id, ten_sach, don_gia, bia_sach, quantity = 1) {
+    console.info(bia_sach);
     fetch('/api/cart', {
         method: "post",
         body: JSON.stringify({
             "id": id,
             "ten_sach": ten_sach,
             "don_gia": don_gia,
-            "bia_sach": bia_sach
+            "bia_sach": bia_sach,
+            "so_luong": quantity
         }),
         headers: {
             "Content-Type": "application/json"
         }
     }).then(res => res.json()).then(data => {
-        console.info(data)
-        let d = document.getElementsByClassName("cart-counter")
-        for (let i = 0; i<d.length;i++)
-            d[i].innerText = data.total_quantity
-    })
-    console.info(bia_sach)
+        console.info(data);
+
+        let d = document.getElementsByClassName("cart-counter");
+        for (let i = 0; i < d.length; i++) {
+            d[i].innerText = data.total_quantity;
+        }
+    }).catch(error => {
+        console.error('Có lỗi xảy ra:', error);
+    });
 }
 
 function updateCart(productId, obj){
@@ -74,5 +79,18 @@ function changeQuantity(productId, delta, quantityInput) {
     if (newQuantity >= minQuantity && newQuantity <= maxQuantity) {
         quantityInput.value = newQuantity; // Cập nhật giá trị mới cho ô nhập liệu
         updateCart(productId, quantityInput)
+    }
+}
+
+function changeInputNumericValue(delta, quantityInput){
+    let quantity = parseInt(quantityInput.value);
+
+    let newQuantity = quantity+delta;
+
+    let minQuantity = parseInt(quantityInput.min);
+    let maxQuantity = parseInt(quantityInput.max);
+
+    if (newQuantity >= minQuantity && newQuantity <= maxQuantity) {
+        quantityInput.value = newQuantity; // Cập nhật giá trị mới cho ô nhập liệu
     }
 }

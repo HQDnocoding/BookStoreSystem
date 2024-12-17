@@ -24,15 +24,20 @@
                 <hr>
 
                 <div class="col-2 d-flex align-items-center">
-                    <input type="button" value="-" class="minus button ís-form">
+                    <input type="button" value="-" class="minus button ís-form"
+                    onclick="changeInputNumericValue(-1, document.getElementById('inputQuantity'))">
 
                     <input type="number" class="input-text qty text" title="SL" size="4" min="1" max="99"
-                           step="1" placeholder="" inputmode="numeric" autocomplete="off"/>
+                           step="1" placeholder="" inputmode="numeric" autocomplete="off"
+                    value="1" id="inputQuantity"/>
 
-                    <input type="button" value="+" class="plus button ís-form">
+                    <input type="button" value="+" class="plus button ís-form"
+                    onclick="changeInputNumericValue(1, document.getElementById('inputQuantity'))">
                 </div>
 
-                <a href="#!" class="btn btn-accent mt-4 align-items-center gap-2"
+                <a href="javascript:;"
+                   onclick="addToCart({{sach.id}}, '{{sach.ten_sach}}', {{sach.don_gia}}, '{{sach.bia_sach}}')"
+                   class="btn btn-accent mt-4 align-items-center gap-2"
                    style="border: 1px solid green; border-radius: 5px; padding: 5px 10px; color: green;
 font-weight: bold;">
                     <i class="fa-solid fa-cart-shopping"></i>
