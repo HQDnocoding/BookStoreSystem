@@ -44,7 +44,9 @@
             <h3>Đơn hàng</h3>
             <p class="order-layout">Tổng sản phẩm: <span class = "cart-counter" style="font-weight: bold;">{{cart.total_quantity}}</span></p>
             <p class="order-layout">Tổng tiền: <span class = "cart-amount" style="font-weight: bold;">{{ "{:,.0f}".format(cart.total_amount) }}₫</span></p>
-            <input type="button" value="Thanh toán" class="plus button ís-form"/>
+            <form action="/payment/">
+                <input type="submit"  value="Thanh toán" class="plus button ís-form"  />
+            </form>
         </div>
     </div>
 
