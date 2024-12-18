@@ -23,7 +23,7 @@ from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user ,UserMixin
-from flask import redirect, g, request, flash, url_for
+from flask import redirect, g, request, flash, url_for, session, jsonify
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
 from wtforms.validators import DataRequired
@@ -42,6 +42,12 @@ class AuthenticatedView(ModelView):
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
 
 
+class AuthenticatedNhanVienView(BaseView):
+    def is_accessible(self):
+        nhan_vien_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('NHANVIEN')).first()
+        return current_user.is_authenticated and current_user.vai_tro_id == nhan_vien_id.id
+
+
 class AuthenticatedQuanLyKhoViewBV(BaseView):
     def is_accessible(self):
         qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
@@ -55,6 +61,96 @@ class AuthenticatedQuanLyKhoViewMV(ModelView):
 class QuyDinhView(AuthenticatedView):
     can_create = True
     can_edit = True
+
+
+class CashierView(BaseView):
+    @expose('/')
+    def index(self):
+        # Trang quản lý giỏ hàng (nếu cần giao diện riêng cho admin)
+        return self.render('admin/cashier.html')
+
+    @expose('/api/cart', methods=['POST'])
+    def add_to_cart(self):
+        """ Thêm sản phẩm vào giỏ hàng """
+        data = request.json
+        product_id = str(data['id'])  # Chuyển ID thành chuỗi để làm key trong session
+        quantity = int(data.get('so_luong', 1))  # Lấy số lượng, mặc định là 1
+
+        # Khởi tạo giỏ hàng nếu chưa có
+        cart = session.get('cart', {})
+
+        # Thêm hoặc cập nhật sản phẩm trong giỏ hàng
+        if product_id in cart:
+            cart[product_id]['so_luong'] += quantity
+        else:
+            cart[product_id] = {
+                "id": data['id'],
+                "ten_sach": data['ten_sach'],
+                "don_gia": data['don_gia'],
+                "bia_sach": data['bia_sach'],
+                "so_luong": quantity
+            }
+
+        # Lưu lại giỏ hàng vào session
+        session['cart'] = cart
+        session.modified = True
+
+        return jsonify(self.cart_stats(cart))
+
+    @expose('/api/cart/<int:product_id>', methods=['PUT'])
+    def update_cart(self, product_id):
+        """ Cập nhật số lượng sản phẩm trong giỏ hàng """
+        data = request.json
+        cart = session.get('cart', {})
+
+        # Kiểm tra sản phẩm có tồn tại không
+        if str(product_id) in cart:
+            cart[str(product_id)]['so_luong'] = int(data['so_luong'])
+
+        # Lưu lại giỏ hàng vào session
+        session['cart'] = cart
+        session.modified = True
+
+        return jsonify(self.cart_stats(cart))
+
+    @expose('/api/cart/<int:product_id>', methods=['DELETE'])
+    def delete_cart(self, product_id):
+        """ Xóa sản phẩm khỏi giỏ hàng """
+        cart = session.get('cart', {})
+
+        # Kiểm tra và xóa sản phẩm
+        if str(product_id) in cart:
+            del cart[str(product_id)]
+
+        # Lưu lại giỏ hàng vào session
+        session['cart'] = cart
+        session.modified = True
+
+        return jsonify(self.cart_stats(cart))
+
+    def cart_stats(self, cart=None):
+        """ Tính toán tổng số lượng và tổng tiền của giỏ hàng """
+        if cart is None:
+            cart = session.get('cart', {})
+
+        total_quantity = sum(item['so_luong'] for item in cart.values())
+        total_amount = sum(item['don_gia'] * item['so_luong'] for item in cart.values())
+
+        return {
+            "total_quantity": total_quantity,
+            "total_amount": total_amount
+        }
+
+    def search_products(selt):
+        query = request.args.get('query', '')
+        products = Sach.query.filter(
+            Sach.ten_sach.like(f'%{query}%') | Sach.id.like(f'%{query}%')
+        ).limit(10).all()
+
+        return jsonify([
+            {'id': p.id, 'name': p.name, 'price': p.price} for p in products
+        ])
+
 
 
 class RevenueStatsView(MyView):
@@ -340,5 +436,7 @@ admin.add_view(XemPhieuNhapSach(ChiTietPhieuNhapSach,db.session,name="Xem Chi Ti
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
+
+admin.add_view(CashierView(name='Bán hàng'))
 
 admin.add_view(Logout(name="Đăng xuất"))

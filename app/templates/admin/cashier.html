@@ -1,0 +1,230 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Phần nhập và danh sách sản phẩm -->
+        <div class="col-md-8 border-right">
+            <div class="mb-3">
+
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="product-search"
+                        placeholder="Thêm sản phẩm vào đơn (F3)"
+                    >
+                </div>
+            </div>
+
+            <!-- Danh sách kết quả tìm kiếm -->
+            <ul class="list-group" id="search-results">
+
+            </ul>
+
+            <!-- Danh sách sản phẩm trong giỏ hàng -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Danh sách sản phẩm</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="cart-items">
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phần thông tin thanh toán -->
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="font-weight-bold">Thông Tin Thanh Toán</h5>
+                    <div class="form-group">
+                        <label for="total-price">Tổng tiền:</label>
+                        <input
+                            type="text"
+                            id="total-price"
+                            class="form-control text-right font-weight-bold"
+                            value="0"
+                            readonly
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="amount-paid">Tiền khách đưa:</label>
+                        <input
+                            type="number"
+                            id="amount-paid"
+                            class="form-control text-right"
+                            placeholder="Nhập số tiền"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="change">Tiền thừa:</label>
+                        <input
+                            type="text"
+                            id="change"
+                            class="form-control text-right font-weight-bold"
+                            value="0"
+                            readonly
+                        >
+                    </div>
+
+                    <!-- Nút Thanh toán -->
+                    <button id="btn-pay" class="btn btn-success btn-block font-weight-bold">
+                        Thanh toán (F1)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="mt-3 text-center">
+        <button class="btn btn-secondary mx-2" id="clear-cart-btn">Xóa toàn bộ sản phẩm</button>
+    </div>
+</div>
+
+<script>
+    let cart = [];
+    const cartItemsEl = document.getElementById("cart-items");
+    const totalPriceEl = document.getElementById("total-price");
+    const amountPaidEl = document.getElementById("amount-paid");
+    const changeEl = document.getElementById("change");
+    const searchResultsEl = document.getElementById("search-results");
+
+    // Hàm render giỏ hàng
+    function renderCart() {
+        cartItemsEl.innerHTML = "";
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            total += item.don_gia * item.so_luong;
+            const li = document.createElement("li");
+            li.className = "list-group-item d-flex justify-content-between align-items-center";
+            li.innerHTML = `
+                <div>
+                    <strong>${item.ten_sach}</strong> - ${item.don_gia.toLocaleString()} đ x ${item.so_luong}
+                </div>
+                <button class="btn btn-sm btn-danger" onclick="removeItem(${item.id})">
+                    Xóa
+                </button>
+            `;
+            cartItemsEl.appendChild(li);
+        });
+
+        totalPriceEl.value = total.toLocaleString();
+    }
+
+    // Xóa sản phẩm khỏi giỏ hàng
+    function removeItem(productId) {
+        fetch(`/api/cart/${productId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(cart => {
+            renderCart();
+            updateChange();
+        });
+    }
+
+    // Tính tiền thừa
+    amountPaidEl.addEventListener("input", updateChange);
+    function updateChange() {
+        const total = parseInt(totalPriceEl.value.replace(/,/g, "")) || 0;
+        const amountPaid = parseInt(amountPaidEl.value) || 0;
+        const change = amountPaid - total;
+        changeEl.value = change >= 0 ? change.toLocaleString() : "0";
+    }
+
+    // Thêm sản phẩm vào giỏ khi Enter
+    document.getElementById("product-search").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+            const product = { id: 1, ten_sach: "Sản phẩm demo", don_gia: 10000, so_luong: 1 };
+            fetch('/api/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(product)
+            })
+            .then(response => response.json())
+            .then(cart => {
+                renderCart();
+                updateChange();
+            });
+        }
+    });
+
+    // Hàm tìm kiếm sản phẩm theo tên
+    async function searchProducts(query) {
+        if (query.length < 2) {
+            searchResultsEl.innerHTML = '';  // Nếu không đủ 2 ký tự, không tìm kiếm
+            return;
+        }
+
+        const response = await fetch(`/api/search?query=${query}`);
+        const data = await response.json();
+
+        displaySearchResults(data);
+    }
+
+    // Hiển thị kết quả tìm kiếm
+    function displaySearchResults(products) {
+        searchResultsEl.innerHTML = '';  // Xóa kết quả cũ
+
+        if (products.length === 0) {
+            searchResultsEl.innerHTML = '<li class="list-group-item">Không tìm thấy sản phẩm.</li>';
+            return;
+        }
+
+        products.forEach(product => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item d-flex justify-content-between align-items-center';
+            li.innerHTML = `
+                <div>
+                    <strong>${product.name}</strong> - ${product.price.toLocaleString()} đ
+                </div>
+                <button class="btn btn-sm btn-primary" onclick="addToCart(${product.id})">Thêm</button>
+            `;
+            searchResultsEl.appendChild(li);
+        });
+    }
+
+    // Thêm sản phẩm vào giỏ hàng khi chọn
+    function addToCart(productId) {
+        fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: productId, quantity: 1 })
+        })
+        .then(response => response.json())
+        .then(cart => {
+            renderCart();
+            updateChange();
+        });
+    }
+
+    // Xóa toàn bộ giỏ hàng
+    document.getElementById("clear-cart-btn").addEventListener("click", () => {
+        fetch('/api/cart', { method: 'DELETE' })
+            .then(response => response.json())
+            .then(cart => {
+                renderCart();
+                updateChange();
+            });
+    });
+
+    // Lấy giỏ hàng từ server khi trang tải
+    window.onload = () => {
+        fetch('/api/cart')
+            .then(response => response.json())
+            .then(cart => {
+                renderCart();
+                updateChange();
+            });
+    };
+</script>
+{% endblock %}

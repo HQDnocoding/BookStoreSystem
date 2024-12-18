@@ -178,9 +178,9 @@ if __name__ == "__main__":
     with my_app.app_context():
         
         # db.drop_all()
-        db.create_all()
+        # db.create_all()
 
-        db.session.commit()
+        # db.session.commit()
         #
         # vt1=VaiTro(ten_vai_tro='QUANLY')
         # vt2=VaiTro(ten_vai_tro='NHANVIEN')
@@ -190,14 +190,14 @@ if __name__ == "__main__":
         #
         # # db.session.query(User).delete()
         #
-        # pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+        pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+
+        admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
+        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
+        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
+        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
         #
-        # admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
-        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
-        # qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
-        # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
-        #
-        # db.session.add_all([admin,nhan_vien,qlk,u])
+        db.session.add_all([admin,nhan_vien,qlk,u])
         #
         #
         # pt1=PhuongThucThanhToan(ten_phuong_thuc='ONLINE')
@@ -208,4 +208,4 @@ if __name__ == "__main__":
         # tt3=TrangThaiDonHang(ten_trang_thai='CANCELED')
         # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
         # db.session.add(qlk)
-        # db.session.commit()
+        db.session.commit()
