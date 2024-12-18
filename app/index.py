@@ -1,16 +1,15 @@
 import hmac
 import math
-import time
 import urllib
 
 import random
 from flask import render_template, redirect, request, session, jsonify
 from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_API_KEY, VNPAY_PAYMENT_URL
 from app.admin import *
-import os
 import app.dao as dao
 from flask_login import login_user, logout_user
 from enum import Enum
+from decorators import annonymous_user, login_required
 
 
 class Role(Enum):
@@ -42,6 +41,7 @@ def login_admin_process():
 
 
 @app.route('/register/', methods=['get', 'post'])
+@annonymous_user
 def register():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -74,7 +74,7 @@ def register():
 
 
 @app.route('/login/', methods=['get', 'post'])
-# @annonymous_user
+@annonymous_user
 def login_my_user():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -83,7 +83,8 @@ def login_my_user():
         user = dao.auth_user(username, password)
         if user:
             login_user(user=user)
-            return redirect('/')
+            n=request.args.get('next')
+            return redirect(n if n else '/')
         else:
             if not dao.user_exists(request.form['username']):
                 err_msg = 'Tài khoản KHÔNG tồn tại'
@@ -205,6 +206,7 @@ def common_attr():
     }
 
 @app.route('/payment/')
+@login_required
 def payment():
     return render_template('payment.html')
 

@@ -4,9 +4,11 @@
 
 <div class="container" style="padding: 20px;">
 
-    <div class="row" >
+    {% if 'cart' in session and session['cart'] is not none %}
+    {% if session['cart']|length > 0 %}
+    
+    <div class="row">
         <div class="col-md-8 col-sm-12 align-items-center">
-
             {% for c in session['cart'].values() %}
             <div class="row" id="cart{{ c.id }}">
                 <div class="col-3 d-flex align-items-center">
@@ -42,14 +44,26 @@
         </div>
         <div class="col-md-4 col-sm-12 fixed-order">
             <h3>Đơn hàng</h3>
-            <p class="order-layout">Tổng sản phẩm: <span class = "cart-counter" style="font-weight: bold;">{{cart.total_quantity}}</span></p>
-            <p class="order-layout">Tổng tiền: <span class = "cart-amount" style="font-weight: bold;">{{ "{:,.0f}".format(cart.total_amount) }}₫</span></p>
+            <p class="order-layout">Tổng sản phẩm: <span class="cart-counter" style="font-weight: bold;">{{cart.total_quantity}}</span>
+            </p>
+            <p class="order-layout">Tổng tiền: <span class="cart-amount" style="font-weight: bold;">{{ "{:,.0f}".format(cart.total_amount) }}₫</span>
+            </p>
             <form action="/payment/">
-                <input type="submit"  value="Thanh toán" class="plus button ís-form"  />
+                <input type="submit" value="Thanh toán" class="plus button ís-form"
+                       {% if not current_user.is_authenticated %} disabled {% endif %}/>
             </form>
+            {% if not current_user.is_authenticated %}
+            <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> bằng tài khoản KHÁCH HÀNG.</p>
+            {% endif %}
         </div>
     </div>
 
+    {% else %}
+    <p>Giỏ hàng của bạn hiện đang trống.</p>
+    {% endif %}
+    {% else %}
+    <p>Giỏ hàng của bạn hiện đang trống.</p>
+    {% endif %}
 
 </div>
 
