@@ -20,3 +20,61 @@
     border: 1px solid #ccc; /* Tùy chọn: thêm viền */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tùy chọn: thêm bóng đổ */
 }
+
+
+<style>
+    .list-group-item {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .list-group-item:hover {
+        transform: scale(1.02); /* Hiệu ứng phóng to nhẹ khi hover */
+    }
+
+    .img-thumbnail {
+        border: none;
+        border-radius: 5px;
+    }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+
+    .text-danger {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    #search-results li {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+    }
+
+    #search-results img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+
+    #search-results h6 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    #search-results small {
+        color: #6c757d;
+    }
+
+    #search-results .btn {
+        white-space: nowrap;
+    }
+
+
+</style>

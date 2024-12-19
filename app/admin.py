@@ -22,7 +22,7 @@ from app import admin, db, app
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
-from flask_login import current_user, logout_user ,UserMixin
+from flask_login import current_user, logout_user, UserMixin, login_required
 from flask import redirect, g, request, flash, url_for, session, jsonify
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
@@ -53,33 +53,40 @@ class AuthenticatedQuanLyKhoViewBV(BaseView):
         qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
 
+
 class AuthenticatedQuanLyKhoViewMV(ModelView):
     def is_accessible(self):
         qlk = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLYKHO')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == qlk.id
+
 
 class QuyDinhView(AuthenticatedView):
     can_create = True
     can_edit = True
 
 
-class CashierView(BaseView):
+class CashierView(AuthenticatedNhanVienView):
     @expose('/')
     def index(self):
-        # Trang quản lý giỏ hàng (nếu cần giao diện riêng cho admin)
         return self.render('admin/cashier.html')
 
-    @expose('/api/cart', methods=['POST'])
+    @expose('/cart', methods=['GET'])
+    def get_cart(self):
+        """Lấy thông tin giỏ hàng"""
+        cart = session.get('cart', {})
+        return jsonify(self.cart_stats(cart))
+
+    @expose('/cart', methods=['POST'])
     def add_to_cart(self):
-        """ Thêm sản phẩm vào giỏ hàng """
+        """Thêm sản phẩm vào giỏ hàng"""
         data = request.json
-        product_id = str(data['id'])  # Chuyển ID thành chuỗi để làm key trong session
-        quantity = int(data.get('so_luong', 1))  # Lấy số lượng, mặc định là 1
+        product_id = str(data['id'])
+        quantity = int(data.get('so_luong', 1))
 
         # Khởi tạo giỏ hàng nếu chưa có
         cart = session.get('cart', {})
 
-        # Thêm hoặc cập nhật sản phẩm trong giỏ hàng
+        # Thêm hoặc cập nhật sản phẩm
         if product_id in cart:
             cart[product_id]['so_luong'] += quantity
         else:
@@ -91,34 +98,51 @@ class CashierView(BaseView):
                 "so_luong": quantity
             }
 
-        # Lưu lại giỏ hàng vào session
+        # Lưu lại giỏ hàng
         session['cart'] = cart
         session.modified = True
 
+        # Trả về trạng thái giỏ hàng
         return jsonify(self.cart_stats(cart))
 
-    @expose('/api/cart/<int:product_id>', methods=['PUT'])
+    @expose('/cart', methods=['DELETE'])
+    def clear_cart(self):
+        """Xóa toàn bộ giỏ hàng"""
+        session['cart'] = {}
+        session.modified = True
+        return jsonify({"message": "Giỏ hàng đã được xóa."}), 204
+
+    @expose('/cart/<int:product_id>', methods=['PUT'])
     def update_cart(self, product_id):
-        """ Cập nhật số lượng sản phẩm trong giỏ hàng """
+        """Cập nhật số lượng sản phẩm trong giỏ hàng"""
         data = request.json
+        new_quantity = int(data.get('so_luong', 0))  # Lấy số lượng mới từ request
         cart = session.get('cart', {})
 
-        # Kiểm tra sản phẩm có tồn tại không
+        # Kiểm tra nếu sản phẩm tồn tại trong giỏ hàng
         if str(product_id) in cart:
-            cart[str(product_id)]['so_luong'] = int(data['so_luong'])
+            if new_quantity > 0:
+                cart[str(product_id)]['so_luong'] = new_quantity  # Cập nhật số lượng
+            else:
+                del cart[str(product_id)]  # Xóa sản phẩm nếu số lượng = 0
 
         # Lưu lại giỏ hàng vào session
         session['cart'] = cart
         session.modified = True
 
-        return jsonify(self.cart_stats(cart))
+        # Trả về trạng thái giỏ hàng hiện tại
+        return jsonify({
+            "cart": list(cart.values()),
+            "total_quantity": sum(item['so_luong'] for item in cart.values()),
+            "total_amount": sum(item['don_gia'] * item['so_luong'] for item in cart.values())
+        })
 
-    @expose('/api/cart/<int:product_id>', methods=['DELETE'])
-    def delete_cart(self, product_id):
-        """ Xóa sản phẩm khỏi giỏ hàng """
+    @expose('/cart/<int:product_id>', methods=['DELETE'])
+    def remove_from_cart(self, product_id):
+        """Xóa sản phẩm khỏi giỏ hàng"""
         cart = session.get('cart', {})
 
-        # Kiểm tra và xóa sản phẩm
+        # Xóa sản phẩm khỏi giỏ hàng nếu tồn tại
         if str(product_id) in cart:
             del cart[str(product_id)]
 
@@ -126,43 +150,60 @@ class CashierView(BaseView):
         session['cart'] = cart
         session.modified = True
 
-        return jsonify(self.cart_stats(cart))
+        # Trả về trạng thái giỏ hàng hiện tại
+        return jsonify({
+            "cart": list(cart.values()),
+            "total_quantity": sum(item['so_luong'] for item in cart.values()),
+            "total_amount": sum(item['don_gia'] * item['so_luong'] for item in cart.values())
+        })
 
-    def cart_stats(self, cart=None):
-        """ Tính toán tổng số lượng và tổng tiền của giỏ hàng """
-        if cart is None:
-            cart = session.get('cart', {})
-
-        total_quantity = sum(item['so_luong'] for item in cart.values())
-        total_amount = sum(item['don_gia'] * item['so_luong'] for item in cart.values())
-
-        return {
-            "total_quantity": total_quantity,
-            "total_amount": total_amount
-        }
-
-    def search_products(selt):
-        query = request.args.get('query', '')
-        products = Sach.query.filter(
-            Sach.ten_sach.like(f'%{query}%') | Sach.id.like(f'%{query}%')
-        ).limit(10).all()
+    @expose('/search', methods=['GET'])
+    def search_products(self):
+        """Tìm kiếm sản phẩm"""
+        query = request.args.get('query', '').strip()
+        products = Sach.query.filter(Sach.ten_sach.ilike(f'%{query}%')).all()
 
         return jsonify([
-            {'id': p.id, 'name': p.name, 'price': p.price} for p in products
+            {
+                'id': p.id,
+                'name': p.ten_sach,
+                'price': p.don_gia,
+                'image': p.bia_sach
+            } for p in products
         ])
 
+    def cart_stats(self, cart):
+        """Tính toán tổng số lượng và tổng tiền của giỏ hàng"""
+        total_quantity = sum(item['so_luong'] for item in cart.values())
+        total_price = sum(item['don_gia'] * item['so_luong'] for item in cart.values())
+        return {
+            "cart": list(cart.values()),
+            "total_quantity": total_quantity,
+            "total_price": total_price
+        }
+
+    @expose('/cart/cash', methods=['GET'])
+    @login_required
+    def cashier(self, **kwargs):
+        try:
+            hoa_don = create_invoice_from_cart()
+            flash("Hóa đơn đã được tạo thành công.", "success")
+        except Exception as e:
+            app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
+            flash("Đã xảy ra lỗi khi tạo hóa đơn.", "danger")
+        return redirect('/admin/cashierview')
 
 
 class RevenueStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/revenue-stats.html",tl=get_the_loai())
+        return self.render("admin/revenue-stats.html", tl=get_the_loai())
 
 
 class FrequencyStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/frequency-stats.html",tl=get_the_loai())
+        return self.render("admin/frequency-stats.html", tl=get_the_loai())
 
 
 class Logout(MyView):
@@ -273,7 +314,6 @@ class TacGiaView(AuthenticatedView):
     }
 
 
-
 class TheLoaiView(AuthenticatedView):
     column_searchable_list = ['ten_the_loai']
     form_excluded_columns = ['sach']
@@ -284,25 +324,26 @@ class TheLoaiView(AuthenticatedView):
     }
 
 
-
-
 class VaitroView(AuthenticatedView):
     can_create = True
     can_edit = True
+
 
 class UserForm(Form):
     ho = StringField('Họ', validators=[DataRequired()])
     ten = StringField('Tên', validators=[DataRequired()])
     username = StringField('Tên đăng nhập', validators=[DataRequired()])
-    password = StringField('Mật khẩu', validators=[ DataRequired()])
+    password = StringField('Mật khẩu', validators=[DataRequired()])
     ngay_tao = DateTimeField('Ngày tạo', default=datetime.now(), format='%Y-%m-%d %H:%M:%S')
-    avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
+    avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
+                                                                         "Chỉ được phép upload file hình ảnh!")])
     vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
-                              get_label='ten_vai_tro', allow_blank=False)
+                                  get_label='ten_vai_tro', allow_blank=False)
+
 
 class UserView(AuthenticatedView):
-    column_searchable_list = ['id','ho','ten','username']
-    form_excluded_columns = ['phieu_nhap_sach','don_hang']
+    column_searchable_list = ['id', 'ho', 'ten', 'username']
+    form_excluded_columns = ['phieu_nhap_sach', 'don_hang']
     can_edit = True
     can_create = True
 
@@ -311,6 +352,7 @@ class UserView(AuthenticatedView):
     def create_form(self):
         form = super().create_form()
         return form
+
     def edit_form(self, obj):
         form = super().edit_form(obj)
         return form
@@ -336,17 +378,20 @@ class UserView(AuthenticatedView):
         ) if m.avatar else Markup('<p>No Image</p>')
     }
     form_widget_args = {
-        'avatar':{
+        'avatar': {
 
         }
     }
+
 
 class XemPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
     can_view_details = True
     can_create = False
     can_edit = False
     can_delete = False
-   # column_list = ['id','ngay_nhap','quan_ly_kho_id']
+
+
+# column_list = ['id','ngay_nhap','quan_ly_kho_id']
 
 class XemChiTietPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
     can_view_details = True
@@ -364,11 +409,9 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
 
         theloais = load_all_theloai()
         tacgias = load_all_tacgia()
-        sachs = load_sach(ten_the_loai = ten_the_loai , ten_tac_gia = ten_tac_gia)
+        sachs = load_sach(ten_the_loai=ten_the_loai, ten_tac_gia=ten_tac_gia)
 
-
-
-        return self.render("admin/booksimport.html",theloais = theloais,tacgias = tacgias,sachs=sachs)
+        return self.render("admin/booksimport.html", theloais=theloais, tacgias=tacgias, sachs=sachs)
 
     @expose("/create", methods=["POST"])
     def create_invoice(self):
@@ -382,7 +425,7 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
             books = json.loads(books_data)
 
             # Tạo phiếu nhập mới
-            phieu_nhap = PhieuNhapSach(quan_ly_kho_id = current_user.get_id())
+            phieu_nhap = PhieuNhapSach(quan_ly_kho_id=current_user.get_id())
             db.session.add(phieu_nhap)
             db.session.commit()
 
@@ -396,7 +439,7 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
                         so_luong=book["so_luong"]
                     )
 
-                    update_or_add_so_luong(so_luong = book["so_luong"],sach_id = sach.id)
+                    update_or_add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
 
                     db.session.add(chi_tiet)
 
@@ -407,6 +450,7 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
             flash(f"Đã xảy ra lỗi: {e}", "error")
 
         return redirect(url_for(".index"))
+
 
 class PhuongThucThanhToanView(AuthenticatedView):
     can_view_details = True
@@ -425,14 +469,14 @@ admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sá
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
-admin.add_view(UserView(User,db.session,name='Quản lý User'))
-admin.add_view(VaitroView(VaiTro,db.session,name='Vai trò'))
+admin.add_view(UserView(User, db.session, name='Quản lý User'))
+admin.add_view(VaitroView(VaiTro, db.session, name='Vai trò'))
 
-admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan,db.session,name='Phương thức thanh toán'))
+admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan, db.session, name='Phương thức thanh toán'))
 
 admin.add_view(NhapPhieuView(name="Nhập sách"))
-admin.add_view(XemPhieuNhapSach(PhieuNhapSach,db.session,name="Xem Phiếu Nhập sách",category="XEM PHIẾU NHẬP"))
-admin.add_view(XemPhieuNhapSach(ChiTietPhieuNhapSach,db.session,name="Xem Chi Tiết Phiếu",category="XEM PHIẾU NHẬP"))
+admin.add_view(XemPhieuNhapSach(PhieuNhapSach, db.session, name="Xem Phiếu Nhập sách", category="XEM PHIẾU NHẬP"))
+admin.add_view(XemPhieuNhapSach(ChiTietPhieuNhapSach, db.session, name="Xem Chi Tiết Phiếu", category="XEM PHIẾU NHẬP"))
 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))

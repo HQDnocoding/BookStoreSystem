@@ -1,6 +1,8 @@
 from datetime import datetime
 from xmlrpc.client import DateTime
 
+from flask import session
+from flask_login import current_user
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 
@@ -299,3 +301,47 @@ def update_or_add_so_luong(sach_id, so_luong):
 
     # Lưu thay đổi vào cơ sở dữ liệu
     db.session.commit()
+
+
+def create_invoice_from_cart():
+    try:
+        cart = session.get('cart', {})
+        if not cart:
+            raise ValueError("Giỏ hàng trống.")
+
+        user = current_user
+        if not user:
+            raise ValueError("Người dùng chưa đăng nhập.")
+
+        # Tính tổng tiền từ giỏ hàng
+        tong_tien = sum(int(item['so_luong']) * float(item['don_gia']) for item in cart.values())
+
+        # Tạo hóa đơn bán sách
+        hoa_don = HoaDonBanSach(ngay_tao_hoa_don=datetime.now(),nhan_vien=user.id)
+        db.session.add(hoa_don)
+        db.session.flush()  # Đảm bảo `hoa_don.id` được sinh ra
+
+        # Thêm chi tiết hóa đơn
+        for item in cart.values():
+            sach = Sach.query.get(int(item['id']))
+            if not sach:
+                raise ValueError(f"Không tìm thấy sách với ID: {item['id']}")
+
+            chi_tiet = ChiTietHoaDon(
+
+                sach_id=sach.id,
+                hoa_don_id=hoa_don.id,
+                so_luong=item['so_luong'],
+                tong_tien=sach.don_gia*item['so_luong']
+            )
+            db.session.add(chi_tiet)
+
+        db.session.commit()
+        # Xóa giỏ hàng sau khi tạo hóa đơn
+        session.pop('cart', None)
+        return hoa_don
+
+    except Exception as e:
+        db.session.rollback()  # Rollback nếu có lỗi
+        app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
+        raise
