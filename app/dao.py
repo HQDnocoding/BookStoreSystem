@@ -4,6 +4,7 @@ from xmlrpc.client import DateTime
 from flask import session
 from flask_login import current_user
 from sqlalchemy import func
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
 
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
@@ -57,10 +58,12 @@ def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
     db.session.commit()
 
 
-def create_hoadonbansach(ngay_tao_hoa_don):  # Da test
-    new_hoadonbansach = HoaDonBanSach(ngay_tao_hoa_don=ngay_tao_hoa_don)
+def create_hoadonbansach(ngay_tao_hoa_don,nhanvien_id=None):  # Da test
+    new_hoadonbansach = HoaDonBanSach(ngay_tao_hoa_don=ngay_tao_hoa_don,nhan_vien= nhanvien_id)
     db.session.add(new_hoadonbansach)
     db.session.commit()
+
+    return new_hoadonbansach
 
 
 def create_sach(tenSach, donGia, the_loai_id, tac_gia_id):  # Da test
@@ -100,15 +103,19 @@ def create_donhang(ngay_tao_don, phuong_thuc_id, trang_thai_id, khach_hang_id):
     db.session.add(new_donhang)
     db.session.commit()
 
+    return  new_donhang
 
-def create_thongtinnhanhang(dien_thoai_nhan_hang, dia_chi_nhan_hang):
-    new_thongtinnhanhang = ThongTinNhanHang(dien_thoai_nhan_hang=dien_thoai_nhan_hang,
+
+
+def create_thongtinnhanhang( id,dien_thoai_nhan_hang, dia_chi_nhan_hang):
+    new_thongtinnhanhang = ThongTinNhanHang(id=id, dien_thoai_nhan_hang=dien_thoai_nhan_hang,
                                             dia_chi_nhan_hang=dia_chi_nhan_hang)
     db.session.add(new_thongtinnhanhang)
     db.session.commit()
+    return new_thongtinnhanhang
 
 
-def create_chitietdonhang(don_hang_id, sach_id, so_luong, tong_tien):
+def create_chitietdonhang( don_hang_id, sach_id, so_luong, tong_tien):
     new_chitietdonhang = ChiTietDonHang(don_hang_id=don_hang_id, sach_id=sach_id, so_luong=so_luong,
                                         tong_tien=tong_tien)
     db.session.add(new_chitietdonhang)
@@ -345,3 +352,49 @@ def create_invoice_from_cart():
         db.session.rollback()  # Rollback nếu có lỗi
         app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
         raise
+
+
+def get_or_create_phuong_thuc_id(ten_phuong_thuc):
+    # Tìm kiếm phương thức trong cơ sở dữ liệu
+    phuong_thuc = PhuongThucThanhToan.query.filter_by(ten_phuong_thuc=ten_phuong_thuc).first()
+
+    # Nếu không tìm thấy, tạo mới
+    if not phuong_thuc:
+        phuong_thuc = PhuongThucThanhToan(ten_phuong_thuc=ten_phuong_thuc)
+        db.session.add(phuong_thuc)
+        db.session.commit()
+
+    # Trả về ID của phương thức
+    return phuong_thuc.id
+
+
+def get_or_create_trang_thai_id(ten_trang_thai):
+    # Tìm kiếm trạng thái trong cơ sở dữ liệu
+    trang_thai = TrangThaiDonHang.query.filter_by(ten_trang_thai=ten_trang_thai).first()
+
+    # Nếu không tìm thấy, tạo mới
+    if not trang_thai:
+        trang_thai = TrangThaiDonHang(ten_trang_thai=ten_trang_thai)
+        db.session.add(trang_thai)
+        db.session.commit()
+
+    # Trả về ID của trạng thái
+    return trang_thai.id
+
+
+def get_so_luong_cuon_con_lai(sach_id):
+    # Truy vấn các bản ghi có `sach_id` tương ứng và tính tổng `so_luong`
+    total_so_luong = db.session.query(db.func.sum(SoLuongCuonConLai.so_luong)) \
+        .filter(SoLuongCuonConLai.sach_id == sach_id) \
+        .scalar()  # `.scalar()` trả về giá trị tổng hoặc None nếu không có kết quả
+
+    # Nếu không có bản ghi nào, trả về 0
+    if total_so_luong is None:
+        return 0
+    return total_so_luong
+
+def get_order_by_order_id(order_id):
+    order = DonHang.query.get(order_id)
+
+    return order
+

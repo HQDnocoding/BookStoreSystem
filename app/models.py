@@ -154,6 +154,9 @@ class DonHang(db.Model):
     thong_tin_nhan_hang = relationship('ThongTinNhanHang', uselist=False, backref='don_hang')
     sach = relationship('ChiTietDonHang', backref='don_hang')
 
+    # def __class__(self):
+    #      return self
+
 
 class ThongTinNhanHang(db.Model):
     id = Column(Integer, ForeignKey(DonHang.id), primary_key=True)
@@ -179,14 +182,14 @@ if __name__ == "__main__":
         
         # db.drop_all()
         # db.create_all()
-
+        #
         # db.session.commit()
         #
-        # vt1=VaiTro(ten_vai_tro='QUANLY')
-        # vt2=VaiTro(ten_vai_tro='NHANVIEN')
-        # vt3=VaiTro(ten_vai_tro='QUANLYKHO')
-        # vt4=VaiTro(ten_vai_tro='KHACHHANG')
-        # db.session.add_all([vt1,vt2,vt3,vt4])
+        vt1=VaiTro(ten_vai_tro='QUANLY')
+        vt2=VaiTro(ten_vai_tro='NHANVIEN')
+        vt3=VaiTro(ten_vai_tro='QUANLYKHO')
+        vt4=VaiTro(ten_vai_tro='KHACHHANG')
+        db.session.add_all([vt1,vt2,vt3,vt4])
         #
         # # db.session.query(User).delete()
         #
@@ -206,6 +209,8 @@ if __name__ == "__main__":
         # tt1=TrangThaiDonHang(ten_trang_thai='PAYING')
         # tt2=TrangThaiDonHang(ten_trang_thai='PAID')
         # tt3=TrangThaiDonHang(ten_trang_thai='CANCELED')
-        # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
-        # db.session.add(qlk)
+        qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
+        db.session.add(qlk)
         db.session.commit()
+
+

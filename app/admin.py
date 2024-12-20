@@ -438,8 +438,11 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
                         sach_id=sach.id,
                         so_luong=book["so_luong"]
                     )
-
-                    update_or_add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
+                    soluongconlai = get_so_luong_cuon_con_lai(sach.id)
+                    if(soluongconlai >= 300):
+                        pass
+                    else:
+                        update_or_add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
 
                     db.session.add(chi_tiet)
 
@@ -464,14 +467,17 @@ class PhuongThucThanhToanView(AuthenticatedView):
         ]
     }
 
-class TrangThaiDonHang(AuthenticatedView):
+class TrangThaiDonHangView(AuthenticatedView):
     can_view_details = False
     can_delete = True
     can_create = True
+    form_excluded_columns = ['don_hang']
     form_choices = {
         'ten_trang_thai': [
-            ('Đã thanh toán', 'Đã thanh toán'),
-            ('Chưa thanh toán', 'Chưa thanh toán')
+            ('Đang xử lý', 'Đang xử lý'),
+            ('Đã xử lý', 'Đã xử lý'),
+            ('Đang giao', 'Đang giao'),
+            ('Đã giao', 'Đã giao')
         ]
     }
 
@@ -482,6 +488,7 @@ admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quả
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 admin.add_view(UserView(User, db.session, name='Quản lý User'))
 admin.add_view(VaitroView(VaiTro, db.session, name='Vai trò'))
+admin.add_view(TrangThaiDonHangView(TrangThaiDonHang,db.session,name='Trạng thái đơn hàng'))
 
 admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan, db.session, name='Phương thức thanh toán'))
 
