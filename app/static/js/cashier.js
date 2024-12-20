@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Tải giỏ hàng khi trang được tải
+    if (window.location.pathname === '/admin/cashierview/'){
     loadCart();
+    }
+
 
     // Gắn sự kiện cho ô tìm kiếm
 document.addEventListener('keydown', function(event) {
@@ -21,7 +24,7 @@ document.addEventListener('keydown', function (event) {
             document.getElementById('search-input').value = '';  // Làm rỗng ô tìm kiếm
             document.getElementById('search-results').innerHTML = '';  // Xóa kết quả tìm kiếm
         }
-    });
+});
 document.getElementById('search-input').addEventListener('input', function () {
 
 
@@ -31,7 +34,7 @@ document.getElementById('search-input').addEventListener('input', function () {
         } else {
             document.getElementById('search-results').innerHTML = '';
         }
-    });
+});
 
 document.addEventListener('click', function (event) {
     if (event.target.classList.contains('add-to-cart-btn')) {
@@ -76,16 +79,13 @@ function loadCart() {
 document.getElementById("amount-paid").addEventListener("keydown", function(event) {
     // Kiểm tra nếu phím nhấn là Enter (keyCode 13)
     if (event.key === "Enter") {
-        event.preventDefault();  // Ngừng hành động mặc định của Enter (không cho form submit)
+        event.preventDefault();
 
-        // Lấy giá trị tiền khách đưa và tổng tiền
         const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
         const totalPrice = parseFloat(document.getElementById("total-price").value) || 0;
 
-        // Tính tiền thừa
         const change = amountPaid - totalPrice;
 
-        // Cập nhật ô hiển thị tiền thừa
         document.getElementById("change").value = change >= 0 ? change : 0;
     }
 });
@@ -254,10 +254,9 @@ async function updateCart(productId, newQuantity) {
             body: JSON.stringify({ so_luong: newQuantity }) // Cập nhật số lượng mới
         });
 
-        const data = await response.json(); // Lấy dữ liệu phản hồi từ server
+        const data = await response.json();
         console.log('Cập nhật sản phẩm trong giỏ hàng:', data);
 
-        // Làm mới giao diện giỏ hàng
         loadCart();
     } catch (error) {
         console.error('Lỗi khi cập nhật số lượng sản phẩm:', error);
@@ -290,4 +289,6 @@ function updateCartSummary(totalQuantity, totalPrice) {
         priceElement.value = `${totalPrice.toLocaleString()}₫`;
     }
 }
+
+
 

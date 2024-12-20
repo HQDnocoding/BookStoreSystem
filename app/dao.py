@@ -1,15 +1,16 @@
 from datetime import datetime
 from xmlrpc.client import DateTime
 
-from flask import session
+from flask import session, jsonify
 from flask_login import current_user
 from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import joinedload
 
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
     ThongTinNhanHang
-from app import db, admin, app
+from app import db, admin, app,Status,Role,PayingMethod
 import hashlib
 
 
@@ -247,7 +248,7 @@ def load_all_theloai():
 
 
 def load_sach(ten_the_loai=None, ten_tac_gia=None):
-    if ten_the_loai == 'None' and  ten_tac_gia == 'None':
+    if ten_the_loai == 'None' and ten_tac_gia == 'None':
         return Sach.query.all()
 
     query = Sach.query.options(
@@ -273,7 +274,7 @@ def user_exists(username):
 
 def get_sach_for_detail_by_id(sach_id):
     sach = Sach.query.get(sach_id)
-    #vai_tro = VaiTro.query.get(role_id)
+    # vai_tro = VaiTro.query.get(role_id)
     if sach:
         return {
             'id': sach.id,
@@ -284,6 +285,7 @@ def get_sach_for_detail_by_id(sach_id):
             'the_loai': sach.the_loai.ten_the_loai if sach.the_loai else None  # Lấy tên thể loại
         }
     return None
+
 
 def update_or_add_so_luong(sach_id, so_luong):
     # Tìm bản ghi có sach_id tương ứng
@@ -317,7 +319,7 @@ def create_invoice_from_cart():
         tong_tien = sum(int(item['so_luong']) * float(item['don_gia']) for item in cart.values())
 
         # Tạo hóa đơn bán sách
-        hoa_don = HoaDonBanSach(ngay_tao_hoa_don=datetime.now(),nhan_vien=user.id)
+        hoa_don = HoaDonBanSach(ngay_tao_hoa_don=datetime.now(), nhan_vien=user.id)
         db.session.add(hoa_don)
         db.session.flush()  # Đảm bảo `hoa_don.id` được sinh ra
 
@@ -332,7 +334,7 @@ def create_invoice_from_cart():
                 sach_id=sach.id,
                 hoa_don_id=hoa_don.id,
                 so_luong=item['so_luong'],
-                tong_tien=sach.don_gia*item['so_luong']
+                tong_tien=sach.don_gia * item['so_luong']
             )
             db.session.add(chi_tiet)
 
@@ -345,3 +347,71 @@ def create_invoice_from_cart():
         db.session.rollback()  # Rollback nếu có lỗi
         app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
         raise
+
+
+def get_don_hang(id):
+    # Truy vấn đơn hàng theo mã đơn hàng
+    return DonHang.query.filter_by(id=id).first()
+
+
+def get_nhan_vien(id):
+    # Truy vấn đơn hàng theo mã đơn hàng
+    return User.query.filter_by(id=id).first()
+
+def get_chi_tiet_don_hang(id):
+    return ChiTietDonHang.query.filter(id=id)
+
+
+
+
+def create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id=None):
+    try:
+        # Lấy thông tin đơn hàng
+        don_hang = DonHang.query.get(don_hang_id)
+        if not don_hang:
+            return {"error": "Đơn hàng không tồn tại."}, 404
+
+        # Lấy danh sách chi tiết đơn hàng
+        chi_tiet_don_hang = ChiTietDonHang.query.filter_by(don_hang_id=don_hang_id).all()
+
+        if not chi_tiet_don_hang:
+            return {"error": "Đơn hàng không có sách nào."}, 400
+
+        # Tạo hóa đơn
+        hoa_don = HoaDonBanSach(
+            ngay_tao_hoa_don=datetime.now(),
+            nhan_vien=nhan_vien_id  # Nếu có thông tin nhân viên
+        )
+        db.session.add(hoa_don)
+        db.session.flush()  # Đẩy tạm để lấy ID của hóa đơn
+
+        # Thêm chi tiết hóa đơn từ chi tiết đơn hàng
+        for chi_tiet in chi_tiet_don_hang:
+            sach = Sach.query.get(chi_tiet.sach_id)
+            if sach:
+                chi_tiet_hoa_don = ChiTietHoaDon(
+                    sach_id=sach.id,
+                    hoa_don_id=hoa_don.id,
+                    so_luong=chi_tiet.so_luong,
+                    tong_tien=chi_tiet.tong_tien
+                )
+                db.session.add(chi_tiet_hoa_don)
+
+        don_hang.trang_thai_id = TrangThaiDonHang.query.filter_by(Status.PAID.value).first().id
+        db.session.commit()
+        return jsonify({
+            "hoa_don_id": hoa_don.id,
+            "ngay_tao_hoa_don": hoa_don.ngay_tao_hoa_don.strftime("%Y-%m-%d %H:%M:%S"),
+            "nhan_vien_id": hoa_don.nhan_vien,
+            "sach": [
+                {
+                    "sach_id": chi_tiet.sach_id,
+                    "so_luong": chi_tiet.so_luong,
+                    "tong_tien": chi_tiet.tong_tien
+                } for chi_tiet in hoa_don.sach
+            ]
+        }), 201
+
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        return {"error": f"Lỗi hệ thống: {str(e)}"}, 500

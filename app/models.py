@@ -2,10 +2,10 @@ import datetime
 import hashlib
 from datetime import date
 
-from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint, Date
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from app import app as my_app, db
+from app import app as my_app, db, Role, Status, PayingMethod
 from flask_login import UserMixin
 
 
@@ -17,6 +17,7 @@ class VaiTro(db.Model):
 
     # def __int__(self):
     #     return int(self.id)
+
 
 class QuyDinh(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -70,9 +71,11 @@ class User(db.Model, UserMixin):
     vai_tro_id = Column(Integer, ForeignKey(VaiTro.id), nullable=False)
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
     don_hang = relationship('DonHang', backref='user', lazy=True)
-    hoa_don_ban_sach=relationship('HoaDonBanSach',backref='user',lazy=True)
+    hoa_don_ban_sach = relationship('HoaDonBanSach', backref='user', lazy=True)
+
     def __str__(self):
         return self.ten
+
 
 class HoaDonBanSach(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -87,6 +90,8 @@ class Sach(db.Model):
     ten_sach = Column(String(100), nullable=False)
     don_gia = Column(Float, nullable=False)
     bia_sach = Column(String(225))
+    # mo_ta=Column(Text,nullable=True)
+    # ngay_xuat_ban=Column(Date,nullable=True)
 
     the_loai_id = Column(Integer, ForeignKey(TheLoai.id), nullable=False)
     tac_gia_id = Column(Integer, ForeignKey(TacGia.id), nullable=False)
@@ -98,6 +103,7 @@ class Sach(db.Model):
 
     def __str__(self):
         return self.ten_sach
+
 
 class ChiTietHoaDon(db.Model):
     sach_id = Column(ForeignKey(Sach.id), primary_key=True)
@@ -132,7 +138,8 @@ class PhieuNhapSach(db.Model):
     sach = relationship('ChiTietPhieuNhapSach', backref='phieu_nhap_sach')
 
     def __int__(self):
-         return self.id
+        return self.id
+
 
 class ChiTietPhieuNhapSach(db.Model):
     phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id),
@@ -140,8 +147,6 @@ class ChiTietPhieuNhapSach(db.Model):
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False)
-
-
 
 
 class DonHang(db.Model):
@@ -170,42 +175,45 @@ class ChiTietDonHang(db.Model):
     tong_tien = Column(Integer, nullable=False, default=0)
 
 
-
-
-
-
 if __name__ == "__main__":
     with my_app.app_context():
-        
         # db.drop_all()
         # db.create_all()
 
         # db.session.commit()
-        #
-        # vt1=VaiTro(ten_vai_tro='QUANLY')
-        # vt2=VaiTro(ten_vai_tro='NHANVIEN')
-        # vt3=VaiTro(ten_vai_tro='QUANLYKHO')
-        # vt4=VaiTro(ten_vai_tro='KHACHHANG')
+
         # db.session.add_all([vt1,vt2,vt3,vt4])
         #
         # # db.session.query(User).delete()
         #
-        pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+        # pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
 
-        admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
-        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
-        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
-        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
-        #
-        db.session.add_all([admin,nhan_vien,qlk,u])
-        #
-        #
-        # pt1=PhuongThucThanhToan(ten_phuong_thuc='ONLINE')
-        # pt2=PhuongThucThanhToan(ten_phuong_thuc='AT_STORE')
-        # tt0=TrangThaiDonHang(ten_trang_thai='SHOPPING')
-        # tt1=TrangThaiDonHang(ten_trang_thai='PAYING')
-        # tt2=TrangThaiDonHang(ten_trang_thai='PAID')
-        # tt3=TrangThaiDonHang(ten_trang_thai='CANCELED')
+
+
         # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
         # db.session.add(qlk)
+
+        # pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
+        # pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
+        # db.session.add_all([pt1, pt2])
+
+        # tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
+        # tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
+        # tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
+        # db.session.add_all([tt1, tt2, tt3])
+
+        # r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
+        # r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
+        # r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
+        # r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
+        # db.session.add_all([r1,r2,r3,r4])
+
+        # admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
+        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
+        # qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
+        # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
+        # #
+        # db.session.add_all([admin,nhan_vien,qlk,u])
+
+
         db.session.commit()

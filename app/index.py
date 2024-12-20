@@ -10,15 +10,11 @@ from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_AP
 from app.admin import *
 import app.dao as dao
 from flask_login import login_user, logout_user
-from enum import Enum
+from app import Role
 from decorators import annonymous_user, login_required
 
 
-class Role(Enum):
-    QUANLY = 'QUANLY'
-    NHAN_VIEN = 'NHANVIEN'
-    QUAN_LY_KHO = 'QUANLYKHO'
-    KHACH_HANG = 'KHACHHANG'
+
 
 
 @app.route("/")

@@ -2,7 +2,39 @@
 
 {% block body %}
 <div class="container-fluid mt-4">
+
     <div class="row">
+ {% if request.path == '/admin/cashier2view/' %}
+<div class="col-md-8 border-right">
+            <div class="order-section">
+                <label for="don-hang-id">Nhập mã đơn hàng:</label>
+                <input type="text" id="don-hang-id" class="form-control" placeholder="Nhập mã đơn hàng">
+                <button id="search-don-hang-btn" class="btn btn-primary mt-2"
+                    >Tìm đơn hàng</button>
+            </div>
+
+            <div id="order-details" class="mt-4" >
+                <h5>Thông tin hóa đơn</h5>
+                <p><strong>Tên khách hàng:</strong> <span id="customer-name"></span></p>
+                <p><strong>Ngày tạo:</strong> <span id="creation-date"></span></p>
+                <table class="table table-bordered mt-3">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên sách</th>
+                        <th>Thể loại</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                    </tr>
+                    </thead>
+                    <tbody id="order-books"></tbody>
+                </table>
+                <button id="print-order-btn" class="btn btn-success mt-3"
+                        onclick="window.location.href='/don_hang/<int:don_hang_id>/create-invoice'">
+                    In hóa đơn</button>
+            </div>
+</div>
+        {% else %}
         <!-- Phần nhập và danh sách sản phẩm -->
         <div class="col-md-8 border-right">
             <div class="mb-3">
@@ -17,10 +49,13 @@
                             placeholder="Thêm sản phẩm vào đơn (F3)"
                     >
                 </div>
+
             </div>
 
             <!-- Danh sách kết quả tìm kiếm -->
             <ul class="list-group" id="search-results"></ul>
+
+
 
             <!-- Danh sách sản phẩm trong giỏ hàng -->
             <div class="card shadow-sm mt-3">
@@ -35,7 +70,7 @@
             </div>
 
         </div>
-
+   {%endif%}
         <!-- Phần thông tin thanh toán -->
         <div class="col-md-4">
             <div class="card shadow-sm">
@@ -74,18 +109,26 @@
                         >
                     </div>
 
-                    <button id="btn-pay" onclick="window.location.href='/admin/cashierview/cart/cash'" class="btn btn-success btn-block font-weight-bold">
+                    <button id="btn-pay" onclick="window.location.href='/admin/cashierview/cart/cash'"
+                            class="btn btn-success btn-block font-weight-bold">
                         Thanh toán (F1)
                     </button>
                 </div>
             </div>
+             {% if request.path == '/admin/cashierview/' %}
             <div class="mt-3 text-center">
-        <button class="btn btn-secondary mx-2" id="clear-cart-btn">Gỡ toàn bộ sách trong giỏ</button>
-    </div>
+                <button class="btn btn-secondary mx-2" id="clear-cart-btn">Gỡ toàn bộ sách trong giỏ</button>
+            </div>
+            {%endif%}
         </div>
     </div>
 
 
 </div>
+ {% if request.path == '/admin/cashierview/' %}
 <script src="{{ url_for('static', filename='js/cashier.js')}}"></script>
+{%else%}
+<script src="{{ url_for('static', filename='js/cashier2.js')}}"></script>
+{%endif%}
+
 {% endblock %}

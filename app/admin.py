@@ -18,7 +18,7 @@ from wtforms.fields.datetime import DateField, DateTimeField
 from wtforms.fields.simple import PasswordField
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from app import admin, db, app
+from app import admin, db, app, dao
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
@@ -194,6 +194,68 @@ class CashierView(AuthenticatedNhanVienView):
         return redirect('/admin/cashierview')
 
 
+
+
+class Cashier2View(AuthenticatedNhanVienView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/cashier.html')
+    @expose('/don_hang/<int:don_hang_id>', methods=['GET'])
+    def get_order_details(self, don_hang_id):
+        # Truy vấn đơn hàng
+        don_hang = DonHang.query.filter_by(id=don_hang_id).first()
+        if not don_hang:
+            return jsonify({"error": "don_hang not found"}), 404
+
+        # Lấy thông tin người nhận hàng
+        thong_tin_nhan_hang = ThongTinNhanHang.query.filter_by(id=don_hang.id).first()
+
+        khach_hang=User.query.get(don_hang.khach_hang_id)
+
+        # Lấy danh sách sách trong đơn hàng
+        chi_tiet_don_hang = ChiTietDonHang.query.filter_by(don_hang_id=don_hang.id).all()
+
+        sach_data = [
+            {
+                "ten_sach": Sach.query.get(chi_tiet.sach_id).ten_sach if Sach.query.get(
+                    chi_tiet.sach_id) else "Không xác định",
+                "the_loai": TheLoai.query.get(
+                    Sach.query.get(chi_tiet.sach_id).the_loai_id).ten_the_loai if Sach.query.get(chi_tiet.sach_id)
+                                                                                  and TheLoai.query.get(
+                    Sach.query.get(chi_tiet.sach_id).the_loai_id) else "Không xác định",
+                "so_luong": chi_tiet.so_luong,
+                "don_gia":Sach.query.get(chi_tiet.sach_id).don_gia if Sach.query.get(
+                    chi_tiet.sach_id) else "Không xác định",
+            }
+            for chi_tiet in chi_tiet_don_hang
+        ]
+
+        # Cấu trúc dữ liệu trả về
+        response = {
+            "don_hang_id": don_hang.id,
+            "ngay_tao": don_hang.ngay_tao_don.strftime('%Y-%m-%d %H:%M:%S'),
+            "phuong_thuc_thanh_toan": PhuongThucThanhToan.query.get(
+                don_hang.phuong_thuc_id).ten_phuong_thuc if don_hang.phuong_thuc_id else None,
+            "trang_thai_don_hang": TrangThaiDonHang.query.get(
+                don_hang.trang_thai_id).ten_trang_thai if don_hang.trang_thai_id else None,
+            "khach_hang_id": don_hang.khach_hang_id,
+            "ten_khach_hang":khach_hang.ten,
+            "ho_khach_hang":khach_hang.ho,
+            "thong_tin_nhan_hang": {
+                "dien_thoai": thong_tin_nhan_hang.dien_thoai_nhan_hang if thong_tin_nhan_hang else None,
+                "dia_chi": thong_tin_nhan_hang.dia_chi_nhan_hang if thong_tin_nhan_hang else None,
+            },
+            "sach": sach_data
+        }
+
+        return jsonify(response), 200
+
+    @expose('/don_hang/<int:don_hang_id>/create-invoice', methods=['POST'])
+    def create_invoice(self,don_hang_id):
+        nhan_vien_id = request.json.get("nhan_vien_id", None)
+        return create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id)
+
+
 class RevenueStatsView(MyView):
     @expose("/")
     def index(self):
@@ -281,7 +343,7 @@ class SachView(AuthenticatedView):
     #
     column_formatters = {
         'so_luong_cuon_con_lai': lambda v, c, m, p: (
-                db.session.query(SoLuongCuonConLai.so_luong).filter(SoLuongCuonConLai.sach_id == m.id).order_by(
+                db.session.query(SoLuongCuonConLai.so_luong).filter(SoLuongCuonConLai.sach_id == m.id)._by(
                     SoLuongCuonConLai.thoi_diem.desc()).first() or 'NaN'
         )
     }
@@ -464,7 +526,8 @@ class PhuongThucThanhToanView(AuthenticatedView):
         ]
     }
 
-class TrangThaiDonHang(AuthenticatedView):
+
+class TrangThaiDonHangView(AuthenticatedView):
     can_view_details = False
     can_delete = True
     can_create = True
@@ -492,6 +555,7 @@ admin.add_view(XemPhieuNhapSach(ChiTietPhieuNhapSach, db.session, name="Xem Chi 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
 
-admin.add_view(CashierView(name='Bán hàng'))
+admin.add_view(CashierView(name='Bán hàng mua tại cửa hàng',category='Bán hàng'))
+admin.add_view(Cashier2View(name='Bán hàng đã đặt trước',category='Bán hàng'))
 
 admin.add_view(Logout(name="Đăng xuất"))
