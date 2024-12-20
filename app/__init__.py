@@ -25,6 +25,16 @@ VNPAY_MERCHANT_ID = 'BGJVFP3Z'
 VNPAY_API_KEY = '9JVDXL67YUMV3I01HKS36KAPKQCL7TN5'
 VNPAY_PAYMENT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'  # URL thanh toán VNPAY Sandbox
 VNPAY_RETURN_URL = 'https://huymanhdatbookstoresystemcnpm.loca.lt/vnpay_return'  # URL trả về sau khi thanh toán
+class PayingMethod(Enum):
+    ONLINE_PAY = 'ONLINE_PAY'
+    OFFLINE_PAY = 'OFFLINE_PAY'
+
+
+class Status(Enum):
+    "Dành cho đơn hàng online"
+    PAID = 'PAID'  # đã trả tiền
+    WAITING = 'WAITING'  # đang đợi trả tiền
+    FAIL = 'FAIL'  # hủy vì hết thời gian trả
 
 babel = Babel(app)
 

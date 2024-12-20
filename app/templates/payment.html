@@ -21,13 +21,18 @@
 
       <div class="form-group">
         <label for="total_amount">Tổng Tiền:</label>
-        <input type="numbers" class="form-control" id="total_amount" name="total_amount" value="100000 VND" readonly>
+        <input type="numbers" class="form-control" id="total_amount" name="total_amount" value=" {{ '{:,.0f}'.format(cart.total_amount) }} VND" readonly>
       </div>
 
       <div class="form-group text-center">
         <button type="submit" class="btn btn-warning">Thanh toán</button>
       </div>
     </form>
+     <form>
+         <div class="form-group text-center">
+            <button type="submit" class="btn btn-warning">Chỉ lưu đơn</button>
+          </div>
+     </form>
   </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

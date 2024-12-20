@@ -18,7 +18,6 @@ class VaiTro(db.Model):
     # def __int__(self):
     #     return int(self.id)
 
-
 class QuyDinh(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     ten_quy_dinh = Column(String(50), nullable=False, unique=True)
@@ -71,11 +70,9 @@ class User(db.Model, UserMixin):
     vai_tro_id = Column(Integer, ForeignKey(VaiTro.id), nullable=False)
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
     don_hang = relationship('DonHang', backref='user', lazy=True)
-    hoa_don_ban_sach = relationship('HoaDonBanSach', backref='user', lazy=True)
-
+    hoa_don_ban_sach=relationship('HoaDonBanSach',backref='user',lazy=True)
     def __str__(self):
         return self.ten
-
 
 class HoaDonBanSach(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -103,7 +100,6 @@ class Sach(db.Model):
 
     def __str__(self):
         return self.ten_sach
-
 
 class ChiTietHoaDon(db.Model):
     sach_id = Column(ForeignKey(Sach.id), primary_key=True)
@@ -138,8 +134,7 @@ class PhieuNhapSach(db.Model):
     sach = relationship('ChiTietPhieuNhapSach', backref='phieu_nhap_sach')
 
     def __int__(self):
-        return self.id
-
+         return self.id
 
 class ChiTietPhieuNhapSach(db.Model):
     phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id),
@@ -147,6 +142,8 @@ class ChiTietPhieuNhapSach(db.Model):
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
 
     so_luong = Column(Integer, nullable=False)
+
+
 
 
 class DonHang(db.Model):
@@ -158,6 +155,9 @@ class DonHang(db.Model):
     khach_hang_id = Column(Integer, ForeignKey(User.id), nullable=False)
     thong_tin_nhan_hang = relationship('ThongTinNhanHang', uselist=False, backref='don_hang')
     sach = relationship('ChiTietDonHang', backref='don_hang')
+
+    # def __class__(self):
+    #      return self
 
 
 class ThongTinNhanHang(db.Model):
@@ -175,8 +175,13 @@ class ChiTietDonHang(db.Model):
     tong_tien = Column(Integer, nullable=False, default=0)
 
 
+
+
+
+
 if __name__ == "__main__":
     with my_app.app_context():
+        
         # db.drop_all()
         # db.create_all()
 

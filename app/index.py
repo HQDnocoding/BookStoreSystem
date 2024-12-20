@@ -3,18 +3,30 @@ import math
 import urllib
 
 import random
+
 from datetime import timedelta
 
 from flask import render_template, redirect, request, session, jsonify
-from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_API_KEY, VNPAY_PAYMENT_URL
+from sqlalchemy.sql.sqltypes import NullType
+
+from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_API_KEY, VNPAY_PAYMENT_URL, PayingMethod, \
+    Status
 from app.admin import *
 import app.dao as dao
 from flask_login import login_user, logout_user
 from app import Role
+from flask_login import login_user, logout_user , current_user
+from enum import Enum
+
+from app.utils import cart_stats
 from decorators import annonymous_user, login_required
 
 
-
+class Role(Enum):
+    QUANLY = 'QUANLY'
+    NHAN_VIEN = 'NHANVIEN'
+    QUAN_LY_KHO = 'QUANLYKHO'
+    KHACH_HANG = 'KHACHHANG'
 
 
 @app.route("/")
@@ -255,6 +267,38 @@ class vnpay:
         return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest() #
 
 
+@app.route('/payment_offline/')
+@login_required
+def payment_offline():
+
+    return render_template('payment_offline.html')
+
+
+@app.route('/payment_offline_done', methods=['get'])
+@login_required
+def payment_offline_done():
+    cart_key = app.config['CART_KEY']
+    dien_thoai_nhan_hang = request.args['phone']
+    dia_chi_nhan_hang = "THANH TOÁN TẠI CỬA HÀNG"
+    # print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
+    # print('user_id : ',current_user.get_id())
+    donhang = create_donhang(ngay_tao_don=datetime.now(),
+                             phuong_thuc_id=get_or_create_phuong_thuc_id(PayingMethod.OFFLINE_PAY.value),
+                             trang_thai_id=get_or_create_trang_thai_id(Status.WAITING.value),
+                             khach_hang_id=current_user.get_id())
+    cart_items = session[cart_key]
+
+    # print(donhang)
+    thongtinnhanhang = create_thongtinnhanhang(id=donhang.id, dien_thoai_nhan_hang=dien_thoai_nhan_hang,
+                                               dia_chi_nhan_hang=dia_chi_nhan_hang)
+
+    for ci in cart_items.values():
+        create_chitietdonhang(don_hang_id=donhang.id, sach_id=ci['id'], so_luong=ci['so_luong'],
+                              tong_tien=ci['don_gia'] * ci['so_luong'])
+
+    session['order_id'] = donhang.id
+    return redirect('/')
+
 
 @app.route('/payment/')
 @login_required
@@ -266,12 +310,35 @@ def payment():
 
 
 @app.route('/process_payment', methods=['post'])
+@login_required
 def process_payment():
+
+
+    cart_key = app.config['CART_KEY']
+    dien_thoai_nhan_hang = request.form['phone']
+    dia_chi_nhan_hang = request.form['address']
+    #print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
+    #print('user_id : ',current_user.get_id())
+    donhang = create_donhang( ngay_tao_don=datetime.now(),phuong_thuc_id= get_or_create_phuong_thuc_id(PayingMethod.ONLINE_PAY.value),trang_thai_id= get_or_create_trang_thai_id(Status.WAITING.value), khach_hang_id=current_user.get_id())
+    cart_items = session[cart_key]
+
+    #print(donhang)
+    thongtinnhanhang = create_thongtinnhanhang(id=donhang.id,dien_thoai_nhan_hang=dien_thoai_nhan_hang,
+                                               dia_chi_nhan_hang=dia_chi_nhan_hang)
+
+    for ci in cart_items.values():
+        create_chitietdonhang(don_hang_id=donhang.id,sach_id=ci['id'],so_luong=ci['so_luong'],tong_tien=ci['don_gia']*ci['so_luong'])
+
+    session['order_id'] = donhang.id
+
+    total_amount = cart_stats(cart_items).get('total_amount')
+
+    #########################################
     vnp = vnpay()
     vnp.requestData['vnp_Version'] = '2.1.0'
     vnp.requestData['vnp_Command'] = 'pay'
     vnp.requestData['vnp_TmnCode'] = VNPAY_MERCHANT_ID
-    vnp.requestData['vnp_Amount'] = 25000 * 100
+    vnp.requestData['vnp_Amount'] = total_amount * 100
     vnp.requestData['vnp_CurrCode'] = 'VND'
     vnp.requestData['vnp_TxnRef'] = str(random.randint(100000, 999999))
     vnp.requestData['vnp_OrderInfo'] = 'Thanh toan'
@@ -305,6 +372,14 @@ def payment_return():
         # Validate response
         if vnp.validate_response(VNPAY_API_KEY):
             if vnp_response_code == "00":
+                hoa_don = create_hoadonbansach( ngay_tao_hoa_don=datetime.now())
+                order_id = session['order_id']
+
+                donhang = get_order_by_order_id(order_id)
+
+                for d in donhang.sach:
+                    create_chitiethoadon(sach_id=d.sach_id,hoa_don_id=hoa_don.id,so_luong=d.so_luong,tong_tien=d.tong_tien)
+
                 return redirect(url_for('payment_succeed'))  # Chuyển hướng đến trang thành công
             else:
                 return redirect(url_for('payment_failed'))  # Chuyển hướng đến trang thất bại
@@ -312,11 +387,11 @@ def payment_return():
 
 @app.route('/payment_succeed')
 def payment_succeed():
-    return "Payment succeeded!"
+    return render_template('payment_succeed.html')
 
 @app.route('/payment_failed')
 def payment_failed():
-    return "Payment failed!"
+    return render_template('payment_failed.html')
 
 
 if __name__ == "__main__":
