@@ -464,6 +464,17 @@ class PhuongThucThanhToanView(AuthenticatedView):
         ]
     }
 
+class TrangThaiDonHang(AuthenticatedView):
+    can_view_details = False
+    can_delete = True
+    can_create = True
+    form_choices = {
+        'ten_trang_thai': [
+            ('Đã thanh toán', 'Đã thanh toán'),
+            ('Chưa thanh toán', 'Chưa thanh toán')
+        ]
+    }
+
 
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))

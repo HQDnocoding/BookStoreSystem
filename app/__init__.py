@@ -19,10 +19,10 @@ app.config['CART_KEY'] = 'cart'
 
 
 # VNPAY thông tin cấu hình
-VNPAY_MERCHANT_ID = 'OVW2PEB7'
-VNPAY_API_KEY = 'UB63RKYVUSRVXRSYWOYO2V8D9BVAS1QR'
+VNPAY_MERCHANT_ID = 'BGJVFP3Z'
+VNPAY_API_KEY = '9JVDXL67YUMV3I01HKS36KAPKQCL7TN5'
 VNPAY_PAYMENT_URL = 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html'  # URL thanh toán VNPAY Sandbox
-VNPAY_RETURN_URL = 'https://huymanhdatbookstoresystemdemo.loca.lt/vnpay_return'  # URL trả về sau khi thanh toán
+VNPAY_RETURN_URL = 'https://huymanhdatbookstoresystemcnpm.loca.lt/vnpay_return'  # URL trả về sau khi thanh toán
 
 babel = Babel(app)
 
