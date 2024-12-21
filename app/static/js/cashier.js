@@ -42,9 +42,10 @@ document.addEventListener('click', function (event) {
         const productName = event.target.dataset.name;
         const productPrice = parseFloat(event.target.dataset.price);
         const productImage = event.target.dataset.image;
+        const productTheLoai = event.target.dataset.theloai;
 
         // Thêm sản phẩm vào giỏ hàng
-        addToCart(productId, productName, productPrice, productImage);
+        addToCart(productId, productName, productPrice, productImage,productTheLoai);
         loadCart()
     }
 });
@@ -69,7 +70,7 @@ function loadCart() {
             }
 
             renderCart(data.cart);
-            updateCartSummary(data.total_quantity, data.total_price);
+            updateCartSummary(data.total_quantity, data.total_amount);
         })
         .catch(err => console.error('Lỗi khi tải giỏ hàng:', err));
 }
@@ -119,7 +120,8 @@ function searchProducts(query) {
                             data-id="${product.id}"
                             data-name="${product.name}"
                             data-price="${product.price}"
-                            data-image="${product.image}">
+                            data-image="${product.image}"
+                            data-theloai="${product.the_loai_id}">
                             Thêm
                         </button>
                     </li>`;
@@ -142,7 +144,7 @@ function searchProducts(query) {
 }
 
 
-async function addToCart(productId, productName, productPrice, productImage) {
+async function addToCart(productId, productName, productPrice, productImage,theLoaiId) {
     try {
         // Gửi yêu cầu thêm sản phẩm
         const response = await fetch('/admin/cashierview/cart', {
@@ -153,6 +155,7 @@ async function addToCart(productId, productName, productPrice, productImage) {
                 ten_sach: productName,
                 don_gia: productPrice,
                 bia_sach: productImage,
+                the_loai_id:theLoaiId,
                 so_luong: 1
             })
         });

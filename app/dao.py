@@ -405,7 +405,7 @@ def create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id=None):
         # status=Status.PAID.value
         # don_hang.trang_thai_id = TrangThaiDonHang.query.filter(status).first().id
         db.session.commit()
-        return jsonify({
+        return {
             "hoa_don_id": hoa_don.id,
             "ngay_tao_hoa_don": hoa_don.ngay_tao_hoa_don.strftime("%Y-%m-%d %H:%M:%S"),
             "nhan_vien_id": hoa_don.nhan_vien,
@@ -416,11 +416,14 @@ def create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id=None):
                     "tong_tien": chi_tiet.tong_tien
                 } for chi_tiet in hoa_don.sach
             ]
-        }), 201
+        }, 201
 
     except SQLAlchemyError as e:
         db.session.rollback()
         return {"error": f"Lỗi hệ thống: {str(e)}"}, 500
+
+
+
 
 
 def get_or_create_phuong_thuc_id(ten_phuong_thuc):
@@ -466,4 +469,8 @@ def get_order_by_order_id(order_id):
     order = DonHang.query.get(order_id)
 
     return order
+
+
+def get_trang_thai_id(ten):
+    return TrangThaiDonHang.query.filter_by(ten_trang_thai=ten).first()
 

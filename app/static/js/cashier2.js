@@ -33,10 +33,12 @@ async function findOrder() {
 // Hàm hiển thị dữ liệu đơn hàng ra giao diện
 
 var don_hang_id=-1
+var ho_ten_kh=''
 
 function renderOrderDetails(don_hang_data) {
 
     don_hang_id=don_hang_data.don_hang_id
+    ho_ten_kh=don_hang_data.ho_khach_hang+" "+don_hang_data.ten
 
     document.getElementById("customer-name").textContent = (don_hang_data.ten_khach_hang+" " +don_hang_data.ho_khach_hang )|| 'Không xác định';
     document.getElementById("creation-date").textContent = don_hang_data.ngay_tao || 'Không xác định';
@@ -69,7 +71,7 @@ function renderOrderDetails(don_hang_data) {
 async function createInvoice(id_don_hang) {
 
     try {
-        const response = await fetch(`/admin/cashier2view/don_hang/${id_don_hang}/create-invoice`, {
+        const response = await fetch(`/admin/cashier2view/don_hang/${id_don_hang}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -77,7 +79,8 @@ async function createInvoice(id_don_hang) {
         });
 
         if (response.ok) {
-            const invoiceData = await response.json();
+            const data = await response.json();
+             window.location.href =data.path
             alert('Hóa đơn đã được tạo thành công!');
         } else {
             alert('Đã xảy ra lỗi khi tạo hóa đơn');

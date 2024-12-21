@@ -1,8 +1,10 @@
 import hashlib
 import json
+import os
 from datetime import datetime
 from email.policy import default
 from math import trunc
+from operator import and_
 from xmlrpc.client import DateTime
 
 import cloudinary.uploader
@@ -18,7 +20,7 @@ from wtforms.fields.datetime import DateField, DateTimeField
 from wtforms.fields.simple import PasswordField
 from wtforms_sqlalchemy.fields import QuerySelectField
 
-from app import admin, db, app, dao
+from app import admin, db, app, dao, utils
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
@@ -74,7 +76,7 @@ class CashierView(AuthenticatedNhanVienView):
     def get_cart(self):
         """Lấy thông tin giỏ hàng"""
         cart = session.get('cart', {})
-        return jsonify(self.cart_stats(cart))
+        return jsonify(utils.cart_stats(cart))
 
     @expose('/cart', methods=['POST'])
     def add_to_cart(self):
@@ -95,6 +97,7 @@ class CashierView(AuthenticatedNhanVienView):
                 "ten_sach": data['ten_sach'],
                 "don_gia": data['don_gia'],
                 "bia_sach": data['bia_sach'],
+                "the_loai_id": data['the_loai_id'],
                 "so_luong": quantity
             }
 
@@ -103,7 +106,7 @@ class CashierView(AuthenticatedNhanVienView):
         session.modified = True
 
         # Trả về trạng thái giỏ hàng
-        return jsonify(self.cart_stats(cart))
+        return jsonify(utils.cart_stats(cart))
 
     @expose('/cart', methods=['DELETE'])
     def clear_cart(self):
@@ -168,25 +171,48 @@ class CashierView(AuthenticatedNhanVienView):
                 'id': p.id,
                 'name': p.ten_sach,
                 'price': p.don_gia,
-                'image': p.bia_sach
+                'image': p.bia_sach,
+                'the_loai_id': p.the_loai_id,
             } for p in products
         ])
-
-    def cart_stats(self, cart):
-        """Tính toán tổng số lượng và tổng tiền của giỏ hàng"""
-        total_quantity = sum(item['so_luong'] for item in cart.values())
-        total_price = sum(item['don_gia'] * item['so_luong'] for item in cart.values())
-        return {
-            "cart": list(cart.values()),
-            "total_quantity": total_quantity,
-            "total_price": total_price
-        }
 
     @expose('/cart/cash', methods=['GET'])
     @login_required
     def cashier(self, **kwargs):
+
+        nv = dao.get_user_by_id(current_user.id)
+
+        if nv is not None:
+            ten_nv = f"{nv.ho} {nv.ten}"
+        else:
+            ten_nv = "Chưa có thông tin nhân viên"
+
+        ten_kh = "Khách hàng mua tại nhà sách"
+
+        cart = session.get('cart', {})
+
+        cart_list_dict = [
+            {
+                "ten_sach": sach['ten_sach'],
+                "don_gia": sach['don_gia'],
+                    "the_loai": TheLoai.query.filter_by(id=sach['the_loai_id']).first().ten_the_loai if TheLoai.query.filter_by(
+                    id=sach['the_loai_id']).first()  else "Không có",
+                "so_luong":sach['so_luong']
+            }
+            for sach in cart.values()
+        ]
+
         try:
+
+            app.logger.error(cart_list_dict.__str__())
+
             hoa_don = create_invoice_from_cart()
+
+            output_dir = "bieu_mau_hoa_don_mua_tai_cua_hang"
+            os.makedirs(output_dir, exist_ok=True)
+            output_filename = os.path.join(output_dir, f"tch_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+
+            utils.create_invoice_pdf(ten_kh,hoa_don.ngay_tao_hoa_don, ten_nv,cart_list_dict,output_filename)
             flash("Hóa đơn đã được tạo thành công.", "success")
         except Exception as e:
             app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
@@ -194,23 +220,29 @@ class CashierView(AuthenticatedNhanVienView):
         return redirect('/admin/cashierview')
 
 
-
-
 class Cashier2View(AuthenticatedNhanVienView):
+
     @expose('/')
     def index(self):
+
         return self.render('admin/cashier.html')
+
     @expose('/don_hang/<int:don_hang_id>', methods=['GET'])
     def get_order_details(self, don_hang_id):
         # Truy vấn đơn hàng
-        don_hang = DonHang.query.filter_by(id=don_hang_id).first()
+        waiting_status_id = dao.get_trang_thai_id(Status.WAITING.value)
+
+        don_hang = DonHang.query.filter(and_(
+            DonHang.id == don_hang_id,
+            DonHang.trang_thai_id == waiting_status_id.id
+        )).first()
         if not don_hang:
             return jsonify({"error": "don_hang not found"}), 404
 
         # Lấy thông tin người nhận hàng
         thong_tin_nhan_hang = ThongTinNhanHang.query.filter_by(id=don_hang.id).first()
 
-        khach_hang=User.query.get(don_hang.khach_hang_id)
+        khach_hang = User.query.get(don_hang.khach_hang_id)
 
         # Lấy danh sách sách trong đơn hàng
         chi_tiet_don_hang = ChiTietDonHang.query.filter_by(don_hang_id=don_hang.id).all()
@@ -224,11 +256,13 @@ class Cashier2View(AuthenticatedNhanVienView):
                                                                                   and TheLoai.query.get(
                     Sach.query.get(chi_tiet.sach_id).the_loai_id) else "Không xác định",
                 "so_luong": chi_tiet.so_luong,
-                "don_gia":Sach.query.get(chi_tiet.sach_id).don_gia if Sach.query.get(
+                "don_gia": Sach.query.get(chi_tiet.sach_id).don_gia if Sach.query.get(
                     chi_tiet.sach_id) else "Không xác định",
             }
             for chi_tiet in chi_tiet_don_hang
         ]
+
+        session['sach_data'] = sach_data
 
         # Cấu trúc dữ liệu trả về
         response = {
@@ -239,8 +273,8 @@ class Cashier2View(AuthenticatedNhanVienView):
             "trang_thai_don_hang": TrangThaiDonHang.query.get(
                 don_hang.trang_thai_id).ten_trang_thai if don_hang.trang_thai_id else None,
             "khach_hang_id": don_hang.khach_hang_id,
-            "ten_khach_hang":khach_hang.ten,
-            "ho_khach_hang":khach_hang.ho,
+            "ten_khach_hang": khach_hang.ten,
+            "ho_khach_hang": khach_hang.ho,
             "thong_tin_nhan_hang": {
                 "dien_thoai": thong_tin_nhan_hang.dien_thoai_nhan_hang if thong_tin_nhan_hang else None,
                 "dia_chi": thong_tin_nhan_hang.dia_chi_nhan_hang if thong_tin_nhan_hang else None,
@@ -248,20 +282,29 @@ class Cashier2View(AuthenticatedNhanVienView):
             "sach": sach_data
         }
 
+        session['ten_kh'] = f"{khach_hang.ho} {khach_hang.ten}"
+
         return jsonify(response), 200
 
-    @expose('/don_hang/<int:don_hang_id>/create-invoice', methods=['POST'])
+    @expose('/don_hang/<int:don_hang_id>', methods=['POST'])
     def create_invoice(self, don_hang_id):
         nhan_vien_id = current_user.id
 
-        result = create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id)
-        if result:
-            return jsonify({"message": "Hóa đơn được tạo thành công"}), 200
-        else:
-            return jsonify({"error": "Không thể tạo hóa đơn"}), 400
+        infor, sach = create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id)
 
+        ten_kh = session.get('ten_kh', '')
+        sach_data = session.get('sach_data', [])
 
+        nv = dao.get_nhan_vien(nhan_vien_id)
+        ho_ten_nv = f"{nv.ho} {nv.ten}"
 
+        output_dir = "bieu_mau_hoa_don_mua_tai_cua_hang"
+        os.makedirs(output_dir, exist_ok=True)
+        output_filename = os.path.join(output_dir, f"dt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+
+        utils.create_invoice_pdf(ten_kh, infor['ngay_tao_hoa_don'], sach_data, ho_ten_nv, output_filename)
+
+        return jsonify({"path": "/admin/cashier2view"}), 200
 
 
 class RevenueStatsView(MyView):
@@ -509,7 +552,7 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
                         so_luong=book["so_luong"]
                     )
                     soluongconlai = get_so_luong_cuon_con_lai(sach.id)
-                    if(soluongconlai >= 300):
+                    if (soluongconlai >= 300):
                         pass
                     else:
                         update_or_add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
@@ -537,6 +580,7 @@ class PhuongThucThanhToanView(AuthenticatedView):
         ]
     }
 
+
 class TrangThaiDonHangView(AuthenticatedView):
     can_view_details = False
     can_delete = True
@@ -558,7 +602,7 @@ admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quả
 admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
 admin.add_view(UserView(User, db.session, name='Quản lý User'))
 admin.add_view(VaitroView(VaiTro, db.session, name='Vai trò'))
-admin.add_view(TrangThaiDonHangView(TrangThaiDonHang,db.session,name='Trạng thái đơn hàng'))
+admin.add_view(TrangThaiDonHangView(TrangThaiDonHang, db.session, name='Trạng thái đơn hàng'))
 
 admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan, db.session, name='Phương thức thanh toán'))
 
@@ -569,7 +613,7 @@ admin.add_view(XemPhieuNhapSach(ChiTietPhieuNhapSach, db.session, name="Xem Chi 
 admin.add_view(RevenueStatsView(name='Thống kê doanh thu', category='Thống kê báo cáo'))
 admin.add_view(FrequencyStatsView(name='Thống kê tần suất', category='Thống kê báo cáo'))
 
-admin.add_view(CashierView(name='Bán hàng mua tại cửa hàng',category='Bán hàng'))
-admin.add_view(Cashier2View(name='Bán hàng đã đặt trước',category='Bán hàng'))
+admin.add_view(CashierView(name='Bán hàng mua tại cửa hàng', category='Bán hàng'))
+admin.add_view(Cashier2View(name='Bán hàng đã đặt trước', category='Bán hàng'))
 
 admin.add_view(Logout(name="Đăng xuất"))
