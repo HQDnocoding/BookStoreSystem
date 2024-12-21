@@ -297,6 +297,7 @@ def payment_offline_done():
                               tong_tien=ci['don_gia'] * ci['so_luong'])
 
     session['order_id'] = donhang.id
+    session.pop('cart', None)
     return redirect('/')
 
 
@@ -317,6 +318,7 @@ def process_payment():
     cart_key = app.config['CART_KEY']
     dien_thoai_nhan_hang = request.form['phone']
     dia_chi_nhan_hang = request.form['address']
+    is_pay_later = request.form.get('switch_isThanhToanSau', False)
     #print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
     #print('user_id : ',current_user.get_id())
     donhang = create_donhang( ngay_tao_don=datetime.now(),phuong_thuc_id= get_or_create_phuong_thuc_id(PayingMethod.ONLINE_PAY.value),trang_thai_id= get_or_create_trang_thai_id(Status.WAITING.value), khach_hang_id=current_user.get_id())
@@ -333,6 +335,10 @@ def process_payment():
 
     total_amount = cart_stats(cart_items).get('total_amount')
 
+    if is_pay_later:
+        return redirect('/')
+    else:
+        pass
     #########################################
     vnp = vnpay()
     vnp.requestData['vnp_Version'] = '2.1.0'
@@ -349,6 +355,7 @@ def process_payment():
     vnp.requestData['vnp_ReturnUrl'] = VNPAY_RETURN_URL
     vnpay_payment_url = vnp.get_payment_url(VNPAY_PAYMENT_URL, VNPAY_API_KEY)
     print(vnpay_payment_url)
+    session.pop(cart_key, None)
     return redirect(vnpay_payment_url)
 
 
