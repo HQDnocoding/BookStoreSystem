@@ -14,7 +14,7 @@
             </div>
 
             <div id="order-details" class="mt-4" >
-                <h5>Thông tin hóa đơn</h5>
+                <h5>Thông tin đơn hàng</h5>
                 <p><strong>Tên khách hàng:</strong> <span id="customer-name"></span></p>
                 <p><strong>Ngày tạo:</strong> <span id="creation-date"></span></p>
                 <table class="table table-bordered mt-3">
@@ -29,9 +29,6 @@
                     </thead>
                     <tbody id="order-books"></tbody>
                 </table>
-                <button id="print-order-btn" class="btn btn-success mt-3"
-                        onclick="window.location.href='/don_hang/<int:don_hang_id>/create-invoice'">
-                    In hóa đơn</button>
             </div>
 </div>
         {% else %}
@@ -108,11 +105,17 @@
                                 readonly
                         >
                     </div>
-
+ {% if request.path == '/admin/cashierview/' %}
                     <button id="btn-pay" onclick="window.location.href='/admin/cashierview/cart/cash'"
                             class="btn btn-success btn-block font-weight-bold">
                         Thanh toán (F1)
                     </button>
+               {%else%}
+                    <button id="btn-pay2"
+                            class="btn btn-success btn-block font-weight-bold">
+                        Thanh toán (F1)
+                    </button>
+                           {%endif%}
                 </div>
             </div>
              {% if request.path == '/admin/cashierview/' %}

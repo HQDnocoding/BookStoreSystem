@@ -31,7 +31,13 @@ async function findOrder() {
 }
 
 // Hàm hiển thị dữ liệu đơn hàng ra giao diện
+
+var don_hang_id=-1
+
 function renderOrderDetails(don_hang_data) {
+
+    don_hang_id=don_hang_data.don_hang_id
+
     document.getElementById("customer-name").textContent = (don_hang_data.ten_khach_hang+" " +don_hang_data.ho_khach_hang )|| 'Không xác định';
     document.getElementById("creation-date").textContent = don_hang_data.ngay_tao || 'Không xác định';
 
@@ -53,10 +59,48 @@ function renderOrderDetails(don_hang_data) {
         orderBooksTable.appendChild(row);
     });
     document.getElementById('total-price').value=tong_tien
+
+
+
+
+
 }
 
+async function createInvoice(id_don_hang) {
+
+    try {
+        const response = await fetch(`/admin/cashier2view/don_hang/${id_don_hang}/create-invoice`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const invoiceData = await response.json();
+            alert('Hóa đơn đã được tạo thành công!');
+        } else {
+            alert('Đã xảy ra lỗi khi tạo hóa đơn');
+        }
+    } catch (error) {
+        console.error('Lỗi khi gọi API:', error);
+        alert('Không thể kết nối đến máy chủ');
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.getElementById('search-don-hang-btn').addEventListener('click', findOrder);
+    document.getElementById('btn-pay2').addEventListener('click',function () {createInvoice(don_hang_id)} );
+
+    document.getElementById('search-don-hang-btn').addEventListener('click',function (){findOrder()});
+
+    document.getElementById('btn-change').addEventListener('click', function () {
+        const totalPaid = parseFloat(document.getElementById('amount-paid').value.replace('₫', '').replace(',', '')) || 0;
+        const totalAmount = parseFloat(document.getElementById('total-price').value.replace('₫', '').replace(',', '')) || 0;
+
+        const changeAmount = totalPaid - totalAmount;
+
+        document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
+    });
+
 });

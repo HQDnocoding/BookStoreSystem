@@ -251,9 +251,17 @@ class Cashier2View(AuthenticatedNhanVienView):
         return jsonify(response), 200
 
     @expose('/don_hang/<int:don_hang_id>/create-invoice', methods=['POST'])
-    def create_invoice(self,don_hang_id):
-        nhan_vien_id = request.json.get("nhan_vien_id", None)
-        return create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id)
+    def create_invoice(self, don_hang_id):
+        nhan_vien_id = current_user.id
+
+        result = create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id)
+        if result:
+            return jsonify({"message": "Hóa đơn được tạo thành công"}), 200
+        else:
+            return jsonify({"error": "Không thể tạo hóa đơn"}), 400
+
+
+
 
 
 class RevenueStatsView(MyView):

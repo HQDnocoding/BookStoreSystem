@@ -402,8 +402,8 @@ def create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id=None):
                     tong_tien=chi_tiet.tong_tien
                 )
                 db.session.add(chi_tiet_hoa_don)
-
-        don_hang.trang_thai_id = TrangThaiDonHang.query.filter_by(Status.PAID.value).first().id
+        # status=Status.PAID.value
+        # don_hang.trang_thai_id = TrangThaiDonHang.query.filter(status).first().id
         db.session.commit()
         return jsonify({
             "hoa_don_id": hoa_don.id,
