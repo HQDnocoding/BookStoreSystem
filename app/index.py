@@ -145,7 +145,7 @@ def search():
 
 @app.route('/books/<int:sach_id>')
 def details(sach_id):
-    sach = dao.get_sach_for_detail_by_id(sach_id)
+    sach = Sach.query.get(sach_id)
     return render_template('book_details.html', sach=sach)
 
 

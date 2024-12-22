@@ -280,20 +280,6 @@ def user_exists(username):
     return db.session.query(User).filter_by(username=username).first() is not None
 
 
-def get_sach_for_detail_by_id(sach_id):
-    sach = Sach.query.get(sach_id)
-    #vai_tro = VaiTro.query.get(role_id)
-    if sach:
-        return {
-            'id': sach.id,
-            'ten_sach': sach.ten_sach,
-            'don_gia': sach.don_gia,
-            'bia_sach': sach.bia_sach,
-            'tac_gia': sach.tac_gia.ten_tac_gia if sach.tac_gia else None,  # Lấy tên tác giả
-            'the_loai': sach.the_loai.ten_the_loai if sach.the_loai else None  # Lấy tên thể loại
-        }
-    return None
-
 def update_or_add_so_luong(sach_id, so_luong):
     # Tìm bản ghi có sach_id tương ứng
     so_luong_con_lai = SoLuongCuonConLai.query.filter_by(sach_id=sach_id).first()
