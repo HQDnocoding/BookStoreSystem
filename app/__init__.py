@@ -69,3 +69,7 @@ class Status(Enum):
     PAID = 'PAID'  # đã trả tiền
     WAITING = 'WAITING'  # đang đợi trả tiền
     FAIL = 'FAIL'  # hủy vì hết thời gian trả
+
+@app.template_filter('format_currency')
+def format_currency(value):
+    return f"{value:,.0f}"

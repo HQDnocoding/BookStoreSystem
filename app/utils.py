@@ -1,9 +1,14 @@
+
 import locale
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
+
+from app.models import DonHang
+
+
 
 def cart_stats(cart):
     total_amount, total_quantity = 0,0
@@ -24,6 +29,7 @@ def cart_stats(cart):
         "total_amount":total_amount,
         "total_quantity":total_quantity
     }
+
 
 
 
@@ -75,3 +81,7 @@ def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_
     # Lưu file PDF
     pdf.save()
     print(f"Hóa đơn đã được tạo tại {output_filename}")
+
+def count_orders(khach_hang_id):
+    return DonHang.query.filter_by(khach_hang_id=khach_hang_id).count()
+
