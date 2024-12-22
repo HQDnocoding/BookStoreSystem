@@ -14,7 +14,6 @@ from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_AP
     Status
 from app.admin import *
 import app.dao as dao
-from flask_login import login_user, logout_user
 from app import Role
 from flask_login import login_user, logout_user , current_user
 from enum import Enum
@@ -108,6 +107,11 @@ def login_my_user():
 def logout_my_user():
     logout_user()
     return redirect('/login')
+
+
+@app.route('/profile/')
+def profile():
+    return render_template('profile.html')
 
 
 @app.route('/shop/')
