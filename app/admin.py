@@ -190,17 +190,25 @@ class CashierView(AuthenticatedNhanVienView):
         ten_kh = "Khách hàng mua tại nhà sách"
 
         cart = session.get('cart', {})
+        print("Cart contents:", cart)
+        print("Cart values:", cart.values())
 
-        cart_list_dict = [
-            {
-                "ten_sach": sach['ten_sach'],
-                "don_gia": sach['don_gia'],
-                    "the_loai": TheLoai.query.filter_by(id=sach['the_loai_id']).first().ten_the_loai if TheLoai.query.filter_by(
-                    id=sach['the_loai_id']).first()  else "Không có",
-                "so_luong":sach['so_luong']
-            }
-            for sach in cart.values()
-        ]
+        cart_list_dict = []
+
+        for sach in cart.values():
+            if not isinstance(sach, dict):
+                app.logger.error(f"Giỏ hàng chứa phần tử không hợp lệ: {sach}")
+                continue
+
+            the_loai = TheLoai.query.filter_by(id=sach['the_loai_id']).first()
+            the_loai_ten = the_loai.ten_the_loai if the_loai else "Không có"
+
+            cart_list_dict.append({
+                "ten_sach": sach.get('ten_sach', 'Không rõ'),
+                "the_loai": the_loai_ten,
+                "don_gia": sach.get('don_gia', 0),
+                "so_luong": sach.get('so_luong', 0)
+            })
 
         try:
 
@@ -212,7 +220,7 @@ class CashierView(AuthenticatedNhanVienView):
             os.makedirs(output_dir, exist_ok=True)
             output_filename = os.path.join(output_dir, f"tch_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
-            utils.create_invoice_pdf(ten_kh,hoa_don.ngay_tao_hoa_don, ten_nv,cart_list_dict,output_filename)
+            utils.create_invoice_pdf(ten_kh, hoa_don.ngay_tao_hoa_don, cart_list_dict ,ten_nv ,output_filename)
             flash("Hóa đơn đã được tạo thành công.", "success")
         except Exception as e:
             app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
@@ -224,7 +232,6 @@ class Cashier2View(AuthenticatedNhanVienView):
 
     @expose('/')
     def index(self):
-
         return self.render('admin/cashier.html')
 
     @expose('/don_hang/<int:don_hang_id>', methods=['GET'])

@@ -19,7 +19,7 @@ from flask_login import login_user, logout_user , current_user
 from enum import Enum
 
 from app.utils import cart_stats
-from decorators import annonymous_user, login_required
+# from decorators import annonymous_user, login_required
 
 
 class Role(Enum):
@@ -51,7 +51,7 @@ def login_admin_process():
 
 
 @app.route('/register/', methods=['get', 'post'])
-@annonymous_user
+# @annonymous_user
 def register():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -84,7 +84,7 @@ def register():
 
 
 @app.route('/login/', methods=['get', 'post'])
-@annonymous_user
+# @annonymous_user
 def login_my_user():
     err_msg = ''
     if request.method.__eq__('POST'):
