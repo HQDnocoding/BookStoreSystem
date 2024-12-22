@@ -329,6 +329,7 @@ class Logout(MyView):
 class SachForm(Form):
     ten_sach = StringField('Tên sách', validators=[DataRequired()])
     don_gia = StringField('Đơn giá', validators=[DataRequired()])
+    noi_dung = StringField('Nội dung', validators=[DataRequired()])
     tac_gia_id = SelectField('Tác giả', coerce=int, validators=[DataRequired()])
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
     bia_sach = FileField('Bìa sách', validators=[
