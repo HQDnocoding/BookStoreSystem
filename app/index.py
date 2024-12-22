@@ -5,6 +5,7 @@ import urllib
 import random
 
 from datetime import timedelta
+from itertools import count
 
 from flask import render_template, redirect, request, session, jsonify
 from sqlalchemy.sql.sqltypes import NullType
@@ -214,6 +215,32 @@ def common_attr():
     return {
         'cart': utils.cart_stats(session.get(app.config['CART_KEY']))
     }
+
+@app.route('/orders/', methods=['get'])
+@login_required
+def orders():
+
+    page_size = 2
+    page = request.args.get('page',1)
+
+    don_hangs = get_order_by_user_id(current_user.get_id(),page,page_size)
+    counter = utils.count_orders(current_user.get_id())
+    order_json = []
+    for o in don_hangs:
+        order_json.append(
+        {
+            "id": o.id,
+            "ngay_tao_don": o.ngay_tao_don,
+            "phuong_thuc": get_phuong_thuc_by_id(o.phuong_thuc_id).ten_phuong_thuc,
+            "trang_thai": get_trang_thai_by_id(o.trang_thai_id).ten_trang_thai,
+            "total_price": get_order_total_price_by_id(o.id)
+        })
+
+    return render_template('orders_view.html',orders = order_json,pages= math.ceil(counter/page_size))
+
+
+
+
 #class vnpay để thanh toán online code mẫu dijango của VNPAY
 class vnpay:
     requestData = {}
