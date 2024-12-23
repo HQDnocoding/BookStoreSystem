@@ -1,10 +1,13 @@
 import locale
-import logging
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
+
+from app.models import DonHang
+
+
 
 from app import app
 
@@ -83,3 +86,7 @@ def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_
     except Exception as e:
         app.logger.error(e)
     print(f"Hóa đơn đã được tạo tại {output_filename}")
+
+def count_orders(khach_hang_id):
+    return DonHang.query.filter_by(khach_hang_id=khach_hang_id).count()
+

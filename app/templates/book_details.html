@@ -13,13 +13,17 @@
                 <h1 style="margin-bottom: 20px;">{{sach.ten_sach}}</h1>
                 <p>
                     <i class="fa-solid fa-user"></i>
-                    Tác giả: {{sach.tac_gia}}
+                    <strong>Tác giả:</strong> {{sach.tac_gia.ten_tac_gia}}
                 </p>
                 <p>
                     <i class="fa-solid fa-tag"></i>
-                    Thể loại: {{sach.the_loai}}
+                    <strong>Thể loại:</strong> {{sach.the_loai.ten_the_loai}}
+                </p>
+                <p>
+                    {{sach.noi_dung}}
                 </p>
                 <h4 style="color: green; font-weight: bold;">{{ "{:,.0f}".format(sach.don_gia) }} ₫</h4>
+
 
                 <hr>
 

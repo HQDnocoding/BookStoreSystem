@@ -5,6 +5,7 @@ import urllib
 import random
 
 from datetime import timedelta
+from itertools import count
 
 from flask import render_template, redirect, request, session, jsonify
 from sqlalchemy.sql.sqltypes import NullType
@@ -13,7 +14,6 @@ from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_AP
     Status
 from app.admin import *
 import app.dao as dao
-from flask_login import login_user, logout_user
 from app import Role
 from flask_login import login_user, logout_user , current_user
 from enum import Enum
@@ -109,6 +109,11 @@ def logout_my_user():
     return redirect('/login')
 
 
+@app.route('/profile/')
+def profile():
+    return render_template('profile.html')
+
+
 @app.route('/shop/')
 def shopping():
     the_loai = dao.get_the_loai()
@@ -144,7 +149,7 @@ def search():
 
 @app.route('/books/<int:sach_id>')
 def details(sach_id):
-    sach = dao.get_sach_for_detail_by_id(sach_id)
+    sach = Sach.query.get(sach_id)
     return render_template('book_details.html', sach=sach)
 
 
@@ -214,6 +219,32 @@ def common_attr():
     return {
         'cart': utils.cart_stats(session.get(app.config['CART_KEY']))
     }
+
+@app.route('/orders/', methods=['get'])
+@login_required
+def orders():
+
+    page_size = 2
+    page = request.args.get('page',1)
+
+    don_hangs = get_order_by_user_id(current_user.get_id(),page,page_size)
+    counter = utils.count_orders(current_user.get_id())
+    order_json = []
+    for o in don_hangs:
+        order_json.append(
+        {
+            "id": o.id,
+            "ngay_tao_don": o.ngay_tao_don,
+            "phuong_thuc": get_phuong_thuc_by_id(o.phuong_thuc_id).ten_phuong_thuc,
+            "trang_thai": get_trang_thai_by_id(o.trang_thai_id).ten_trang_thai,
+            "total_price": get_order_total_price_by_id(o.id)
+        })
+
+    return render_template('orders_view.html',orders = order_json,pages= math.ceil(counter/page_size))
+
+
+
+
 #class vnpay để thanh toán online code mẫu dijango của VNPAY
 class vnpay:
     requestData = {}
@@ -297,6 +328,7 @@ def payment_offline_done():
                               tong_tien=ci['don_gia'] * ci['so_luong'])
 
     session['order_id'] = donhang.id
+    session.pop('cart', None)
     return redirect('/')
 
 
@@ -317,6 +349,7 @@ def process_payment():
     cart_key = app.config['CART_KEY']
     dien_thoai_nhan_hang = request.form['phone']
     dia_chi_nhan_hang = request.form['address']
+    is_pay_later = request.form.get('switch_isThanhToanSau', False)
     #print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
     #print('user_id : ',current_user.get_id())
     donhang = create_donhang( ngay_tao_don=datetime.now(),phuong_thuc_id= get_or_create_phuong_thuc_id(PayingMethod.ONLINE_PAY.value),trang_thai_id= get_or_create_trang_thai_id(Status.WAITING.value), khach_hang_id=current_user.get_id())
@@ -333,6 +366,10 @@ def process_payment():
 
     total_amount = cart_stats(cart_items).get('total_amount')
 
+    if is_pay_later:
+        return redirect('/')
+    else:
+        pass
     #########################################
     vnp = vnpay()
     vnp.requestData['vnp_Version'] = '2.1.0'
@@ -349,6 +386,7 @@ def process_payment():
     vnp.requestData['vnp_ReturnUrl'] = VNPAY_RETURN_URL
     vnpay_payment_url = vnp.get_payment_url(VNPAY_PAYMENT_URL, VNPAY_API_KEY)
     print(vnpay_payment_url)
+    session.pop(cart_key, None)
     return redirect(vnpay_payment_url)
 
 

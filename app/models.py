@@ -87,8 +87,9 @@ class Sach(db.Model):
     ten_sach = Column(String(100), nullable=False)
     don_gia = Column(Float, nullable=False)
     bia_sach = Column(String(225))
-    # mo_ta=Column(Text,nullable=True)
+    noi_dung=Column(Text,nullable=True)
     # ngay_xuat_ban=Column(Date,nullable=True)
+    so_luong = Column(Integer, default=0)
 
     the_loai_id = Column(Integer, ForeignKey(TheLoai.id), nullable=False)
     tac_gia_id = Column(Integer, ForeignKey(TacGia.id), nullable=False)
@@ -183,42 +184,42 @@ if __name__ == "__main__":
     with my_app.app_context():
         
         # db.drop_all()
-        # db.create_all()
+        db.create_all()
 
         # db.session.commit()
 
         # db.session.add_all([vt1,vt2,vt3,vt4])
+
+        # db.session.query(User).delete()
+
+        pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+
+
+
+        qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
+        db.session.add(qlk)
+
+        pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
+        pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
+        db.session.add_all([pt1, pt2])
+
+        tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
+        tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
+        tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
+        db.session.add_all([tt1, tt2, tt3])
+
+        r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
+        r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
+        r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
+        r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
+        db.session.add_all([r1,r2,r3,r4])
+
+        admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
+        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
+        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
+        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
         #
-        # # db.session.query(User).delete()
-        #
-        # pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
-
-
-
-        # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
-        # db.session.add(qlk)
-
-        # pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
-        # pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
-        # db.session.add_all([pt1, pt2])
-
-        # tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
-        # tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
-        # tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
-        # db.session.add_all([tt1, tt2, tt3])
-
-        # r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
-        # r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
-        # r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
-        # r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
-        # db.session.add_all([r1,r2,r3,r4])
-
-        # admin=User(ho='Hứa',ten="Hứa",username='admin',password=pw,vai_tro_id=1)
-        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
-        # qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
-        # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
-        # #
-        # db.session.add_all([admin,nhan_vien,qlk,u])
+        db.session.add_all([admin,nhan_vien,qlk,u])
 
 
         db.session.commit()

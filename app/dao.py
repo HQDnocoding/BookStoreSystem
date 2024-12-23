@@ -7,6 +7,7 @@ from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.operators import desc_op
 
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
     Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
@@ -279,20 +280,6 @@ def user_exists(username):
     return db.session.query(User).filter_by(username=username).first() is not None
 
 
-def get_sach_for_detail_by_id(sach_id):
-    sach = Sach.query.get(sach_id)
-    #vai_tro = VaiTro.query.get(role_id)
-    if sach:
-        return {
-            'id': sach.id,
-            'ten_sach': sach.ten_sach,
-            'don_gia': sach.don_gia,
-            'bia_sach': sach.bia_sach,
-            'tac_gia': sach.tac_gia.ten_tac_gia if sach.tac_gia else None,  # Lấy tên tác giả
-            'the_loai': sach.the_loai.ten_the_loai if sach.the_loai else None  # Lấy tên thể loại
-        }
-    return None
-
 def update_or_add_so_luong(sach_id, so_luong):
     # Tìm bản ghi có sach_id tương ứng
     so_luong_con_lai = SoLuongCuonConLai.query.filter_by(sach_id=sach_id).first()
@@ -471,6 +458,33 @@ def get_order_by_order_id(order_id):
     return order
 
 
+
 def get_trang_thai_id(ten):
     return TrangThaiDonHang.query.filter_by(ten_trang_thai=ten).first()
+
+
+def get_order_by_user_id(khach_hang_id,page,page_size):
+    don_hangs = DonHang.query.filter_by(khach_hang_id=khach_hang_id).order_by(DonHang.id.desc())
+
+    start = (int(page)-1)* page_size
+    end = start + page_size
+    return don_hangs.slice(start,end).all()
+
+def get_phuong_thuc_by_id(phuong_thuc_id):
+    phuong_thuc = PhuongThucThanhToan.query.get(phuong_thuc_id)
+    return phuong_thuc
+
+def get_trang_thai_by_id(trang_thai_id):
+    trang_thai = TrangThaiDonHang.query.get(trang_thai_id)
+    return trang_thai
+
+def get_order_total_price_by_id(id):
+    don_hang = DonHang.query.get(id)
+    order_details = don_hang.sach
+
+    total_amount = 0
+    for o in order_details:
+        total_amount += o.tong_tien
+
+    return total_amount
 

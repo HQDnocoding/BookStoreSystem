@@ -11,6 +11,7 @@ import cloudinary.uploader
 import flask_login
 import wtforms
 from flask_admin import Admin, BaseView, expose
+from flask_wtf import FlaskForm
 from unicodedata import category
 
 from app.dao import *
@@ -336,6 +337,7 @@ class Logout(MyView):
 class SachForm(Form):
     ten_sach = StringField('Tên sách', validators=[DataRequired()])
     don_gia = StringField('Đơn giá', validators=[DataRequired()])
+    noi_dung = StringField('Nội dung', validators=[DataRequired()])
     tac_gia_id = SelectField('Tác giả', coerce=int, validators=[DataRequired()])
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
     bia_sach = FileField('Bìa sách', validators=[
@@ -364,7 +366,7 @@ class SachView(AuthenticatedView):
 
     # form_excluded_columns=['hoa_don_ban_sach','phieu_nhap_sach','don_hang','hoa_don_ban_sach','so_luong_cuon_con_lai']# fields bị loại bỏ trong form
 
-    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong_cuon_con_lai']  # cot hiển thị
+    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong']  # cot hiển thị
 
     column_labels = {  # sua ten hien thi
         'id': 'Mã SP',
@@ -372,7 +374,7 @@ class SachView(AuthenticatedView):
         'don_gia': 'Đơn giá',
         'tac_gia_id': 'Tác giả',
         'the_loai_id': 'Thể loại',
-        'so_luong_cuon_con_lai': 'Số lượng',
+        'so_luong': 'Số lượng',
         'bia_sach': 'Bìa sách'
     }
     #
@@ -449,12 +451,12 @@ class VaitroView(AuthenticatedView):
     can_edit = True
 
 
-class UserForm(Form):
+class UserForm(FlaskForm):
     ho = StringField('Họ', validators=[DataRequired()])
     ten = StringField('Tên', validators=[DataRequired()])
     username = StringField('Tên đăng nhập', validators=[DataRequired()])
     password = StringField('Mật khẩu', validators=[DataRequired()])
-    ngay_tao = DateTimeField('Ngày tạo', default=datetime.now(), format='%Y-%m-%d %H:%M:%S')
+    ngay_tao = ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S', default=datetime.now)  # Gán ngày giờ mặc định
     avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
                                                                          "Chỉ được phép upload file hình ảnh!")])
     vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
@@ -464,21 +466,42 @@ class UserForm(Form):
 class UserView(AuthenticatedView):
     column_searchable_list = ['id', 'ho', 'ten', 'username']
     form_excluded_columns = ['phieu_nhap_sach', 'don_hang']
+
     can_edit = True
     can_create = True
+    can_view_details = True
 
     form = UserForm
 
     def create_form(self):
         form = super().create_form()
+        form.ngay_tao.flags.hidden = True
         return form
 
     def edit_form(self, obj):
         form = super().edit_form(obj)
+        form.password.flags.hidden = True
+        form.username.render_kw = {"readonly": True}
+        form.password.render_kw = {"readonly": True}
+        del form.password
+        form.ngay_tao.render_kw = {"readonly": True}
         return form
 
+    def get_detail_view(self, obj):
+        # Tạo view detail mà không có mật khẩu
+        return {
+            'Họ': obj.ho,
+            'Tên': obj.ten,
+            'Tên đăng nhập': obj.username,
+            'Ngày tạo': obj.ngay_tao.strftime('%Y-%m-%d %H:%M:%S'),  # Định dạng ngày
+            'Avatar': obj.avatar,  # Nếu cần hiển thị ảnh, có thể thêm xử lý hiển thị
+            'Vai trò': obj.vai_tro_id.ten_vai_tro if obj.vai_tro_id else None,
+        }
+
     def on_model_change(self, form, model, is_created):
-        model.ngay_tao = datetime.now()
+        if is_created:
+            model.ngay_tao = datetime.now()  # Gán giá trị khi tạo mới
+            model.password = str(hashlib.md5(form.password.data.encode('utf-8')).hexdigest())
         model.vai_tro_id = form.vai_tro_id.data.id
         file_data = form.avatar.data
         if file_data:
@@ -488,7 +511,6 @@ class UserView(AuthenticatedView):
 
             upload_result = cloudinary.uploader.upload(file_data, folder="upload/avatar")
             model.avatar = upload_result.get('secure_url')
-        model.password = str(hashlib.md5(form.password.data.encode('utf-8')).hexdigest())
 
         return super().on_model_change(form, model, is_created)
 
