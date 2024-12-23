@@ -89,6 +89,7 @@ class Sach(db.Model):
     bia_sach = Column(String(225))
     noi_dung=Column(Text,nullable=True)
     # ngay_xuat_ban=Column(Date,nullable=True)
+    so_luong = Column(Integer, default=0)
 
     the_loai_id = Column(Integer, ForeignKey(TheLoai.id), nullable=False)
     tac_gia_id = Column(Integer, ForeignKey(TacGia.id), nullable=False)
@@ -183,7 +184,7 @@ if __name__ == "__main__":
     with my_app.app_context():
         
         # db.drop_all()
-        # db.create_all()
+        db.create_all()
 
         # db.session.commit()
 

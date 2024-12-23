@@ -358,7 +358,7 @@ class SachView(AuthenticatedView):
 
     # form_excluded_columns=['hoa_don_ban_sach','phieu_nhap_sach','don_hang','hoa_don_ban_sach','so_luong_cuon_con_lai']# fields bị loại bỏ trong form
 
-    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong_cuon_con_lai']  # cot hiển thị
+    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong']  # cot hiển thị
 
     column_labels = {  # sua ten hien thi
         'id': 'Mã SP',
@@ -366,7 +366,7 @@ class SachView(AuthenticatedView):
         'don_gia': 'Đơn giá',
         'tac_gia_id': 'Tác giả',
         'the_loai_id': 'Thể loại',
-        'so_luong_cuon_con_lai': 'Số lượng',
+        'so_luong': 'Số lượng',
         'bia_sach': 'Bìa sách'
     }
     #
