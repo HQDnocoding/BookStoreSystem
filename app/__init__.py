@@ -20,6 +20,7 @@ app.config["PAGE_SIZE"] = 4
 app.config['DEBUG'] = True
 app.config['CART_KEY'] = 'cart'
 
+
 # VNPAY thông tin cấu hình
 VNPAY_MERCHANT_ID = 'BGJVFP3Z'
 VNPAY_API_KEY = '9JVDXL67YUMV3I01HKS36KAPKQCL7TN5'

@@ -7,36 +7,31 @@ from reportlab.pdfbase.ttfonts import TTFont
 
 from app.models import DonHang
 
-
-
 from app import app
 
 
 def cart_stats(cart):
-    total_amount, total_quantity = 0,0
-
-
-
-
+    total_amount, total_quantity = 0, 0
 
     if cart:
         for c in cart.values():
-            total_quantity+=c['so_luong']
-            total_amount+=c['so_luong']*c['don_gia']
+            total_quantity += c['so_luong']
+            total_amount += c['so_luong'] * c['don_gia']
     else:
-        cart={}
+        cart = {}
 
     return {
         "cart": list(cart.values()),
-        "total_amount":total_amount,
-        "total_quantity":total_quantity
+        "total_amount": total_amount,
+        "total_quantity": total_quantity
     }
-
 
 
 # Đăng ký font Tahoma
 font_path = 'C:\\Windows\\Fonts\\Tahoma.ttf'
 pdfmetrics.registerFont(TTFont('Tahoma', font_path))
+
+
 def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_filename="invoice.pdf"):
     # Tạo canvas
     try:
@@ -87,6 +82,56 @@ def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_
         app.logger.error(e)
     print(f"Hóa đơn đã được tạo tại {output_filename}")
 
+
 def count_orders(khach_hang_id):
     return DonHang.query.filter_by(khach_hang_id=khach_hang_id).count()
+
+
+def get_freq(tu, mau):
+    return tu / mau
+
+
+
+
+
+# Hàm tạo PDF
+def create_pdf_export_freq(data, file_name, month,year):
+
+    pdf = canvas.Canvas(file_name, pagesize=letter)
+    pdf.setFont("Tahoma", 12)
+    width, height = letter
+
+    # Tiêu đề
+    pdf.setFont("Tahoma", 14)
+    pdf.drawString(200, height - 50, "BÁO CÁO TẦN SUẤT SÁCH BÁN")
+    pdf.setFont("Tahoma", 12)
+    pdf.drawString(250, height - 80, f"Tháng: {month/year}")
+
+    # Vẽ bảng
+    x_start = 50
+    y_start = height - 120
+    col_widths = [50, 200, 150, 100, 100]  # Độ rộng từng cột
+    row_height = 30
+
+    # Tiêu đề bảng
+    headers = ["STT", "Tên sách", "Thể loại", "Số lượng", "Tỷ lệ"]
+    pdf.setFont("Tahoma", 11)
+    y = y_start
+    pdf.rect(x_start, y, sum(col_widths), -row_height)  # Vẽ ô tiêu đề
+    x = x_start
+    for i, header in enumerate(headers):
+        pdf.drawString(x + 5, y - 20, header)
+        x += col_widths[i]
+
+    # Nội dung bảng
+    for row in data:
+        y -= row_height
+        pdf.rect(x_start, y, sum(col_widths), -row_height)  # Vẽ từng hàng
+        x = x_start
+        for i, cell in enumerate(row):
+            pdf.drawString(x + 5, y - 20, str(cell))
+            x += col_widths[i]
+
+    # Kết thúc PDF
+    pdf.save()
 

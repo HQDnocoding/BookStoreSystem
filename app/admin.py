@@ -1,7 +1,7 @@
 import hashlib
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.policy import default
 from math import trunc
 from operator import and_
@@ -324,7 +324,72 @@ class RevenueStatsView(MyView):
 class FrequencyStatsView(MyView):
     @expose("/")
     def index(self):
-        return self.render("admin/frequency-stats.html", tl=get_the_loai())
+        now = datetime.now()
+
+        current_year=now.year+1
+
+        last_month = (now - timedelta(days=now.day)).month
+        last_year = (now - timedelta(days=now.day)).year
+
+        # Lấy thông tin lọc từ người dùng
+        thang = request.args.get("sel_monthf", last_month, type=int)
+
+        session['thang_stat']=thang
+
+        nam = request.args.get("sel_yearf", last_year, type=int)
+
+        session['nam_stat']=nam
+        the_loai = request.args.get("the_loaif", "Tất cả")
+
+        # Dữ liệu thống kê
+        fstats = get_frequency_stats(thang, nam)
+
+
+        # Lọc theo thể loại (nếu có)
+        if the_loai != "Tất cả":
+            fstats = [s for s in fstats if s[2] == the_loai]
+
+        # Truyền dữ liệu cho biểu đồ
+        labels = [s[1] for s in fstats] or []  # Tên sách
+        data = [s[3] for s in fstats]  # Số lượng bán
+        percentages = [s[4] for s in fstats]  # Tỉ lệ
+        data = [float(d) for d in data] or []
+        percentages = [float(p) for p in percentages] or []
+        # Danh sách thể loại để hiển thị trong form lọc
+        tl = get_the_loai()
+
+        return self.render(
+            "admin/frequency-stats.html",
+            fstats=fstats,
+            tl=tl,
+            thang=thang,
+            nam=nam,
+            the_loai=the_loai,
+            labels=labels,
+            data=data,
+            percentages=percentages,
+            current_year=current_year
+        )
+
+    @expose('/export/', methods=['get'])
+    def export(self):
+        try:
+            thang = session.get('thang_stat', 1)
+            nam = session.get('nam_stat', 2004)
+            fstats = get_frequency_stats(thang, nam)
+
+            output_dir = "bieu mau thong ke tan suat"
+            os.makedirs(output_dir, exist_ok=True)
+            output_filename = os.path.join(output_dir, f"tch_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+
+            utils.create_pdf_export_freq(fstats, output_filename, thang, nam)
+
+            # Trả về file PDF cho người dùng tải về
+            return 200
+
+        except Exception as e:
+            flash(f"Tạo biểu mẫu thống kê tần suất thất bại {e}", "error")
+            return redirect(request.referrer)  # Quay lại trang trước nếu có lỗi
 
 
 class Logout(MyView):
