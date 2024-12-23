@@ -1,13 +1,16 @@
 
 import locale
+from datetime import datetime, timedelta
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
+from sqlalchemy.testing.config import db_url
 
-from app.models import DonHang
-
+from app import Status, db
+from app.dao import get_trang_thai_by_name
+from app.models import DonHang, User
 
 
 def cart_stats(cart):
@@ -85,3 +88,12 @@ def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_
 def count_orders(khach_hang_id):
     return DonHang.query.filter_by(khach_hang_id=khach_hang_id).count()
 
+
+def check_if_expire_orders(user_id):
+    don_hangs = User.query.get(user_id).don_hang
+
+    for d in don_hangs:
+        if datetime.now() - d.ngay_tao_don > timedelta(hours=72):
+            d.trang_thai_id = get_trang_thai_by_name(Status.FAIL.value).id
+
+    db.session.commit()
