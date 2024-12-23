@@ -238,7 +238,7 @@ class Cashier2View(AuthenticatedNhanVienView):
     @expose('/don_hang/<int:don_hang_id>', methods=['GET'])
     def get_order_details(self, don_hang_id):
         # Truy vấn đơn hàng
-        waiting_status_id = dao.get_trang_thai_id(Status.WAITING.value)
+        waiting_status_id = dao.get_trang_thai_by_name(Status.WAITING.value)
 
         don_hang = DonHang.query.filter(and_(
             DonHang.id == don_hang_id,
@@ -649,7 +649,7 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
                     if (soluongconlai >= 300):
                         pass
                     else:
-                        update_or_add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
+                        add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
 
                     db.session.add(chi_tiet)
 

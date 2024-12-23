@@ -280,22 +280,12 @@ def user_exists(username):
     return db.session.query(User).filter_by(username=username).first() is not None
 
 
-def update_or_add_so_luong(sach_id, so_luong):
-    # Tìm bản ghi có sach_id tương ứng
-    so_luong_con_lai = SoLuongCuonConLai.query.filter_by(sach_id=sach_id).first()
-
-    # Nếu bản ghi đã tồn tại, cập nhật so_luong
-    if so_luong_con_lai:
-        so_luong_con_lai.so_luong += so_luong  # Cộng thêm so_luong mới vào giá trị hiện tại
-        so_luong_con_lai.thoi_diem = datetime.now()  # Cập nhật thời điểm
-
-    # Nếu không có bản ghi nào, tạo bản ghi mới
-    else:
-        so_luong_con_lai = SoLuongCuonConLai(sach_id=sach_id, so_luong=so_luong)
-        db.session.add(so_luong_con_lai)
-
-    # Lưu thay đổi vào cơ sở dữ liệu
+def add_so_luong(sach_id, so_luong):
+    sach = Sach.query.get(sach_id)
+    sach.so_luong += so_luong
     db.session.commit()
+
+
 
 
 def create_invoice_from_cart():
@@ -442,15 +432,8 @@ def get_or_create_trang_thai_id(ten_trang_thai):
 
 
 def get_so_luong_cuon_con_lai(sach_id):
-    # Truy vấn các bản ghi có `sach_id` tương ứng và tính tổng `so_luong`
-    total_so_luong = db.session.query(db.func.sum(SoLuongCuonConLai.so_luong)) \
-        .filter(SoLuongCuonConLai.sach_id == sach_id) \
-        .scalar()  # `.scalar()` trả về giá trị tổng hoặc None nếu không có kết quả
-
-    # Nếu không có bản ghi nào, trả về 0
-    if total_so_luong is None:
-        return 0
-    return total_so_luong
+    sach = Sach.query.get(sach_id)
+    return sach.so_luong
 
 def get_order_by_order_id(order_id):
     order = DonHang.query.get(order_id)
@@ -459,7 +442,7 @@ def get_order_by_order_id(order_id):
 
 
 
-def get_trang_thai_id(ten):
+def get_trang_thai_by_name(ten):
     return TrangThaiDonHang.query.filter_by(ten_trang_thai=ten).first()
 
 
@@ -488,3 +471,5 @@ def get_order_total_price_by_id(id):
 
     return total_amount
 
+def get_sach_by_id(sach_id):
+    return Sach.query.get(sach_id)

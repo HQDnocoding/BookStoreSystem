@@ -1,10 +1,16 @@
+
 import locale
+from datetime import datetime, timedelta
 
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
+from sqlalchemy.testing.config import db_url
 
+from app import Status, db
+from app.dao import get_trang_thai_by_name
+from app.models import DonHang, User
 from app.models import DonHang
 
 from app import app
@@ -12,6 +18,10 @@ from app import app
 
 def cart_stats(cart):
     total_amount, total_quantity = 0, 0
+
+
+
+
 
     if cart:
         for c in cart.values():
@@ -27,6 +37,8 @@ def cart_stats(cart):
     }
 
 
+
+
 # Đăng ký font Tahoma
 font_path = 'C:\\Windows\\Fonts\\Tahoma.ttf'
 pdfmetrics.registerFont(TTFont('Tahoma', font_path))
@@ -34,58 +46,62 @@ pdfmetrics.registerFont(TTFont('Tahoma', font_path))
 
 def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_filename="invoice.pdf"):
     # Tạo canvas
-    try:
-        pdf = canvas.Canvas(output_filename, pagesize=letter)
-        pdf.setTitle("Hóa đơn bán sách")
+    pdf = canvas.Canvas(output_filename, pagesize=letter)
+    pdf.setTitle("Hóa đơn bán sách")
 
-        # Tiêu đề
-        pdf.setFont("Tahoma", 14)
-        pdf.drawCentredString(300, 750, "HÓA ĐƠN BÁN SÁCH")
+    # Tiêu đề
+    pdf.setFont("Tahoma", 14)
+    pdf.drawCentredString(300, 750, "HÓA ĐƠN BÁN SÁCH")
 
-        # Thông tin khách hàng và ngày lập hóa đơn
-        pdf.setFont("Tahoma", 12)
-        pdf.drawString(50, 720, f"Họ tên khách hàng: {customer_name}")
-        pdf.drawString(350, 720, f"Ngày lập hóa đơn: {invoice_date}")
+    # Thông tin khách hàng và ngày lập hóa đơn
+    pdf.setFont("Tahoma", 12)
+    pdf.drawString(50, 720, f"Họ tên khách hàng: {customer_name}")
+    pdf.drawString(350, 720, f"Ngày lập hóa đơn: {invoice_date}")
 
-        # Bảng tiêu đề
-        pdf.line(50, 710, 550, 710)  # Dòng ngang đầu bảng
-        pdf.setFont("Tahoma", 12)
-        pdf.drawString(60, 690, "STT")
-        pdf.drawString(100, 690, "Sách")
-        pdf.drawString(250, 690, "Thể loại")
-        pdf.drawString(370, 690, "Số lượng")
-        pdf.drawString(470, 690, "Đơn giá")
-        pdf.line(50, 680, 550, 680)
+    # Bảng tiêu đề
+    pdf.line(50, 710, 550, 710)  # Dòng ngang đầu bảng
+    pdf.setFont("Tahoma", 12)
+    pdf.drawString(60, 690, "STT")
+    pdf.drawString(100, 690, "Sách")
+    pdf.drawString(250, 690, "Thể loại")
+    pdf.drawString(370, 690, "Số lượng")
+    pdf.drawString(470, 690, "Đơn giá")
+    pdf.line(50, 680, 550, 680)
 
-        locale.setlocale(locale.LC_ALL, 'vi_VN.UTF-8')
+    locale.setlocale(locale.LC_ALL, 'vi_VN.UTF-8')
 
-        pdf.setFont("Tahoma", 12)
-        y_position = 660
+    pdf.setFont("Tahoma", 12)
+    y_position = 660
+    for idx, item in enumerate(items):
+        pdf.drawString(60, y_position, str(idx + 1))
+        pdf.drawString(100, y_position, item['ten_sach'])
+        pdf.drawString(250, y_position, item['the_loai'])
+        pdf.drawString(370, y_position, str(item['so_luong']))
 
-        for idx, item in enumerate(items):
-            pdf.drawString(60, y_position, str(idx + 1))
-            pdf.drawString(100, y_position, item.get('ten_sach', 'Không rõ'))  # Thay thế bằng giá trị mặc định
-            pdf.drawString(250, y_position, item.get('the_loai', 'Không rõ'))
-            pdf.drawString(370, y_position, str(item.get('so_luong', 0)))
+        formatted_price = locale.format_string("%d", item['don_gia'], grouping=True)
+        pdf.drawString(470, y_position, f"{formatted_price} VND")
+        y_position -= 20
 
-            formatted_price = locale.format_string("%d", item.get('don_gia', 0), grouping=True)
-            pdf.drawString(470, y_position, f"{formatted_price} VND")
-            y_position -= 20
-        print("ok")
 
-        pdf.line(50, y_position - 10, 550, y_position - 10)
-        pdf.drawString(50, y_position - 40, f"Nhân viên thanh toán: {cashier_name}")
+    pdf.line(50, y_position - 10, 550, y_position - 10)
+    pdf.drawString(50, y_position - 40, f"Nhân viên thanh toán: {cashier_name}")
 
-        # Lưu file PDF
-        pdf.save()
-    except Exception as e:
-        app.logger.error(e)
+    # Lưu file PDF
+    pdf.save()
     print(f"Hóa đơn đã được tạo tại {output_filename}")
-
 
 def count_orders(khach_hang_id):
     return DonHang.query.filter_by(khach_hang_id=khach_hang_id).count()
 
+
+def check_if_expire_orders(user_id):
+    don_hangs = User.query.get(user_id).don_hang
+
+    for d in don_hangs:
+        if datetime.now() - d.ngay_tao_don > timedelta(hours=72):
+            d.trang_thai_id = get_trang_thai_by_name(Status.FAIL.value).id
+
+    db.session.commit()
 
 def get_freq(tu, mau):
     return tu / mau

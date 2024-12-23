@@ -10,6 +10,7 @@
 
 <div class="container mt-4">
     <h2 class="mb-4">Danh sách đơn hàng</h2>
+    <h5 class="mb-4">(!) Các đơn hàng đợi thanh toán quá 72 tiếng sẽ bị hủy</h5>
 
 
         <ul class="pagination">
@@ -34,7 +35,7 @@
             <tbody>
             <!-- Duyệt qua các đơn hàng và hiển thị -->
             {% for order in orders %}
-            <tr onclick="window.location.href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'">
+            <tr onclick="window.location.href='/order_details/{{order.id}}'">
                 <td>{{ order.id }}</td>
                 <td>{{ order.ngay_tao_don }}</td>
                 <td>{{ order.phuong_thuc }}</td>

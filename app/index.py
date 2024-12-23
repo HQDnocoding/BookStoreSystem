@@ -18,8 +18,8 @@ from app import Role
 from flask_login import login_user, logout_user , current_user
 from enum import Enum
 
-from app.utils import cart_stats
-# from decorators import annonymous_user, login_required
+from app.utils import cart_stats, check_if_expire_orders
+from decorators import annonymous_user, login_required
 
 
 class Role(Enum):
@@ -51,7 +51,7 @@ def login_admin_process():
 
 
 @app.route('/register/', methods=['get', 'post'])
-# @annonymous_user
+@annonymous_user
 def register():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -84,7 +84,7 @@ def register():
 
 
 @app.route('/login/', methods=['get', 'post'])
-# @annonymous_user
+@annonymous_user
 def login_my_user():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -223,6 +223,7 @@ def common_attr():
 @app.route('/orders/', methods=['get'])
 @login_required
 def orders():
+    check_if_expire_orders(current_user.get_id())
 
     page_size = 2
     page = request.args.get('page',1)
@@ -243,6 +244,34 @@ def orders():
     return render_template('orders_view.html',orders = order_json,pages= math.ceil(counter/page_size))
 
 
+@app.route('/order_details/<int:order_id>', methods=['get'])
+@login_required
+def order_details(order_id):
+    don_hang = get_don_hang(order_id)
+    ct_don_hang = don_hang.sach
+
+    total_amount = get_order_total_price_by_id(order_id)
+    order_status = get_trang_thai_by_id(don_hang.trang_thai_id).ten_trang_thai
+
+    sachs=[]
+
+    for ct in ct_don_hang:
+        sachs.append(get_sach_by_id(ct.sach_id))
+
+    order_details = []
+
+    for s, ct in zip(sachs, ct_don_hang):
+        order_details.append({
+            'bia_sach' : s.bia_sach,
+            'ten_sach' : s.ten_sach,
+            'so_luong' : ct.so_luong,
+            'tong_tien' : ct.tong_tien
+        })
+
+    print(order_details)
+
+
+    return render_template('order_details.html',order = don_hang,order_details = order_details,total_amount=total_amount,trang_thai = order_status)
 
 
 #class vnpay để thanh toán online code mẫu dijango của VNPAY
@@ -410,13 +439,12 @@ def payment_return():
         # Validate response
         if vnp.validate_response(VNPAY_API_KEY):
             if vnp_response_code == "00":
-                hoa_don = create_hoadonbansach( ngay_tao_hoa_don=datetime.now())
+
                 order_id = session['order_id']
 
                 donhang = get_order_by_order_id(order_id)
 
-                for d in donhang.sach:
-                    create_chitiethoadon(sach_id=d.sach_id,hoa_don_id=hoa_don.id,so_luong=d.so_luong,tong_tien=d.tong_tien)
+                donhang.trang_thai_id = get_trang_thai_by_name(Status.PAID)
 
                 return redirect(url_for('payment_succeed'))  # Chuyển hướng đến trang thành công
             else:
