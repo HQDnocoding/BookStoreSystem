@@ -448,7 +448,7 @@ class UserForm(Form):
     ten = StringField('Tên', validators=[DataRequired()])
     username = StringField('Tên đăng nhập', validators=[DataRequired()])
     password = StringField('Mật khẩu', validators=[DataRequired()])
-    ngay_tao = DateTimeField('Ngày tạo', default=datetime.now(), format='%Y-%m-%d %H:%M:%S')
+    ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S')
     avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
                                                                          "Chỉ được phép upload file hình ảnh!")])
     vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
@@ -465,14 +465,17 @@ class UserView(AuthenticatedView):
 
     def create_form(self):
         form = super().create_form()
+        self.form_excluded_columns.append('ngay_tao')
         return form
 
     def edit_form(self, obj):
         form = super().edit_form(obj)
+        self.form_excluded_columns.append('mat_khau')
         return form
 
     def on_model_change(self, form, model, is_created):
-        model.ngay_tao = datetime.now()
+        if is_created:
+            model.ngay_tao = datetime.now()  # Gán giá trị khi tạo mới
         model.vai_tro_id = form.vai_tro_id.data.id
         file_data = form.avatar.data
         if file_data:
