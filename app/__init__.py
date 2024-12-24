@@ -12,7 +12,7 @@ from cloudinary.utils import cloudinary_url
 
 app = Flask(__name__)
 app.secret_key = "##%#%FGE~EBb$enb?jn##3323290!!@vdv;vd.;ư"
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/bookstoredb?charset=utf8mb4" % quote( "Admin@123")
+app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/bookstoredb?charset=utf8mb4" % quote( "Kochiyasanae!@7")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config['BABEL_DEFAULT_LOCALE'] = 'vi'  # Đặt ngôn ngữ mặc định là tiếng Việt
 app.config["PAGE_SIZE"] = 4
@@ -73,3 +73,9 @@ class Status(Enum):
 @app.template_filter('format_currency')
 def format_currency(value):
     return f"{value:,.0f}"
+
+class Rule(Enum):
+
+    SL_NHAP_MIN='SL_NHAP_MIN'
+    SL_MIN_TO_NHAP='SL_MIN_TO_NHAP'
+    OUT_OF_TIME_TO_PAY='OUT_OF_TIME_TO_PAY'

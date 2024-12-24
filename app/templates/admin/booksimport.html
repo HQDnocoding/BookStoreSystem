@@ -21,7 +21,8 @@
             <!-- Input số lượng -->
             <div class="col">
                 <label for="soluong_nhap">Số lượng:</label>
-                <input type="number" class="form-control" id="soluong_nhap" min="150" value="150">
+                <input type="number" class="form-control" id="soluong_nhap" min="150" value="150"
+           oninput="if(this.value < 150) this.value = 150;">
             </div>
         </div>
         <!-- Nút thêm -->

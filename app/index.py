@@ -395,6 +395,8 @@ def process_payment():
 
     total_amount = cart_stats(cart_items).get('total_amount')
 
+    session.pop(cart_key, None)
+
     if is_pay_later:
         return redirect('/')
     else:
@@ -406,7 +408,7 @@ def process_payment():
     vnp.requestData['vnp_TmnCode'] = VNPAY_MERCHANT_ID
     vnp.requestData['vnp_Amount'] = total_amount * 100
     vnp.requestData['vnp_CurrCode'] = 'VND'
-    vnp.requestData['vnp_TxnRef'] = str(random.randint(100000, 999999))
+    vnp.requestData['vnp_TxnRef'] = str(random.randint(100000, 999999)) + str(donhang.id)
     vnp.requestData['vnp_OrderInfo'] = 'Thanh toan'
     vnp.requestData['vnp_OrderType'] = 'other'
     vnp.requestData['vnp_Locale'] = 'vn'
@@ -415,9 +417,34 @@ def process_payment():
     vnp.requestData['vnp_ReturnUrl'] = VNPAY_RETURN_URL
     vnpay_payment_url = vnp.get_payment_url(VNPAY_PAYMENT_URL, VNPAY_API_KEY)
     print(vnpay_payment_url)
-    session.pop(cart_key, None)
     return redirect(vnpay_payment_url)
 
+
+@app.route('/process_payment_in_order_details', methods=['post'])
+@login_required
+def process_payment_in_order_details():
+    order_id = request.form['order_id']
+
+    session['order_id'] = order_id
+    total_amount = get_order_total_price_by_id(order_id)
+
+####################################
+    vnp = vnpay()
+    vnp.requestData['vnp_Version'] = '2.1.0'
+    vnp.requestData['vnp_Command'] = 'pay'
+    vnp.requestData['vnp_TmnCode'] = VNPAY_MERCHANT_ID
+    vnp.requestData['vnp_Amount'] = total_amount * 100
+    vnp.requestData['vnp_CurrCode'] = 'VND'
+    vnp.requestData['vnp_TxnRef'] = str(random.randint(100000, 999999)) + str(order_id)
+    vnp.requestData['vnp_OrderInfo'] = 'Thanh toan'
+    vnp.requestData['vnp_OrderType'] = 'other'
+    vnp.requestData['vnp_Locale'] = 'vn'
+    vnp.requestData['vnp_CreateDate'] = datetime.now().strftime('%Y%m%d%H%M%S')  # 20150410063022
+    vnp.requestData['vnp_IpAddr'] = request.remote_addr
+    vnp.requestData['vnp_ReturnUrl'] = VNPAY_RETURN_URL
+    vnpay_payment_url = vnp.get_payment_url(VNPAY_PAYMENT_URL, VNPAY_API_KEY)
+    # print(vnpay_payment_url)
+    return redirect(vnpay_payment_url)
 
 
 @app.route('/vnpay_return', methods=['get'])
