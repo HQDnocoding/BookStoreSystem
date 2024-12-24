@@ -178,7 +178,7 @@ def get_revenue_by_month_year(thang, nam):
     return ket_qua
 
 
-def get_frequency_stats(thang, nam):
+def get_frequency_stats(thang, nam, ten_the_loai):
     start_date = datetime(nam, thang, 1)
     if thang == 12:
         end_date = datetime(nam + 1, 1, 1)  # Nếu là tháng 12, chuyển sang tháng 1 năm sau.
@@ -199,8 +199,8 @@ def get_frequency_stats(thang, nam):
     if not total_sales_subquery:
         return []
 
-    # Truy vấn dữ liệu cho từng sách
-    results = db.session.query(
+    # Truy vấn dữ liệu cho từng sách, lọc theo thể loại nếu có
+    query = db.session.query(
         Sach.id.label('ma_sach'),
         Sach.ten_sach,
         TheLoai.ten_the_loai,
@@ -215,11 +215,17 @@ def get_frequency_stats(thang, nam):
     ).filter(
         DonHang.ngay_tao_don >= start_date,
         DonHang.ngay_tao_don < end_date
-    ).group_by(
+    )
+
+    if ten_the_loai != "Tất cả":
+        query = query.filter(TheLoai.ten_the_loai == ten_the_loai)
+
+    results = query.group_by(
         Sach.id, Sach.ten_sach, TheLoai.ten_the_loai
     ).all()
 
     return results
+
 
 
 def get_id_from_ten_vai_tro(ten_vai_tro):

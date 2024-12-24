@@ -348,13 +348,14 @@ class FrequencyStatsView(AuthenticatedStatsView):
 
         session['nam_stat'] = nam
         the_loai = request.args.get("the_loaif", "Tất cả")
+        session['ten_the_loai']=the_loai
 
         # Dữ liệu thống kê
-        fstats = get_frequency_stats(thang, nam)
+        fstats = get_frequency_stats(thang, nam,the_loai)
 
-        # Lọc theo thể loại (nếu có)
-        if the_loai != "Tất cả":
-            fstats = [s for s in fstats if s[2] == the_loai]
+        # # Lọc theo thể loại (nếu có)
+        # if the_loai != "Tất cả":
+        #     fstats = [s for s in fstats if s[2] == the_loai]
 
         # Truyền dữ liệu cho biểu đồ
         labels = [s[1] for s in fstats] or []  # Tên sách
@@ -383,7 +384,8 @@ class FrequencyStatsView(AuthenticatedStatsView):
         try:
             thang = session.get('thang_stat', 1)
             nam = session.get('nam_stat', 2004)
-            fstats = get_frequency_stats(thang, nam)
+            the_loai=session.get('ten_the_loai','Tất cả')
+            fstats = get_frequency_stats(thang, nam,the_loai)
 
             output_dir = "bieu mau thong ke tan suat"
             os.makedirs(output_dir, exist_ok=True)
