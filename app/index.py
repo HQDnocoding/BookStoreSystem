@@ -87,7 +87,9 @@ def register():
 # @annonymous_user
 def login_my_user():
     err_msg = ''
+    success_msg = request.args.get('success_msg')
     if request.method.__eq__('POST'):
+        success_msg=''
         username = request.form['username']
         password = request.form['password']
         user = dao.auth_user(username, password)
@@ -100,7 +102,7 @@ def login_my_user():
                 err_msg = 'Tài khoản KHÔNG tồn tại'
             else:
                 err_msg = 'SAI mật khẩu'
-    return render_template("login.html", err_msg=err_msg)
+    return render_template("login.html", err_msg=err_msg, success_msg=success_msg)
 
 
 @app.route('/logout/')
@@ -127,10 +129,9 @@ def update_password():
         if user:
             update_user_password(current_user.id, new_password)
             logout_user()
-            return redirect('/login')
+            return redirect('/login?success_msg=Đã đổi mật khẩu thành công, vui lòng đăng nhập')
         else:
             err_msg = 'SAI mật khẩu'
-
     return render_template('update_password.html', err_msg = err_msg)
 
 
