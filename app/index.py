@@ -110,8 +110,12 @@ def logout_my_user():
 
 
 @app.route('/profile/')
+@login_required
 def profile():
-    return render_template('profile.html')
+
+    user = get_user_by_id(current_user.get_id())
+
+    return render_template('profile.html',user=user)
 
 
 @app.route('/shop/')
