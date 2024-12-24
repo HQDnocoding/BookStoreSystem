@@ -44,6 +44,11 @@ class AuthenticatedView(ModelView):
         quan_ly_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLY')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
 
+class AuthenticatedStatsView(BaseView):
+    def is_accessible(self):
+        quan_ly_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLY')).first()
+        return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
+
 
 class AuthenticatedNhanVienView(BaseView):
     def is_accessible(self):
@@ -64,9 +69,10 @@ class AuthenticatedQuanLyKhoViewMV(ModelView):
 
 
 class QuyDinhView(AuthenticatedView):
-    can_create = True
-    can_edit = True
-
+    can_create = False
+    can_delete = False
+    column_editable_list = ['gia_tri','is_active']
+    form_excluded_columns = ['ten_quy_dinh','ngay_tao']
 
 class CashierView(AuthenticatedNhanVienView):
     @expose('/')
@@ -315,13 +321,13 @@ class Cashier2View(AuthenticatedNhanVienView):
         return jsonify({"path": "/admin/cashier2view"}), 200
 
 
-class RevenueStatsView(MyView):
+class RevenueStatsView(AuthenticatedStatsView):
     @expose("/")
     def index(self):
         return self.render("admin/revenue-stats.html", tl=get_the_loai())
 
 
-class FrequencyStatsView(MyView):
+class FrequencyStatsView(AuthenticatedStatsView):
     @expose("/")
     def index(self):
         now = datetime.now()

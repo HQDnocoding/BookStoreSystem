@@ -70,7 +70,7 @@ class Status(Enum):
     WAITING = 'WAITING'  # đang đợi trả tiền
     FAIL = 'FAIL'  # hủy vì hết thời gian trả
 
-    class Rule(Enum):
+class Rule(Enum):
 
         SL_NHAP_MIN='SL_NHAP_MIN'
         SL_MIN_TO_NHAP='SL_MIN_TO_NHAP'
