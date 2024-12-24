@@ -1,102 +1,322 @@
 [
     {
-        "id": 6,
+        "id": 1,
         "ten_sach": "Conan",
         "don_gia": 25000.0,
         "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027448/upload/bia_sach/c5aaxgoimjhiv5uqi1md.jpg",
         "noi_dung": "Truyện xoay quanh một cậu thám tử trung học có tên là Kudo Shinichi trong lúc đang điều tra một Tổ chức Áo đen bí ẩn đã bị ép phải uống một loại thuốc độc có thể gây chết người. May mắn là đã sống sót nhưng cơ thể thì lại bị teo nhỏ như một đứa bé 6-7 tuổi. Kể từ đó để tránh bị lộ thân phận thực sự của mình, Shinichi đã lấy tên là Edogawa Conan và chuyển đến sống ở nhà của cô bạn thời thơ ấu Mori Ran cùng với cha của cô ấy là một thám tử tư tên Mori Kogoro với hy vọng một ngày nào đó cậu có thể hạ gục Tổ chức Áo Đen và lấy lại hình dáng ban đầu.",
         "so_luong": 0,
-        "the_loai_id": 20,
-        "tac_gia_id": 61
+        "the_loai_id": 1,
+        "tac_gia_id": 1
+    },
+    {
+        "id": 2,
+        "ten_sach": "Doraemon",
+        "don_gia": 30000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027527/upload/bia_sach/exfqcma3xjx1bkf7l6mu.jpg",
+        "noi_dung": "Doraemon là một chú mèo máy được Nobi Sewashi (Nobi Nobito), cháu năm đời của Nobi Nobita, gửi từ thế kỷ 22 về quá khứ của ông mình để giúp đỡ Nobita trở nên tiến bộ và giàu có, tức là cũng sẽ cải thiện hoàn cảnh của con cháu Nobita sau này. Còn ở hiện tại, Nobita là một cậu bé luôn thất bại ở trường học, và sau đó công ty phá sản, thất bại trong công việc, đẩy gia đình và con cháu sau này vào cảnh nợ nần.  Các câu chuyện trong Doraemon thường có một chủ đề chung, đó là xoay quanh những rắc rối hay xảy ra với cậu bé Nobita học lớp năm, nhân vật chính thứ hai của bộ truyện. Doraemon có một chiếc túi thần kỳ trước bụng với đủ loại bảo bối của tương lai. Cốt truyện thường gặp nhất sẽ là Nobita trở về nhà khóc lóc với những rắc rối mà cậu gặp phải ở trường học hoặc với bạn bè. Sau khi bị cậu bé van nài hoặc thúc giục, Doraemon sẽ đưa ra một bảo bối giúp Nobita giải quyết những rắc rối của mình, hoặc là để trả đũa hay khoe khoang với bạn bè của cậu. Nobita thường đi quá xa so với dự định ban đầu của Doraemon, thậm chí với những bảo bối mới cậu còn gặp rắc rối lớn hơn trước đó. Đôi khi những người bạn của Nobita, thường là Honekawa Suneo hoặc Goda Takeshi (Jaian), lại lấy trộm những bảo bối và sử dụng chúng không đúng mục đích. Tuy nhiên thường thì ở cuối mỗi câu chuyện, những ai sử dụng sai mục đích bảo bối sẽ phải chịu hậu quả do mình gây ra, và người đọc sẽ rút ra được bài học từ đó.[4]",
+        "so_luong": 0,
+        "the_loai_id": 4,
+        "tac_gia_id": 3
+    },
+    {
+        "id": 3,
+        "ten_sach": "Naruto",
+        "don_gia": 50000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027566/upload/bia_sach/uu25xgshhcnacokquvpl.jpg",
+        "noi_dung": "Truyện lấy bối cảnh bắt nguồn từ sự việc xảy ra vào mười hai năm trước, con Hồ Ly Chín Đuôi (Kyuubi-Kurama[2]) đã tấn công Làng Lá (木ノ葉隠れ (Mộc Diệp Ẩn Lý) Konohagakure / Konohagakure no Sato?). Với lượng sức mạnh khổng lồ, nó có thể dễ dàng khiến sóng thần nổi dậy và san bằng núi non chỉ với một trong số chín cái đuôi, nó đã gây ra sự hỗn loạn tột cùng và giết chết nhiều người, cho tới khi người lãnh đạo của làng Lá – ngài Hokage Đệ Tứ (Namikaze Minato) đã hi sinh để phong ấn con quái thú vào cơ thể con trai mình - Naruto khi cậu chỉ vừa mới được sinh ra, bằng cấm thuật: Kin Jutsu Ogi \"Shiki Fuin\" (Thi Quỷ Phong Tận - một thuật cấm phải đánh đổi bằng tính mạng). Hokage Đệ Tứ, người được vinh danh vì đã phong ấn con yêu hồ, khi nhắm mắt xuôi tay đã mong muốn Naruto được người dân tôn trọng khi có thân xác là nơi chứa đựng con quái vật.",
+        "so_luong": 0,
+        "the_loai_id": 6,
+        "tac_gia_id": 10
+    },
+    {
+        "id": 4,
+        "ten_sach": "Hunter x Hunter",
+        "don_gia": 50000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027634/upload/bia_sach/ojgwcekr24dpoce3ohvl.jpg",
+        "noi_dung": "Lúc nhỏ, Gon vào rừng và lỡ chọc giận một con gấu mèo. Sau khi được Kite (hay Kaito) cứu và cho 1 bạt tai, Gon được Kite cho biết anh là học trò của Ging Freecss hay bố Gon còn sống và là 1 Hunter chuyên nghiệp. Từ đó Gon quyết tâm trở thành Hunter và tìm cha mình. Tại cuộc thi Hunter, Gon nhanh chóng kết bạn với 3 người bạn tốt là Kurapika, Leorio và Killua. Kurapika là người sống sót cuối cùng của bộ tộc mắt đỏ Kuruta (hay Kurta), cậu mong muốn được trở thành Hunter để truy sát và trả lại những tròng mắt đỏ đã bị băng cướp Genei Ryodan cướp đoạt cho bộ tộc mình. Leorio ước mong trở thành Hunter để có tiền chữa bệnh cho người nghèo giống cũng mắc bệnh như người bạn quá cố của mình. Killua sinh ra và trưởng thành trong một gia đình có truyền thống làm nghề sát thủ chuyên nghiệp và thấy nhàm chán với cuộc sống bị sắp đặt kế thừa cả gia tộc nên cậu đã bỏ nhà ra đi tìm thử thách mới. Câu chuyện xoay quanh cuộc phiêu lưu của 4 nhân vật chính, đặc biệt là tình bạn giữa Gon và Killua.",
+        "so_luong": 0,
+        "the_loai_id": 6,
+        "tac_gia_id": 9
+    },
+    {
+        "id": 5,
+        "ten_sach": "Địa ngục môn",
+        "don_gia": 100000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027837/upload/bia_sach/wtlpkwdmufujxy3ycmfj.jpg",
+        "noi_dung": "Địa Ngục Môn là tác phẩm truyện tranh Việt Nam được xuất bản vào năm 2016, Tháng 1 năm 2017, Địa Ngục Môn xuất sắc vượt qua hàng trăm tác phẩm truyện tranh trên khắp thế giới để đoạt giải Bạc, cuộc thi International Manga Award tại Nhật Bản",
+        "so_luong": 0,
+        "the_loai_id": 3,
+        "tac_gia_id": 4
+    },
+    {
+        "id": 6,
+        "ten_sach": "halloween năm 2024",
+        "don_gia": 200000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033074/upload/bia_sach/frxphdwswzevr5pah3z1.jpg",
+        "noi_dung": "Đây là truyện ngắn của tác giả Lê Đức Mạnh",
+        "so_luong": 0,
+        "the_loai_id": 8,
+        "tac_gia_id": 11
     },
     {
         "id": 7,
-        "ten_sach": "Doraemon",
-        "don_gia": 30000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027527/upload/bia_sach/exfqcma3xjx1bkf7l6mu.jpg",
-        "noi_dung": "Doraemon là một chú mèo máy được Nobi Sewashi (Nobi Nobito), cháu năm đời của Nobi Nobita, gửi từ thế kỷ 22 về quá khứ của ông mình để giúp đỡ Nobita trở nên tiến bộ và giàu có, tức là cũng sẽ cải thiện hoàn cảnh của con cháu Nobita sau này. Còn ở hiện tại, Nobita là một cậu bé luôn thất bại ở trường học, và sau đó công ty phá sản, thất bại trong công việc, đẩy gia đình và con cháu sau này vào cảnh nợ nần.  Các câu chuyện trong Doraemon thường có một chủ đề chung, đó là xoay quanh những rắc rối hay xảy ra với cậu bé Nobita học lớp năm, nhân vật chính thứ hai của bộ truyện. Doraemon có một chiếc túi thần kỳ trước bụng với đủ loại bảo bối của tương lai. Cốt truyện thường gặp nhất sẽ là Nobita trở về nhà khóc lóc với những rắc rối mà cậu gặp phải ở trường học hoặc với bạn bè. Sau khi bị cậu bé van nài hoặc thúc giục, Doraemon sẽ đưa ra một bảo bối giúp Nobita giải quyết những rắc rối của mình, hoặc là để trả đũa hay khoe khoang với bạn bè của cậu. Nobita thường đi quá xa so với dự định ban đầu của Doraemon, thậm chí với những bảo bối mới cậu còn gặp rắc rối lớn hơn trước đó. Đôi khi những người bạn của Nobita, thường là Honekawa Suneo hoặc Goda Takeshi (Jaian), lại lấy trộm những bảo bối và sử dụng chúng không đúng mục đích. Tuy nhiên thường thì ở cuối mỗi câu chuyện, những ai sử dụng sai mục đích bảo bối sẽ phải chịu hậu quả do mình gây ra, và người đọc sẽ rút ra được bài học từ đó.[4]",
+        "ten_sach": "halloween năm 2024 phần 2",
+        "don_gia": 500000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033325/upload/bia_sach/nnnxyqhup7ht1l6ee51f.jpg",
+        "noi_dung": "Chúc halloween năm 2024 phần 2",
         "so_luong": 0,
-        "the_loai_id": 21,
-        "tac_gia_id": 63
+        "the_loai_id": 8,
+        "tac_gia_id": 11
     },
     {
         "id": 8,
-        "ten_sach": "Naruto",
-        "don_gia": 50000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027566/upload/bia_sach/uu25xgshhcnacokquvpl.jpg",
-        "noi_dung": "Truyện lấy bối cảnh bắt nguồn từ sự việc xảy ra vào mười hai năm trước, con Hồ Ly Chín Đuôi (Kyuubi-Kurama[2]) đã tấn công Làng Lá (木ノ葉隠れ (Mộc Diệp Ẩn Lý) Konohagakure / Konohagakure no Sato?). Với lượng sức mạnh khổng lồ, nó có thể dễ dàng khiến sóng thần nổi dậy và san bằng núi non chỉ với một trong số chín cái đuôi, nó đã gây ra sự hỗn loạn tột cùng và giết chết nhiều người, cho tới khi người lãnh đạo của làng Lá – ngài Hokage Đệ Tứ (Namikaze Minato) đã hi sinh để phong ấn con quái thú vào cơ thể con trai mình - Naruto khi cậu chỉ vừa mới được sinh ra, bằng cấm thuật: Kin Jutsu Ogi \"Shiki Fuin\" (Thi Quỷ Phong Tận - một thuật cấm phải đánh đổi bằng tính mạng). Hokage Đệ Tứ, người được vinh danh vì đã phong ấn con yêu hồ, khi nhắm mắt xuôi tay đã mong muốn Naruto được người dân tôn trọng khi có thân xác là nơi chứa đựng con quái vật.",
+        "ten_sach": "halloween năm 2024 phần 3",
+        "don_gia": 900000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033348/upload/bia_sach/v3nqegrpdnucbm4b7h3h.jpg",
+        "noi_dung": "Chúc halloween năm 2024 phần 3",
         "so_luong": 0,
-        "the_loai_id": 22,
-        "tac_gia_id": 62
+        "the_loai_id": 5,
+        "tac_gia_id": 11
     },
     {
         "id": 9,
-        "ten_sach": "Hunter x Hunter",
-        "don_gia": 50000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027634/upload/bia_sach/ojgwcekr24dpoce3ohvl.jpg",
-        "noi_dung": "Lúc nhỏ, Gon vào rừng và lỡ chọc giận một con gấu mèo. Sau khi được Kite (hay Kaito) cứu và cho 1 bạt tai, Gon được Kite cho biết anh là học trò của Ging Freecss hay bố Gon còn sống và là 1 Hunter chuyên nghiệp. Từ đó Gon quyết tâm trở thành Hunter và tìm cha mình. Tại cuộc thi Hunter, Gon nhanh chóng kết bạn với 3 người bạn tốt là Kurapika, Leorio và Killua. Kurapika là người sống sót cuối cùng của bộ tộc mắt đỏ Kuruta (hay Kurta), cậu mong muốn được trở thành Hunter để truy sát và trả lại những tròng mắt đỏ đã bị băng cướp Genei Ryodan cướp đoạt cho bộ tộc mình. Leorio ước mong trở thành Hunter để có tiền chữa bệnh cho người nghèo giống cũng mắc bệnh như người bạn quá cố của mình. Killua sinh ra và trưởng thành trong một gia đình có truyền thống làm nghề sát thủ chuyên nghiệp và thấy nhàm chán với cuộc sống bị sắp đặt kế thừa cả gia tộc nên cậu đã bỏ nhà ra đi tìm thử thách mới. Câu chuyện xoay quanh cuộc phiêu lưu của 4 nhân vật chính, đặc biệt là tình bạn giữa Gon và Killua.",
+        "ten_sach": "The Art of Computer Programming",
+        "don_gia": 500000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033533/upload/bia_sach/rafxymrrqqe6tjrco878.jpg",
+        "noi_dung": "The Art of Computer Programming (TAOCP) is a comprehensive monograph written by the computer scientist Donald Knuth presenting programming algorithms and their analysis. Volumes 1–5 are intended to represent the central core of computer programming for sequential machines.  When Knuth began the project in 1962, he originally conceived of it as a single book with twelve chapters. The first three volumes of what was then expected to be a seven-volume set were published in 1968, 1969, and 1973. Work began in earnest on Volume 4 in 1973, but was suspended in 1977 for work on typesetting prompted by the second edition of Volume 2. Writing of the final copy of Volume 4A began in longhand in 2001, and the first online pre-fascicle, 2A, appeared later in 2001.[1] The first published installment of Volume 4 appeared in paperback as Fascicle 2 in 2005. The hardback Volume 4A, combining Volume 4, Fascicles 0–4, was published in 2011. Volume 4, Fascicle 6 (\"Satisfiability\") was released in December 2015; Volume 4, Fascicle 5 (\"Mathematical Preliminaries Redux; Backtracking; Dancing Links\") was released in November 2019.",
         "so_luong": 0,
-        "the_loai_id": 23,
-        "tac_gia_id": 63
+        "the_loai_id": 13,
+        "tac_gia_id": 13
     },
     {
         "id": 10,
-        "ten_sach": "Địa ngục môn",
-        "don_gia": 100000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027837/upload/bia_sach/wtlpkwdmufujxy3ycmfj.jpg",
-        "noi_dung": "Địa Ngục Môn là tác phẩm truyện tranh Việt Nam được xuất bản vào năm 2016, Tháng 1 năm 2017, Địa Ngục Môn xuất sắc vượt qua hàng trăm tác phẩm truyện tranh trên khắp thế giới để đoạt giải Bạc, cuộc thi International Manga Award tại Nhật Bản",
+        "ten_sach": " Ú Òa, Mèo Đâu Rồi?",
+        "don_gia": 84000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033743/upload/bia_sach/phhtu6656iqty8evpxac.jpg",
+        "noi_dung": "SÁCH EHON KÍCH THÍCH TƯ DUY VÀ KHẢ NĂNG QUAN SÁT CHO TRẺ Trong giai đoạn từ 0 - 6 tuổi, trẻ nhỏ bắt đầu khám phá thế giới xung quanh bằng tất cả các giác quan. Đây là thời kỳ “vàng” để phát triển kỹ năng quan sát, khả năng tư duy và ngôn ngữ. Bộ sách Ehon “Ú Òa” chính là người bạn đồng hành tuyệt vời, mang đến cho trẻ những trải nghiệm vừa học vừa chơi thông qua những câu chuyện tương tác thú vị.",
         "so_luong": 0,
-        "the_loai_id": 24,
-        "tac_gia_id": 67
+        "the_loai_id": 10,
+        "tac_gia_id": 14
     },
     {
         "id": 11,
-        "ten_sach": "Conan",
-        "don_gia": 25000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027448/upload/bia_sach/c5aaxgoimjhiv5uqi1md.jpg",
-        "noi_dung": "Truyện xoay quanh một cậu thám tử trung học có tên là Kudo Shinichi trong lúc đang điều tra một Tổ chức Áo đen bí ẩn đã bị ép phải uống một loại thuốc độc có thể gây chết người. May mắn là đã sống sót nhưng cơ thể thì lại bị teo nhỏ như một đứa bé 6-7 tuổi. Kể từ đó để tránh bị lộ thân phận thực sự của mình, Shinichi đã lấy tên là Edogawa Conan và chuyển đến sống ở nhà của cô bạn thời thơ ấu Mori Ran cùng với cha của cô ấy là một thám tử tư tên Mori Kogoro với hy vọng một ngày nào đó cậu có thể hạ gục Tổ chức Áo Đen và lấy lại hình dáng ban đầu.",
+        "ten_sach": "Hoa Nở Giữa Vô Thường",
+        "don_gia": 105000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033906/upload/bia_sach/zr68jo7fsaxa93jys2io.jpg",
+        "noi_dung": "Ai cũng nghĩ ngày dài tháng rộng năm thênh thang cho đến khi chứng kiến những trận bể dâu thì ta mới thấy tự do của mình đang bị mai một. Đường chân trời thẳng tắp thu mình vào một hành trình đầy im lặng. Đã bao lâu chúng ta không còn cảm nhận (đúng nghĩa) được sự ấm áp của ánh nắng mặt trời?  Những hơi thở gấp, mấy ai còn có thể lưu giữ lại được sự tuần hoàn hiếm hoi. Người thân còn được mấy ai, đừng vội buông tay khi trong khoảnh khắc ra đi vẫn còn mang nặng ân tình.  Hoa nở giữa vô thường được tác giả lấy cảm hứng từ những kỷ niệm tuổi thơ và những thăng trầm cuộc sống của chính mình để nói đến sự đổi thay của cuộc đời. Phong cách viết kiểu tức cảnh sinh tình. Mỗi trạng huống, mỗi cảm xúc lại dẫn đến những suy tư về thế sự, về chính bản thân và cõi lòng mình. Tác giả nhắc nhở chính bản thân và người đọc về việc giữ một cái tâm cân bằng, một trái tim nguyên vẹn, không xao động trước vô thường.  Điểm nhấn trong cuốn sách này là có những bài học, những đúc rút, những lời khuyên khá thực tế. Mọi lời khuyên được hiện lên qua những dòng chữ này là tâm thế của người đang tu tập, thay đổi từng ngày nên vẫn còn những giằng xé, mắc mứu, vướng bận với nhân tình thế thái, với những phiền muộn trong lòng, chính vì vậy mà người đọc có cảm giác thân quen, cảm nhận rõ hơn.",
         "so_luong": 0,
-        "the_loai_id": 23,
-        "tac_gia_id": 62
+        "the_loai_id": 16,
+        "tac_gia_id": 15
     },
     {
         "id": 12,
-        "ten_sach": "Doraemon",
-        "don_gia": 30000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027527/upload/bia_sach/exfqcma3xjx1bkf7l6mu.jpg",
-        "noi_dung": "Doraemon là một chú mèo máy được Nobi Sewashi (Nobi Nobito), cháu năm đời của Nobi Nobita, gửi từ thế kỷ 22 về quá khứ của ông mình để giúp đỡ Nobita trở nên tiến bộ và giàu có, tức là cũng sẽ cải thiện hoàn cảnh của con cháu Nobita sau này. Còn ở hiện tại, Nobita là một cậu bé luôn thất bại ở trường học, và sau đó công ty phá sản, thất bại trong công việc, đẩy gia đình và con cháu sau này vào cảnh nợ nần.  Các câu chuyện trong Doraemon thường có một chủ đề chung, đó là xoay quanh những rắc rối hay xảy ra với cậu bé Nobita học lớp năm, nhân vật chính thứ hai của bộ truyện. Doraemon có một chiếc túi thần kỳ trước bụng với đủ loại bảo bối của tương lai. Cốt truyện thường gặp nhất sẽ là Nobita trở về nhà khóc lóc với những rắc rối mà cậu gặp phải ở trường học hoặc với bạn bè. Sau khi bị cậu bé van nài hoặc thúc giục, Doraemon sẽ đưa ra một bảo bối giúp Nobita giải quyết những rắc rối của mình, hoặc là để trả đũa hay khoe khoang với bạn bè của cậu. Nobita thường đi quá xa so với dự định ban đầu của Doraemon, thậm chí với những bảo bối mới cậu còn gặp rắc rối lớn hơn trước đó. Đôi khi những người bạn của Nobita, thường là Honekawa Suneo hoặc Goda Takeshi (Jaian), lại lấy trộm những bảo bối và sử dụng chúng không đúng mục đích. Tuy nhiên thường thì ở cuối mỗi câu chuyện, những ai sử dụng sai mục đích bảo bối sẽ phải chịu hậu quả do mình gây ra, và người đọc sẽ rút ra được bài học từ đó.[4]",
+        "ten_sach": "Tâm Lý Học Bỏ Túi",
+        "don_gia": 101000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735033985/upload/bia_sach/b5by6bemhak5nphdojck.jpg",
+        "noi_dung": "“Tôi bận quá, không có thời gian dành cho bản thân nữa.\"  “Tôi đang phải hoãn việc học thi lấy chứng chỉ đây này.”  “Tôi muốn đi tập gym nhưng chẳng sắp xếp được thời gian.”  Những nỗi khổ mang tên “không có thời gian\" nói trên, không ít thì nhiều, ai trong chúng ta cũng từng nếm trải. Vậy làm sao chúng ta có thể nhanh chóng kiểm soát và xua tan nỗi khổ đó  Dậy sớm chính là thuốc đặc trị cho căn bệnh “tôi bận quá”, “tôi không có thời gian”.  Không những thế, dậy sớm còn giúp chúng ta có được trí óc minh mẫn, dễ dàng tiếp thu kiến thức và tập trung làm việc một cách vô cùng hiệu quả, giúp chúng ta quản lý thời gian và tối ưu hóa hiệu suất làm việc trong ngày tốt hơn; giúp chúng ta tự tin và yêu đời hơn, có nhiều thời gian dành cho bản thân và gia đình hơn; đặc biệt giúp chúng ta có thể hoàn thành được các mục tiêu trong ngắn và dài hạn, nâng cao chất lượng cuộc sống của mỗi người.  Chẳng có điều gì sung sướng hơn cảm giác, vào buổi sáng trong lành, được làm những gì mình thích, chẳng bị ai quấy rầy, tận hưởng khoảng thời gian dành cho riêng mình phải không nào?",
         "so_luong": 0,
-        "the_loai_id": 23,
-        "tac_gia_id": 63
+        "the_loai_id": 7,
+        "tac_gia_id": 12
     },
     {
         "id": 13,
-        "ten_sach": "Naruto",
-        "don_gia": 50000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027566/upload/bia_sach/uu25xgshhcnacokquvpl.jpg",
-        "noi_dung": "Truyện lấy bối cảnh bắt nguồn từ sự việc xảy ra vào mười hai năm trước, con Hồ Ly Chín Đuôi (Kyuubi-Kurama[2]) đã tấn công Làng Lá (木ノ葉隠れ (Mộc Diệp Ẩn Lý) Konohagakure / Konohagakure no Sato?). Với lượng sức mạnh khổng lồ, nó có thể dễ dàng khiến sóng thần nổi dậy và san bằng núi non chỉ với một trong số chín cái đuôi, nó đã gây ra sự hỗn loạn tột cùng và giết chết nhiều người, cho tới khi người lãnh đạo của làng Lá – ngài Hokage Đệ Tứ (Namikaze Minato) đã hi sinh để phong ấn con quái thú vào cơ thể con trai mình - Naruto khi cậu chỉ vừa mới được sinh ra, bằng cấm thuật: Kin Jutsu Ogi \"Shiki Fuin\" (Thi Quỷ Phong Tận - một thuật cấm phải đánh đổi bằng tính mạng). Hokage Đệ Tứ, người được vinh danh vì đã phong ấn con yêu hồ, khi nhắm mắt xuôi tay đã mong muốn Naruto được người dân tôn trọng khi có thân xác là nơi chứa đựng con quái vật.",
+        "ten_sach": "Ai Là Người Nói Thật?",
+        "don_gia": 143200.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034095/upload/bia_sach/ifnbv2dsnfgiouefmb5b.jpg",
+        "noi_dung": "Khi ăn mừng sinh nhật lần thứ 45 của mình tại một nhà hàng gần nhà, người dẫn chương trình podcast nổi tiếng Alix Summer tình cờ gặp một người phụ nữ tên là Josie Fair. Josie cũng đang kỷ niệm sinh nhật lần thứ 45. Hóa ra họ sinh cùng ngày cùng tháng cùng năm.     Vài ngày sau, Alix và Josie tình cờ gặp nhau, lần này là bên ngoài trường học của con Alix. Joise đã nghe hết series podcast của Alix và nghĩ rằng câu chuyện của mình có thể là một chủ đề thú vị và mới mẻ. Cuộc sống của Josie có vẻ kỳ lạ và phức tạp, và mặc dù Alix dần dần thấy không thoải mái với Josie, cô vẫn không thể cưỡng lại sự tò mò trước câu chuyện cuộc đời của người phụ nữ này. Cô cảm thấy Josie dường như đang che giấu một bí mật động trời, và đến khi Alix nhận ra mạng sống của chình mình và gia đình đang bị đe dọa, mọi chuyện đã quá muộn. Cô quyết tâm dung chính tài năng của mình để kể lại câu chuyện mình vừa trải qua.",
         "so_luong": 0,
-        "the_loai_id": 23,
-        "tac_gia_id": 66
+        "the_loai_id": 17,
+        "tac_gia_id": 12
     },
     {
         "id": 14,
-        "ten_sach": "Hunter x Hunter",
-        "don_gia": 50000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027634/upload/bia_sach/ojgwcekr24dpoce3ohvl.jpg",
-        "noi_dung": "Lúc nhỏ, Gon vào rừng và lỡ chọc giận một con gấu mèo. Sau khi được Kite (hay Kaito) cứu và cho 1 bạt tai, Gon được Kite cho biết anh là học trò của Ging Freecss hay bố Gon còn sống và là 1 Hunter chuyên nghiệp. Từ đó Gon quyết tâm trở thành Hunter và tìm cha mình. Tại cuộc thi Hunter, Gon nhanh chóng kết bạn với 3 người bạn tốt là Kurapika, Leorio và Killua. Kurapika là người sống sót cuối cùng của bộ tộc mắt đỏ Kuruta (hay Kurta), cậu mong muốn được trở thành Hunter để truy sát và trả lại những tròng mắt đỏ đã bị băng cướp Genei Ryodan cướp đoạt cho bộ tộc mình. Leorio ước mong trở thành Hunter để có tiền chữa bệnh cho người nghèo giống cũng mắc bệnh như người bạn quá cố của mình. Killua sinh ra và trưởng thành trong một gia đình có truyền thống làm nghề sát thủ chuyên nghiệp và thấy nhàm chán với cuộc sống bị sắp đặt kế thừa cả gia tộc nên cậu đã bỏ nhà ra đi tìm thử thách mới. Câu chuyện xoay quanh cuộc phiêu lưu của 4 nhân vật chính, đặc biệt là tình bạn giữa Gon và Killua.",
+        "ten_sach": "Clean Code - Mã Sạch Và Con Đường Trở Thành Lập Trình Viên Giỏi",
+        "don_gia": 308800.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034171/upload/bia_sach/ywptxwupaodkspr7o49y.jpg",
+        "noi_dung": "Clean Code - Mã Sạch Và Con Đường Trở Thành Lập Trình Viên Giỏi - Cuốn sách hướng dẫn cách để viết những đoạn mã có thể hoạt động tốt, cũng như truyền tải được ý định của người viết nên chúng.",
         "so_luong": 0,
-        "the_loai_id": 20,
-        "tac_gia_id": 61
+        "the_loai_id": 13,
+        "tac_gia_id": 12
     },
     {
         "id": 15,
-        "ten_sach": "Địa ngục môn",
-        "don_gia": 100000.0,
-        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027837/upload/bia_sach/wtlpkwdmufujxy3ycmfj.jpg",
-        "noi_dung": "Địa Ngục Môn là tác phẩm truyện tranh Việt Nam được xuất bản vào năm 2016, Tháng 1 năm 2017, Địa Ngục Môn xuất sắc vượt qua hàng trăm tác phẩm truyện tranh trên khắp thế giới để đoạt giải Bạc, cuộc thi International Manga Award tại Nhật Bản",
+        "ten_sach": "Lập Trình Cơ Bản - Tự Học PYTHON Bằng Hình Ảnh",
+        "don_gia": 179500.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034238/upload/bia_sach/xytgsvjfbaqcqfv1syp0.jpg",
+        "noi_dung": "Lập Trình Cơ Bản - Tự Học PYTHON Bằng Hình Ảnh - Cuốn sách này mong muốn phổ cập ngôn ngữ Python đến với nhiều bạn có mong muốn tìm hiểu lập trình máy tính.",
         "so_luong": 0,
-        "the_loai_id": 22,
-        "tac_gia_id": 60
+        "the_loai_id": 13,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 16,
+        "ten_sach": "Khoa Học Dữ Liệu Với Python",
+        "don_gia": 168300.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034343/upload/bia_sach/x3oqpcz34wvrneht7er5.jpg",
+        "noi_dung": "Khoa Học Dữ Liệu Với Python - Sách giới thiệu nhanh về các thư viện chính dùng nhiều trong phân tích dữ liệu, học máy, học sâu, các thành phần thiết yếu của ngôn ngữ Python dành cho các nhà nghiên cứu phân tích dữ liệu và nhà phát triển học máy và học sâu.",
+        "so_luong": 0,
+        "the_loai_id": 13,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 17,
+        "ten_sach": "Thiên Tài Bên Trái, Kẻ Điên Bên Phải",
+        "don_gia": 99000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034440/upload/bia_sach/loo9upcxj1sb3soqbyvv.jpg",
+        "noi_dung": "Thiên Tài Bên Trái, Kẻ Điên Bên Phải là một cuốn sách gây chú ý của tác giả Cao Minh, khám phá ranh giới mong manh giữa thiên tài và sự điên rồ. Cuốn sách tập trung vào các cuộc phỏng vấn với những người mắc các chứng rối loạn tâm lý, từ đó làm sáng tỏ cách mà họ nhìn thế giới và suy nghĩ khác biệt. Qua từng câu chuyện kỳ quái và sâu sắc, độc giả không chỉ được tiếp cận với những quan điểm mới mẻ về cuộc sống mà còn được khuyến khích suy ngẫm về bản chất con người và xã hội. Đây là một tác phẩm độc đáo, kết hợp giữa khoa học, triết học và nghệ thuật kể chuyện, để lại nhiều ấn tượng mạnh mẽ.",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 18,
+        "ten_sach": "Gấu Trúc Tới Đây! - Hi Panda! Cò Le",
+        "don_gia": 162000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034514/upload/bia_sach/mxdmvx55gdl3akkxpbwn.jpg",
+        "noi_dung": "GẤU TRÚC TỚI ĐÂY! - Cuốn sách như một cuốn sổ tay hài hước bật mí về tất cả các \"phương diện cuộc sống\" của loài gấu trúc cũng như lật mở những trang nhật ký về những chặng đường tiến hóa riêng của loài.  Đây là một bộ bách khoa toàn thư sáng tạo về gấu trúc giải thích kiến thức về gấu trúc và truyền bá văn hóa gấu trúc một cách toàn diện và đa góc độ, từ bốn phương diện bao gồm: “Tại sao gấu trúc lại dễ thương như vậy nhỉ?”, “Cuộc sống của gấu trúc”, “Quá khứ và hiện tại của gấu trúc” và “Bảo vệ “quốc bảo” - gấu trúc”. Sách được trang bị số lượng lớn hình ảnh gấu trúc có thật và quý giá, có giá trị nghiên cứu khoa học và làm cảnh cực cao, ghi lại những khoảnh khắc tuyệt vời như trò chơi gấu trúc, ăn uống, chiến đấu, kiếm ăn.  Đặc biệt, sách còn bao gồm hồ sơ thông tin của bốn “minh tinh” gấu trúc gồm: Hòa Hoa (Hoa Hoa), Hòa Diệp, Manh Lan và Thất Tử để những người hâm mộ gấu trúc có thể một lần nữa ngắm nhìn \"thần tượng\" ở những góc độ gần gũi nhất khi đọc. Hi vọng khi cầm sách trên tay, GẤU TRÚC TỚI ĐÂY! sẽ là ấn phẩm giúp bạn có những giây phút giải trí bổ ích!",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 19,
+        "ten_sach": "Chí Phèo - Nam Cao",
+        "don_gia": 100500.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034661/upload/bia_sach/yyf0ki1pntjxjahafegm.jpg",
+        "noi_dung": "Tác phẩm Chí Phèo của nhà văn Nam Cao là một trong những tác phẩm kinh điển nhất được trích dẫn trong sách giáo khoa Ngữ Văn lớp 11. Truyện ngắn khắc họa hình ảnh người nông dân bị bần cùng hóa thông qua ngòi bút nhân đạo sâu sắc và đầy vị tha của Nam Cao.  Truyện kể về Chí Phèo - nhân vật được mệnh danh là con quỷ làng Vũ Đại với thói nghiện rượu và hay chửi bới. Tuy nhiên, Chí đáng trách mà cũng đáng thương đến đau lòng. Vốn là đứa trẻ bị bỏ rơi trong lò gạch, được người ta truyền tay nhau nuôi nấng, Chí chưa bao giờ nghĩ rằng mình sẽ bị người ta hãm hại. Để rồi một ngày, cậu thanh niên trai tráng bị cho vào tù một cách đầy oan ức. Khi trở ra, Chí không còn là chính mình của ngày xưa nữa.  ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 20,
+        "ten_sach": "Số Đỏ - Vũ Trọng Phụng",
+        "don_gia": 256000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034719/upload/bia_sach/welcekrhcdw2mo9b3era.jpg",
+        "noi_dung": "Số Đỏ của Vũ Trọng Phụng là một cuốn sách văn học Việt Nam cũ không chỉ phản ánh hiện thực rõ nét mà còn khéo léo châm biếm sâu cay xã hội bấy giờ. Toàn bộ “Số Đỏ” là những nghịch lý trớ trêu về cuộc đời của Xuân Tóc Đỏ. Từ một tên lang thang đầu đường xó chợ, nhờ cái miệng khéo léo và số phận may mắn, Xuân Tóc Đỏ dần gây dựng cho mình hình tượng “văn minh” đầy cao ngạo. Lối diễn đạt thân thuộc, tình huống đậm chất “tấn hài kịch” của “ông hoàng nghệ thuật trào phúng” Vũ Trọng Phụng đã thực sự ghi dấu ấn mạnh mẽ trong nền văn học Việt Nam. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 21,
+        "ten_sach": "Truyện kiều",
+        "don_gia": 123123.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034773/upload/bia_sach/y55whg81typdykmif8iv.jpg",
+        "noi_dung": "Truyện Kiều của Đại thi hào Nguyễn Du hẳn không còn quá xa lạ với nhiều độc giả yêu mến văn học Việt Nam. Truyện Kiều kể về thân phận của con người trong xã hội phong kiến thông qua nhân vật nàng Kiều tài hoa bạc phận.      Với thể thơ lục bát truyền thống, Nguyễn Du đã thực sự cô đúc tinh hoa văn hóa ngàn đời của dân tộc trong 3254 câu thơ. Đọc Truyện Kiều, không phải chỉ đơn thuần một sớm một chiều mà hiểu hết. Đây là cả một quá trình nghiền ngẫm và suy tư sâu sắc để thấy hết cái hay, cái đẹp trong từng ý thơ. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 22,
+        "ten_sach": "Những ngày thơ ấu - Nguyên Hồng",
+        "don_gia": 1231210.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034816/upload/bia_sach/mlf4tpgiwyqezdr1y4nr.jpg",
+        "noi_dung": "Cuốn sách văn học Việt Nam cũ “Những ngày thơ ấu” của nhà văn Nguyên Hồng là tấm vé đưa ta về tuổi thơ. Bằng cuộc du ngoạn dẫn dắt bởi cậu bé từ nhỏ đã phải trải qua nhiều đắng cay, mất mát, độc giả cảm nhận được tình yêu thương trong cậu bé Hồng vẫn luôn rực cháy và chưa bao giờ vơi cạn.   “Những ngày thơ ấu” là lời thủ thỉ tâm tình của Nguyên Hồng về tuổi thơ thông qua khắc họa hình ảnh người mẹ tần tảo yêu thương con vô ngần. Bên cạnh đó, đây còn là bức tranh hiện thực xã hội Việt Nam những năm đầu thế kỷ XX. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 23,
+        "ten_sach": "Cánh đồng bất tận - Nguyễn Ngọc Tư  ",
+        "don_gia": 213111.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034859/upload/bia_sach/ptsrfedv5qim2txagqre.jpg",
+        "noi_dung": "Là tập truyện nổi tiếng của nhà văn Nguyễn Ngọc Tư, “Cánh đồng bất tận” là bức tranh được ghép nối bởi những mảnh đời bất hạnh. Tại đó, những con người không quen biết nhau, ở những thời kỳ khác nhau, nhưng lại giống nhau đến kỳ lạ. Thông qua góc nhìn của người con gái nông thôn, tác giả đã nhẹ nhàng điểm tô giá trị nhân đạo trên nền đau thương, mất mát. Đây là tác phẩm cực kỳ phù hợp cho những ai tìm về quá khứ và yêu mến cái nét đẹp hoài cổ. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 24,
+        "ten_sach": "Vang bóng một thời - Nguyễn Tuân",
+        "don_gia": 213312.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034893/upload/bia_sach/mzw22rhd9o3tuce8twu4.jpg",
+        "noi_dung": "“Vang bóng một thời” của Nguyễn Tuân là cuốn sách văn học Việt Nam cũ dẫn độc giả về với những bậc tài hoa một thời. Đó là cụ Ấm với thú thưởng trà trong sương sớm, là người đao phủ với ngón nghề “chém cheo ngành”, là người tử tù với những con chữ đầy chí khí tung hoành một đời người,...”Nhà văn của cái đẹp” Nguyễn Tuân vẫn ngông nghênh với giọng văn độc nhất như thế, để lại những bông hoa tuyệt đẹp cho đời. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 25,
+        "ten_sach": "Nhật ký trong tù - Hồ Chí Minh ",
+        "don_gia": 250000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735034988/upload/bia_sach/qsfuikfh22hk3iqoquqg.jpg",
+        "noi_dung": "“Nhật ký trong tù” của Chủ tịch Hồ Chí Minh là một trong những cuốn sách văn học Việt Nam cũ đến nay vẫn còn nguyên giá trị. Tác phẩm tái hiện cái nền hiện thực trong tù còn lắm thiếu thốn, chông gai. Thế nhưng, tinh thần lạc quan, mạnh mẽ, yêu đời, yêu cuộc sống của Bác vẫn vượt lên trên tất cả. Những lời thơ thấm đượm cốt cách người lính với những bài học mang đậm giá trị tinh hoa văn hóa dân tộc và thời đại. ",
+        "so_luong": 0,
+        "the_loai_id": 17,
+        "tac_gia_id": 16
+    },
+    {
+        "id": 26,
+        "ten_sach": "Thơ - Tố Hữu",
+        "don_gia": 25000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035045/upload/bia_sach/cor33mdf6sf08tzqjjmh.jpg",
+        "noi_dung": "Tố Hữu không chỉ là nhà thơ mà còn là người chiến sĩ cách mạng đầy gai góc, dũng cảm. “Từ ấy” với lời thơ mạnh mẽ là nguồn động lực to lớn cho những người lính cụ Hồ trong thời kỳ kháng chiến cứu quốc. Cuốn sách văn học Việt Nam cũ “Thơ” không chỉ là một tập thơ hay mà còn là bản ghi chép lịch sử đầy sống động để thế hệ sau này biết ơn và thầm cảm nhớ những vị anh hùng đã hy sinh. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 17
+    },
+    {
+        "id": 27,
+        "ten_sach": "Tắt Đèn - Ngô Tất Tố",
+        "don_gia": 21113.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035086/upload/bia_sach/guz4cqpvqzrvbhv9yeak.jpg",
+        "noi_dung": "“Tắt Đèn” là cuốn sách văn học Việt Nam cũ được viết bởi nhà văn Ngô Tất Tố - một cây bút lão làng trong giai đoạn 1930 - 1945. Xuyên suốt tác phẩm là hình ảnh chị Dậu xinh đẹp - quật cường với số phận đầy sóng gió. Truyện khắc họa rõ nét người nông dân bị xã hội coi như cỏ rác. Từ đó làm sáng lên giá trị tình thân, tình mẫu tử và những giá trị sống tốt đẹp không bao giờ phai nhạt. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 28,
+        "ten_sach": "Gió lạnh đầu mùa - Thạch Lam",
+        "don_gia": 24123.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035122/upload/bia_sach/asjomeo3dnte6ue52fcq.jpg",
+        "noi_dung": "“Gió lạnh đầu mùa” của nhà văn Thạch Lam tuyển tập những truyện ngắn hay nhất, tái hiện những số phận lao động mang đậm tính hiện thực. Không quá bi kịch như Chí Phèo, truyện ngắn của Thạch Lam luôn trung thành với triết lý “không đem đến cho người đọc sự thoát ly hay sự quên”. Đặc trưng của truyện ngắn Thạch Lam luôn lấp lánh ánh sáng của đoàn tàu đợi rời ga. ",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 29,
+        "ten_sach": "Bản án chế độ thực dân Pháp",
+        "don_gia": 121402.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035229/upload/bia_sach/cty6zy3w3bpt7rjho9ei.jpg",
+        "noi_dung": "Tác phẩm “Bản án chế độ thực dân Pháp” (Le Procès de la colonisation Francaise) là tác phẩm của chủ tịch Hồ Chí Minh, viết bằng tiếng Pháp trong khoảng những năm 1921-1925 và được xuất bản đầu tiên năm 1925 tại Paris (Thủ đô nước Pháp).  Năm 1946, tác phẩm này đã xuất bản bằng tiếng Pháp tại Hà Nội. Năm 1960, Nhà xuất bản Sự thật đã xuất bản bằng tiếng Việt lần thứ nhất và đã in trong tuyển tập của Hồ Chí Minh.  Bản án chế độ thực dân Pháp gồm 12 chương, trong đó có một số bài đã đăng trên báo Le Paria. Nội dung của tác phẩm không chỉ tố cáo tội ác của chủ nghĩa đế quốc Pháp đối với dân tộc Việt Nam cũng như với các thuộc địa khác trên các mặt chính trị, kinh tế, văn hoá, xã hội mà điều quan trọng là đã nêu lên những luận điểm cơ bản về vấn đề dân tộc và vấn đề thuộc địa.",
+        "so_luong": 0,
+        "the_loai_id": 10,
+        "tac_gia_id": 16
+    },
+    {
+        "id": 30,
+        "ten_sach": "Horrible Science – Vi Sinh Vật Vi Tính",
+        "don_gia": 250000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035330/upload/bia_sach/gevijdirmwkgh8svw0hd.jpg",
+        "noi_dung": "Cuốn sách thuộc bộ Horrible Science, được trình bày bằng giọng văn và các minh họa hài hước quen thuộc của hai tác giả Nick Arnold và Tony De Saulles giúp bạn dễ dàng làm quen với kiến thức cơ bản nhất liên quan đến các loại vi khuẩn vi sinh.  Những hình vẽ và lời giản dị dễ hiểu – như những đoạn truyện tranh  hấp dẫn giúp bạn dễ tưởng tượng ra thế giới của những “động vật” tí hon, cùng với tên tuổi những nhà bác học trong ngành, những kết luận khoa học và nhất là những lời khuyên thực tế, hữu hiệu vô giá, những cảnh báo quan trọng cho lối sống hiện đại … Và nhờ thế mà cuốn sách được nhiều giải thưởng về sách khoa học dành cho thiếu nhi và được đông đảo bạn đọc từ trẻ em đến người lớn tìm đọc.",
+        "so_luong": 0,
+        "the_loai_id": 5,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 31,
+        "ten_sach": " Horrible Science – Thiên Nhiên Hoang Dã",
+        "don_gia": 200000.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035397/upload/bia_sach/c7l4rbbomv5bru2faumf.jpg",
+        "noi_dung": "Cái gì? “!!!” bạn nghĩ môn sinh vật là thứ dành cho bọn óc chim sẻ, cho đám gà mái oang oác và lũ chuột chũi đui mù? Vậy là bạn chưa từng được nghe điều gì về thiên nhiên hoang dã đến… rụng tim.",
+        "so_luong": 0,
+        "the_loai_id": 5,
+        "tac_gia_id": 12
+    },
+    {
+        "id": 32,
+        "ten_sach": "Horrible Science – Côn Trùng Gớm Ghiếc",
+        "don_gia": 213213.0,
+        "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735035445/upload/bia_sach/feyzmncdalcgen2rqlbx.jpg",
+        "noi_dung": "Đây là tập tiếp theo trong series Horrible science rất được các bạn đọc yêu thích. Tập sách về các loài côn trùng vẫn sống quanh ta nhưng có bao điều thú vị chưa được biết đến như: Con sên làm gì với chất nhầy của nó? Tại sao ruồi lại ói vào đồ ăn của bạn? Côn trùng uống máu bạn như thế nào? Thông qua miêu tả thú vị, hài hước và hình minh họa sinh động, dí dỏm, những thông tin về các sinh vật “gớm ghiếc” đã giúp đưa khoa học đến với cuộc sống loài người được thể hiện vô cùng lôi cuốn, hấp dẫn người đọc đến tận cuối trang sách.",
+        "so_luong": 0,
+        "the_loai_id": 5,
+        "tac_gia_id": 12
     }
 ]

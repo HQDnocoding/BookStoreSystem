@@ -5,8 +5,8 @@ from app.models import Sach, TacGia, TheLoai
 
 
 def sach_to_json():
-    # Lấy tất cả sách từ cơ sở dữ liệu
-    sach_list = db.session.query(Sach).all()
+    # Lấy tất cả sách từ cơ sở dữ liệu và sắp xếp theo id
+    sach_list = db.session.query(Sach).order_by(Sach.id).all()
 
     # Chuyển đổi danh sách sách thành một danh sách dict
     sach_data = []
@@ -30,8 +30,8 @@ def sach_to_json():
 
 
 def tac_gia_to_json():
-    # Lấy tất cả tác giả từ cơ sở dữ liệu
-    tac_gia_list = db.session.query(TacGia).all()
+    # Lấy tất cả tác giả từ cơ sở dữ liệu và sắp xếp theo id
+    tac_gia_list = db.session.query(TacGia).order_by(TacGia.id).all()
 
     # Chuyển đổi danh sách tác giả thành một danh sách dict
     tac_gia_data = []
@@ -49,8 +49,8 @@ def tac_gia_to_json():
 
 
 def the_loai_to_json():
-    # Lấy tất cả thể loại từ cơ sở dữ liệu
-    the_loai_list = db.session.query(TheLoai).all()
+    # Lấy tất cả thể loại từ cơ sở dữ liệu và sắp xếp theo id
+    the_loai_list = db.session.query(TheLoai).order_by(TheLoai.id).all()
 
     # Chuyển đổi danh sách thể loại thành một danh sách dict
     the_loai_data = []
@@ -65,6 +65,7 @@ def the_loai_to_json():
         json.dump(the_loai_data, f, ensure_ascii=False, indent=4)
 
     print("Dữ liệu thể loại đã được lưu vào the_loai.json")
+
 
 if __name__ == "__main__":
     with my_app.app_context():
