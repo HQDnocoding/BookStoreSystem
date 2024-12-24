@@ -465,7 +465,11 @@ def payment_succeed():
 def payment_failed():
     return render_template('payment_failed.html')
 
-
+@app.route('/search_tac_gia', methods=['GET'])
+def search_tac_gia():
+    search_term = request.args.get('q', '').strip()
+    authors = TacGia.query.filter(TacGia.ten_tac_gia.ilike(f'%{search_term}%')).all()
+    return jsonify([{'id': author.id, 'ten_tac_gia': author.ten_tac_gia} for author in authors])
 if __name__ == "__main__":
     with app.app_context():
         app.run(debug=True,port=5001)

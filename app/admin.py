@@ -405,12 +405,17 @@ class Logout(MyView):
         return redirect("/admin")
 
 
+
+
+
 class SachForm(Form):
     ten_sach = StringField('Tên sách', validators=[DataRequired()])
     don_gia = StringField('Đơn giá', validators=[DataRequired()])
     noi_dung = StringField('Nội dung', validators=[DataRequired()])
     tac_gia_id = SelectField('Tác giả', coerce=int, validators=[DataRequired()])
+    new_tac_gia = StringField('Tác giả mới (nếu không có)', validators=[DataRequired()])
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
+    new_the_loai = StringField('Thể loại mới (nếu không có)', validators=[DataRequired()])
     bia_sach = FileField('Bìa sách', validators=[
         DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
 
@@ -435,9 +440,8 @@ class SachView(AuthenticatedView):
 
         return form
 
-    # form_excluded_columns=['hoa_don_ban_sach','phieu_nhap_sach','don_hang','hoa_don_ban_sach','so_luong_cuon_con_lai']# fields bị loại bỏ trong form
 
-    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong']  # cot hiển thị
+    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong','tac_gia_id']  # cot hiển thị
 
     column_labels = {  # sua ten hien thi
         'id': 'Mã SP',
@@ -446,36 +450,12 @@ class SachView(AuthenticatedView):
         'tac_gia_id': 'Tác giả',
         'the_loai_id': 'Thể loại',
         'so_luong': 'Số lượng',
-        'bia_sach': 'Bìa sách'
     }
-    #
-    # form_overrides = {
-    #     'bia_sach': ImageUploadField,  # cho upload file
-    #     'the_loai_id':QuerySelectField
-    # }
-    #
-    # form_args = {
-    #     'bia_sach':{
-    #             'label':'Upload image'
-    #     },
-    #     'the_loai_id': {
-    #         'label':'Thể loại',
-    #         'query_factory': lambda: TheLoai.query.all(),  # Truy vấn tất cả thể loại
-    #         'get_label': 'ten_the_loai',  # Hiển thị tên thể loại trong dropdown
-    #         'allow_blank': False  # Không cho phép bỏ trống trường này
-    #     },
-    #     'tac_gia_id': {
-    #         'label':'Tác giả',
-    #         'query_factory': lambda: TacGia.query.all(),
-    #         'get_label': 'ten_tac_gia',
-    #         'allow_blank': False
-    #     }
-    # }
-    #
+
     column_formatters = {
         'so_luong_cuon_con_lai': lambda v, c, m, p: (
-                db.session.query(SoLuongCuonConLai.so_luong).filter(SoLuongCuonConLai.sach_id == m.id).order_by(
-                    SoLuongCuonConLai.thoi_diem.desc()).first() or 'NaN'
+                db.session.query(Sach.so_luong).filter(Sach.id == m.id).order_by(
+                    Sach.thoi_diem.desc()).first() or 'NaN'
         )
     }
     column_formatters_detail = {
@@ -485,6 +465,37 @@ class SachView(AuthenticatedView):
     }
 
     def on_model_change(self, form, model, is_created):
+        if form.new_tac_gia.data:
+            # Kiểm tra xem tác giả có tồn tại chưa
+            tac_gia = TacGia.query.filter_by(ten_tac_gia=form.new_tac_gia.data).first()
+            if not tac_gia:
+                # Nếu không có tác giả, tạo tác giả mới
+                tac_gia = TacGia(ten_tac_gia=form.new_tac_gia.data)
+                db.session.add(tac_gia)
+                db.session.commit()
+
+                flash(f"Đã tạo tác giả mới: {tac_gia.ten_tac_gia}", 'success')
+
+            # Gán tác giả vào sách
+            model.tac_gia_id = tac_gia.id
+        else:
+            # Nếu người dùng không nhập tác giả mới, gán tác giả đã chọn
+            model.tac_gia_id = form.tac_gia_id.data
+
+        if form.new_the_loai.data:
+            the_loai = TheLoai.query.filter_by(ten_the_loai=form.new_the_loai.data).first()
+            if not the_loai:
+                # Nếu không có tác giả, tạo tác giả mới
+                the_loai = TheLoai(ten_the_loai=form.new_the_loai.data)
+                db.session.add(the_loai)
+                db.session.commit()
+
+                flash(f"Đã tạo thể loại mới: {the_loai.ten_the_loai}", 'success')
+
+            model.the_loai_id = the_loai.id
+        else:
+            model.the_loai_id = form.the_loai_id.data
+
         file_data = form.bia_sach.data
         if file_data:
 
@@ -493,7 +504,7 @@ class SachView(AuthenticatedView):
 
             upload_result = cloudinary.uploader.upload(file_data, folder="upload/bia_sach")
             model.bia_sach = upload_result.get('secure_url')
-        model.tac_gia_id = form.tac_gia_id.data
+
         return super().on_model_change(form, model, is_created)
 
 
