@@ -225,7 +225,7 @@ def common_attr():
 def orders():
     check_if_expire_orders(current_user.get_id())
 
-    page_size = 2
+    page_size = 10
     page = request.args.get('page',1)
 
     don_hangs = get_order_by_user_id(current_user.get_id(),page,page_size)

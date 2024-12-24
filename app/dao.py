@@ -9,8 +9,8 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.operators import desc_op
 
-from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, HoaDonBanSach, \
-    Sach, ChiTietDonHang, ChiTietHoaDon, SoLuongCuonConLai, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
+from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, \
+    Sach, ChiTietDonHang, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
     ThongTinNhanHang
 from app import db, admin, app,Status,Role,PayingMethod
 import hashlib
