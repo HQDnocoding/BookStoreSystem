@@ -42,5 +42,29 @@
     {
         "id": 11,
         "ten_tac_gia": "Lê Đức Mạnh"
+    },
+    {
+        "id": 12,
+        "ten_tac_gia": "Chưa rõ"
+    },
+    {
+        "id": 13,
+        "ten_tac_gia": "Donald Knuth"
+    },
+    {
+        "id": 14,
+        "ten_tac_gia": "Takako Hirono"
+    },
+    {
+        "id": 15,
+        "ten_tac_gia": "Tịnh Văn"
+    },
+    {
+        "id": 16,
+        "ten_tac_gia": "Hồ chí minh"
+    },
+    {
+        "id": 17,
+        "ten_tac_gia": "Tố hữu"
     }
 ]
