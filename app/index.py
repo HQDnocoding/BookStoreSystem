@@ -109,6 +109,32 @@ def logout_my_user():
     return redirect('/login')
 
 
+@app.route('/update_password/', methods=['get', 'post'])
+def update_password():
+    err_msg = ''
+    if request.method.__eq__('POST'):
+        old_password = request.form['old_password']
+        new_password = request.form['new_password']
+        confirm = request.form['confirm']
+        if not new_password.__eq__(confirm):
+            err_msg = 'Mật khẩu KHÔNG khớp'
+            return render_template('update_password.html', err_msg=err_msg)
+        if old_password.__eq__(new_password):
+            err_msg = 'Mật khẩu mới phải KHÁC mật khẩu cũ '
+            return render_template('update_password.html', err_msg=err_msg)
+        user = dao.auth_user(current_user.username, old_password)
+
+        if user:
+            update_user_password(current_user.id, new_password)
+            logout_user()
+            return redirect('/login')
+        else:
+            err_msg = 'SAI mật khẩu'
+
+    return render_template('update_password.html', err_msg = err_msg)
+
+
+
 @app.route('/profile/')
 @login_required
 def profile():

@@ -151,6 +151,13 @@ def auth_user(username, password, roles=None):
     return users.first()
 
 
+def update_user_password(user_id, new_password):
+    user = get_user_by_id(user_id)
+    new_password_hash = str(hashlib.md5(new_password.strip().encode('utf-8')).hexdigest())
+    user.password = new_password_hash
+    db.session.commit()
+
+
 # lấy tổng doanh của từng tựa sách thu từ hóa đơn theo tháng, năm
 def get_revenue_by_month_year(thang, nam):
     # Chuyển tháng, năm thành chuỗi tháng/năm
