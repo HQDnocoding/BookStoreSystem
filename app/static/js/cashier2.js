@@ -97,8 +97,13 @@ async function createInvoice(id_don_hang) {
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-pay2').addEventListener('click', function (event) {
-       if (changeAmount >= 0) {
-           event.preventDefault();
+    const totalPaid = parseFloat(document.getElementById('amount-paid').value.replace('₫', '').replace(',', '')) || 0;
+        const totalAmount = parseFloat(document.getElementById('total-price').value.replace('₫', '').replace(',', '')) || 0;
+
+
+
+        const changeAmount = totalPaid - totalAmount;
+       if (changeAmount <= 0) {
            event.preventDefault();
            alert('Không đủ tiền');
         } else {

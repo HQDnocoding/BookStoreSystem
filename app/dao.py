@@ -11,7 +11,7 @@ from sqlalchemy.sql.operators import desc_op
 
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, \
     Sach, ChiTietDonHang, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
-    ThongTinNhanHang
+    ThongTinNhanHang, NhanVien_DonHang
 from app import db, admin, app,Status,Role,PayingMethod
 import hashlib
 
@@ -60,12 +60,12 @@ def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
     db.session.commit()
 
 
-def create_hoadonbansach(ngay_tao_hoa_don,nhanvien_id=None):  # Da test
-    new_hoadonbansach = HoaDonBanSach(ngay_tao_hoa_don=ngay_tao_hoa_don,nhan_vien= nhanvien_id)
-    db.session.add(new_hoadonbansach)
-    db.session.commit()
-
-    return new_hoadonbansach
+# def create_hoadonbansach(ngay_tao_hoa_don,nhanvien_id=None):  # Da test
+#     new_hoadonbansach = HoaDonBanSach(ngay_tao_hoa_don=ngay_tao_hoa_don,nhan_vien= nhanvien_id)
+#     db.session.add(new_hoadonbansach)
+#     db.session.commit()
+#
+#     return new_hoadonbansach
 
 
 def create_sach(tenSach, donGia, the_loai_id, tac_gia_id):  # Da test
@@ -74,16 +74,16 @@ def create_sach(tenSach, donGia, the_loai_id, tac_gia_id):  # Da test
     db.session.commit()
 
 
-def create_chitiethoadon(sach_id, hoa_don_id, so_luong, tong_tien):  # Da test
-    new_chitiethoadon = ChiTietHoaDon(sach_id=sach_id, hoa_don_id=hoa_don_id, so_luong=so_luong, tong_tien=tong_tien)
-    db.session.add(new_chitiethoadon)
-    db.session.commit()
+# def create_chitiethoadon(sach_id, hoa_don_id, so_luong, tong_tien):  # Da test
+#     new_chitiethoadon = ChiTietHoaDon(sach_id=sach_id, hoa_don_id=hoa_don_id, so_luong=so_luong, tong_tien=tong_tien)
+#     db.session.add(new_chitiethoadon)
+#     db.session.commit()
 
 
-def create_soluongconlai(so_luong, sach_id):
-    new_soluongconlai = SoLuongCuonConLai(so_luong=so_luong, sach_id=sach_id)
-    db.session.add(new_soluongconlai)
-    db.session.commit()
+# def create_soluongconlai(so_luong, sach_id):
+#     new_soluongconlai = SoLuongCuonConLai(so_luong=so_luong, sach_id=sach_id)
+#     db.session.add(new_soluongconlai)
+#     db.session.commit()
 
 
 def create_phieunhapsach(quan_ly_kho_id):
@@ -286,11 +286,19 @@ def add_so_luong(sach_id, so_luong):
     db.session.commit()
 
 
+def get_id_by_phuong_thuc_name(name):
+    return PhuongThucThanhToan.query.filter_by(ten_phuong_thuc=name).first().id
 
+def get_id_by_trang_thai(name):
+    return TrangThaiDonHang.query.filter_by(ten_trang_thai=name).first().id
 
 def create_invoice_from_cart():
     try:
-        cart = session.get('cart', {})
+
+        pt_tt=get_id_by_phuong_thuc_name(PayingMethod.OFFLINE_PAY.value)
+        tt=get_id_by_trang_thai(Status.PAID.value)
+
+        cart = session.get('cart_admin', {})
         if not cart:
             raise ValueError("Giỏ hàng trống.")
 
@@ -298,13 +306,13 @@ def create_invoice_from_cart():
         if not user:
             raise ValueError("Người dùng chưa đăng nhập.")
 
-        # Tính tổng tiền từ giỏ hàng
-        tong_tien = sum(int(item['so_luong']) * float(item['don_gia']) for item in cart.values())
-
         # Tạo hóa đơn bán sách
-        hoa_don = HoaDonBanSach(ngay_tao_hoa_don=datetime.now(), nhan_vien=user.id)
-        db.session.add(hoa_don)
-        db.session.flush()  # Đảm bảo `hoa_don.id` được sinh ra
+        don_hang = DonHang(ngay_tao_don=datetime.now(),phuong_thuc_id=pt_tt,trang_thai_id=tt)
+        db.session.add(don_hang)
+        db.session.commit()
+        nhanvien_donhang=NhanVien_DonHang(donhang_id=don_hang.id,nhanvien_id=user.id,ngay_than_toan=datetime.now())
+        db.session.add(nhanvien_donhang)
+
 
         # Thêm chi tiết hóa đơn
         for item in cart.values():
@@ -312,10 +320,10 @@ def create_invoice_from_cart():
             if not sach:
                 raise ValueError(f"Không tìm thấy sách với ID: {item['id']}")
 
-            chi_tiet = ChiTietHoaDon(
+            chi_tiet = ChiTietDonHang(
 
                 sach_id=sach.id,
-                hoa_don_id=hoa_don.id,
+                don_hang_id=don_hang.id,
                 so_luong=item['so_luong'],
                 tong_tien=sach.don_gia * item['so_luong']
             )
@@ -323,8 +331,8 @@ def create_invoice_from_cart():
 
         db.session.commit()
         # Xóa giỏ hàng sau khi tạo hóa đơn
-        session.pop('cart', None)
-        return hoa_don
+        session.pop('cart_admin', None)
+        return don_hang
 
     except Exception as e:
         db.session.rollback()  # Rollback nếu có lỗi
@@ -347,59 +355,56 @@ def get_chi_tiet_don_hang(id):
 
 
 
-def create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id=None):
+def create_hoa_don_from_don_hang(don_hang_id):
     try:
         # Lấy thông tin đơn hàng
-        don_hang = DonHang.query.get(don_hang_id)
+        don_hang = get_don_hang(don_hang_id)
         if not don_hang:
-            return {"error": "Đơn hàng không tồn tại."}, 404
+            raise ValueError(f"Không tìm thấy đơn hàng với ID {don_hang_id}")
 
-        # Lấy danh sách chi tiết đơn hàng
-        chi_tiet_don_hang = ChiTietDonHang.query.filter_by(don_hang_id=don_hang_id).all()
+        # Cập nhật phương thức thanh toán và trạng thái
+        pt_tt = get_id_by_phuong_thuc_name(PayingMethod.OFFLINE_PAY.value)
+        tt = get_id_by_trang_thai(Status.PAID.value)
+        if not pt_tt or not tt:
+            raise ValueError("Không tìm thấy phương thức thanh toán hoặc trạng thái hợp lệ.")
 
-        if not chi_tiet_don_hang:
-            return {"error": "Đơn hàng không có sách nào."}, 400
+        don_hang.phuong_thuc_id = pt_tt
+        don_hang.trang_thai_id = tt
 
-        # Tạo hóa đơn
-        hoa_don = HoaDonBanSach(
-            ngay_tao_hoa_don=datetime.now(),
-            nhan_vien=nhan_vien_id  # Nếu có thông tin nhân viên
+        # Kiểm tra người dùng hiện tại
+        user = current_user
+        if not user:
+            raise ValueError("Người dùng chưa đăng nhập.")
+
+        # Tạo bản ghi nhân viên - đơn hàng
+        nhanvien_donhang = NhanVien_DonHang(
+            donhang_id=don_hang_id,
+            nhanvien_id=user.id,
+            ngay_than_toan=datetime.now()
         )
-        db.session.add(hoa_don)
-        db.session.flush()  # Đẩy tạm để lấy ID của hóa đơn
+        db.session.add(nhanvien_donhang)
 
-        # Thêm chi tiết hóa đơn từ chi tiết đơn hàng
-        for chi_tiet in chi_tiet_don_hang:
-            sach = Sach.query.get(chi_tiet.sach_id)
-            if sach:
-                chi_tiet_hoa_don = ChiTietHoaDon(
-                    sach_id=sach.id,
-                    hoa_don_id=hoa_don.id,
-                    so_luong=chi_tiet.so_luong,
-                    tong_tien=chi_tiet.tong_tien
-                )
-                db.session.add(chi_tiet_hoa_don)
-        # status=Status.PAID.value
-        # don_hang.trang_thai_id = TrangThaiDonHang.query.filter(status).first().id
+        # Lưu thay đổi vào cơ sở dữ liệu
         db.session.commit()
+
+        # Trả về thông tin cần thiết
         return {
-            "hoa_don_id": hoa_don.id,
-            "ngay_tao_hoa_don": hoa_don.ngay_tao_hoa_don.strftime("%Y-%m-%d %H:%M:%S"),
-            "nhan_vien_id": hoa_don.nhan_vien,
+            "don_hang_id": don_hang_id,
+            "ngay_thanh_toan": nhanvien_donhang.ngay_than_toan.strftime("%Y-%m-%d %H:%M:%S"),
+            "nhan_vien_id": current_user.id,
             "sach": [
                 {
                     "sach_id": chi_tiet.sach_id,
                     "so_luong": chi_tiet.so_luong,
                     "tong_tien": chi_tiet.tong_tien
-                } for chi_tiet in hoa_don.sach
+                } for chi_tiet in don_hang.sach
             ]
         }, 201
 
-    except SQLAlchemyError as e:
+    except Exception as e:
         db.session.rollback()
+        app.logger.error(f"Lỗi khi tạo hóa đơn: {str(e)}")
         return {"error": f"Lỗi hệ thống: {str(e)}"}, 500
-
-
 
 
 

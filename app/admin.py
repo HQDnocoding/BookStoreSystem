@@ -83,19 +83,17 @@ class CashierView(AuthenticatedNhanVienView):
 
     @expose('/cart', methods=['GET'])
     def get_cart(self):
-        """Lấy thông tin giỏ hàng"""
-        cart = session.get('cart', {})
+        cart = session.get('cart_admin', {})
         return jsonify(utils.cart_stats(cart))
 
     @expose('/cart', methods=['POST'])
     def add_to_cart(self):
-        """Thêm sản phẩm vào giỏ hàng"""
         data = request.json
         product_id = str(data['id'])
         quantity = int(data.get('so_luong', 1))
 
         # Khởi tạo giỏ hàng nếu chưa có
-        cart = session.get('cart', {})
+        cart = session.get('cart_admin', {})
 
         # Thêm hoặc cập nhật sản phẩm
         if product_id in cart:
@@ -111,7 +109,7 @@ class CashierView(AuthenticatedNhanVienView):
             }
 
         # Lưu lại giỏ hàng
-        session['cart'] = cart
+        session['cart_admin'] = cart
         session.modified = True
 
         # Trả về trạng thái giỏ hàng
@@ -120,7 +118,7 @@ class CashierView(AuthenticatedNhanVienView):
     @expose('/cart', methods=['DELETE'])
     def clear_cart(self):
         """Xóa toàn bộ giỏ hàng"""
-        session['cart'] = {}
+        session['cart_admin'] = {}
         session.modified = True
         return jsonify({"message": "Giỏ hàng đã được xóa."}), 204
 
@@ -139,12 +137,12 @@ class CashierView(AuthenticatedNhanVienView):
                 del cart[str(product_id)]  # Xóa sản phẩm nếu số lượng = 0
 
         # Lưu lại giỏ hàng vào session
-        session['cart'] = cart
+        session['cart_admin'] = cart
         session.modified = True
 
         # Trả về trạng thái giỏ hàng hiện tại
         return jsonify({
-            "cart": list(cart.values()),
+            "cart_admin": list(cart.values()),
             "total_quantity": sum(item['so_luong'] for item in cart.values()),
             "total_amount": sum(item['don_gia'] * item['so_luong'] for item in cart.values())
         })
@@ -152,19 +150,19 @@ class CashierView(AuthenticatedNhanVienView):
     @expose('/cart/<int:product_id>', methods=['DELETE'])
     def remove_from_cart(self, product_id):
         """Xóa sản phẩm khỏi giỏ hàng"""
-        cart = session.get('cart', {})
+        cart = session.get('cart_admin', {})
 
         # Xóa sản phẩm khỏi giỏ hàng nếu tồn tại
         if str(product_id) in cart:
             del cart[str(product_id)]
 
         # Lưu lại giỏ hàng vào session
-        session['cart'] = cart
+        session['cart_admin'] = cart
         session.modified = True
 
         # Trả về trạng thái giỏ hàng hiện tại
         return jsonify({
-            "cart": list(cart.values()),
+            "cart_admin": list(cart.values()),
             "total_quantity": sum(item['so_luong'] for item in cart.values()),
             "total_amount": sum(item['don_gia'] * item['so_luong'] for item in cart.values())
         })
@@ -185,10 +183,9 @@ class CashierView(AuthenticatedNhanVienView):
             } for p in products
         ])
 
-    @expose('/cart/cash', methods=['POST'])
+    @expose('/cart/cash', methods=['GET'])
     @login_required
     def cashier(self, **kwargs):
-
 
 
         nv = dao.get_user_by_id(current_user.id)
@@ -200,7 +197,7 @@ class CashierView(AuthenticatedNhanVienView):
 
         ten_kh = "Khách hàng mua tại nhà sách"
 
-        cart = session.get('cart', {})
+        cart = session.get('cart_admin', {})
         print("Cart contents:", cart)
         print("Cart values:", cart.values())
 
@@ -225,13 +222,13 @@ class CashierView(AuthenticatedNhanVienView):
 
             app.logger.error(cart_list_dict.__str__())
 
-            hoa_don = create_invoice_from_cart()
+            don_hang = create_invoice_from_cart()
 
             output_dir = "bieu_mau_hoa_don_mua_tai_cua_hang"
             os.makedirs(output_dir, exist_ok=True)
             output_filename = os.path.join(output_dir, f"tch_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
-            utils.create_invoice_pdf(ten_kh, hoa_don.ngay_tao_hoa_don, cart_list_dict, ten_nv, output_filename)
+            utils.create_invoice_pdf(ten_kh, don_hang.ngay_tao_don, cart_list_dict, ten_nv, output_filename)
             flash("Hóa đơn đã được tạo thành công.", "success")
         except Exception as e:
             app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
@@ -306,21 +303,22 @@ class Cashier2View(AuthenticatedNhanVienView):
 
     @expose('/don_hang/<int:don_hang_id>', methods=['POST'])
     def create_invoice(self, don_hang_id):
-        nhan_vien_id = current_user.id
 
-        infor, sach = create_hoa_don_from_don_hang(don_hang_id, nhan_vien_id)
+        infor, sach = create_hoa_don_from_don_hang(don_hang_id)
 
         ten_kh = session.get('ten_kh', '')
         sach_data = session.get('sach_data', [])
 
-        nv = dao.get_nhan_vien(nhan_vien_id)
+        nv = current_user
         ho_ten_nv = f"{nv.ho} {nv.ten}"
 
         output_dir = "bieu_mau_hoa_don_mua_tai_cua_hang"
         os.makedirs(output_dir, exist_ok=True)
         output_filename = os.path.join(output_dir, f"dt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
-        utils.create_invoice_pdf(ten_kh, infor['ngay_tao_hoa_don'], sach_data, ho_ten_nv, output_filename)
+        app.logger.error(f"date {infor['don_hang_id']}")
+
+        utils.create_invoice_pdf(ten_kh, infor['ngay_thanh_toan'], sach_data, ho_ten_nv, output_filename)
 
         return jsonify({"path": "/admin/cashier2view"}), 200
 

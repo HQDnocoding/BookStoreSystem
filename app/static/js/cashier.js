@@ -74,18 +74,35 @@ document.getElementById("amount-paid").addEventListener("keydown", function(even
     }
 });
 
-document.getElementById('btn-pay').addEventListener('click',function(event){
+//document.getElementById('btn-pay').addEventListener('click', function(event) {
+// const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
+//        const totalPrice = parseFloat(document.getElementById("total-price").value) || 0;
+//
+//        const change = amountPaid - totalPrice;
+//    if (change < 0) { // Sửa điều kiện kiểm tra
+//        event.preventDefault();
+//        alert('Không đủ tiền');
+//    } else {
+//        fetch('/admin/cashierview/cart/cash', {
+//            method: 'POST', // Thêm phương thức POST
+//            headers: {
+//                'Content-Type': 'application/json',
+//            },
+//            body: JSON.stringify({
+//                cart: sessionStorage.getItem('cart') // Gửi dữ liệu giỏ hàng nếu cần
+//            })
+//        })
+//        .then(response => {
+//            if (!response.ok) {
+//                throw new Error('Lỗi khi thanh toán!');
+//            }
+//            alert('Thanh toán thành công!');
+//            location.reload();
+//        })
+//        .catch(err => console.error(err));
+//    }
+//});
 
-     if(change>=0){
-           event.preventDefault();
-           alert('Không đủ tiền');
-        }else{
-            fetch('/admin/cashierview/cart/cash')
-            .then(response=>
-            window.location.href=response)
-            .catch(err=>console.error(err))
-        }
-})
 
 
 // Hàm tải giỏ hàng

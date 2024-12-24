@@ -176,7 +176,7 @@ class ThongTinNhanHang(db.Model):
     dia_chi_nhan_hang = Column(String(225), nullable=False)
 
 
-class ChiTietDonHang(db.Model):
+class   ChiTietDonHang(db.Model):
     don_hang_id = Column(Integer, ForeignKey(DonHang.id),
                          primary_key=True)
     sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
