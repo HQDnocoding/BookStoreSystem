@@ -223,12 +223,12 @@ if __name__ == "__main__":
         # r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
         # db.session.add_all([r1,r2,r3,r4])
 
-        admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
-        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=2)
-        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
-        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
-        #
-        db.session.add_all([nhan_vien,qlk,u])
+        # admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
+        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=3)
+        # qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=2)
+        # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
+        # #
+        # db.session.add_all([admin,nhan_vien,qlk,u])
 
         #
         # ten_qd1=Rule.SL_NHAP_MIN.value

@@ -122,7 +122,7 @@ def create_pdf_export_freq(data, file_name, month,year):
     pdf.setFont("Tahoma", 14)
     pdf.drawString(200, height - 50, "BÁO CÁO TẦN SUẤT SÁCH BÁN")
     pdf.setFont("Tahoma", 12)
-    pdf.drawString(250, height - 80, f"Tháng: {month/year}")
+    pdf.drawString(250, height - 80, f"Tháng: {month}/{year}")
 
     # Vẽ bảng
     x_start = 50
@@ -132,7 +132,7 @@ def create_pdf_export_freq(data, file_name, month,year):
 
     # Tiêu đề bảng
     headers = ["STT", "Tên sách", "Thể loại", "Số lượng", "Tỷ lệ"]
-    pdf.setFont("Tahoma", 11)
+    pdf.setFont("Tahoma", 8)
     y = y_start
     pdf.rect(x_start, y, sum(col_widths), -row_height)  # Vẽ ô tiêu đề
     x = x_start

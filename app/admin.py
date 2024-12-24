@@ -26,7 +26,7 @@ from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user, UserMixin, login_required
-from flask import redirect, g, request, flash, url_for, session, jsonify
+from flask import redirect, g, request, flash, url_for, session, jsonify, send_file
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
 from wtforms.validators import DataRequired
@@ -387,12 +387,15 @@ class FrequencyStatsView(AuthenticatedStatsView):
 
             output_dir = "bieu mau thong ke tan suat"
             os.makedirs(output_dir, exist_ok=True)
-            output_filename = os.path.join(output_dir, f"tch_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+            output_filename = os.path.join(output_dir, f"tkts_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
             utils.create_pdf_export_freq(fstats, output_filename, thang, nam)
 
-            # Trả về file PDF cho người dùng tải về
-            return 200
+            return send_file(
+                output_filename,
+                as_attachment=True,
+                download_name=f"ThongKeTanSuat_{thang}_{nam}.pdf",
+            )
 
         except Exception as e:
             flash(f"Tạo biểu mẫu thống kê tần suất thất bại {e}", "error")

@@ -187,32 +187,36 @@ def get_frequency_stats(thang, nam):
 
     # Truy vấn tổng số lượng bán trong tháng và năm
     total_sales_subquery = db.session.query(
-        func.sum(ChiTietHoaDon.so_luong).label('tong_so_luong')
+        func.sum(ChiTietDonHang.so_luong).label('tong_so_luong')
     ).join(
-        HoaDonBanSach, HoaDonBanSach.id == ChiTietHoaDon.hoa_don_id
+        DonHang, DonHang.id == ChiTietDonHang.don_hang_id
     ).filter(
-        HoaDonBanSach.ngay_tao_hoa_don >= start_date,
-        HoaDonBanSach.ngay_tao_hoa_don < end_date
+        DonHang.ngay_tao_don >= start_date,
+        DonHang.ngay_tao_don < end_date
     ).scalar()  # Trả về một giá trị tổng
+
+    # Nếu không có đơn hàng nào trong khoảng thời gian, trả về danh sách trống
+    if not total_sales_subquery:
+        return []
 
     # Truy vấn dữ liệu cho từng sách
     results = db.session.query(
         Sach.id.label('ma_sach'),
         Sach.ten_sach,
         TheLoai.ten_the_loai,
-        func.sum(ChiTietHoaDon.so_luong).label('so_luong_ban'),
-        (func.sum(ChiTietHoaDon.so_luong) / total_sales_subquery * 100).label('ti_le_ban')  # Tính tỉ lệ
+        func.sum(ChiTietDonHang.so_luong).label('so_luong_ban'),
+        (func.sum(ChiTietDonHang.so_luong) / total_sales_subquery * 100).label('ti_le_ban')  # Tính tỉ lệ
     ).join(
-        ChiTietHoaDon, Sach.id == ChiTietHoaDon.sach_id
+        ChiTietDonHang, Sach.id == ChiTietDonHang.sach_id
     ).join(
-        HoaDonBanSach, HoaDonBanSach.id == ChiTietHoaDon.hoa_don_id
+        DonHang, DonHang.id == ChiTietDonHang.don_hang_id
     ).join(
         TheLoai, TheLoai.id == Sach.the_loai_id
     ).filter(
-        HoaDonBanSach.ngay_tao_hoa_don >= start_date,
-        HoaDonBanSach.ngay_tao_hoa_don < end_date
+        DonHang.ngay_tao_don >= start_date,
+        DonHang.ngay_tao_don < end_date
     ).group_by(
-        Sach.id, Sach.ten_sach
+        Sach.id, Sach.ten_sach, TheLoai.ten_the_loai
     ).all()
 
     return results
