@@ -545,7 +545,7 @@ class UserForm(FlaskForm):
     password = StringField('Mật khẩu', validators=[DataRequired()])
     ngay_tao = ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S',
                                         default=datetime.now)  # Gán ngày giờ mặc định
-    avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
+    avatar = FileField('Avatar', validators=[ FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
                                                                          "Chỉ được phép upload file hình ảnh!")])
     vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
                                   get_label='ten_vai_tro', allow_blank=False)
@@ -553,7 +553,16 @@ class UserForm(FlaskForm):
 
 class UserView(AuthenticatedView):
     column_searchable_list = ['id', 'ho', 'ten', 'username']
-    form_excluded_columns = ['phieu_nhap_sach', 'don_hang']
+    form_excluded_columns = ['phieu_nhap_sach', 'don_hang', 'password']
+    column_list = ['ho', 'ten', 'username', 'ngay_tao']
+    column_details_list = ['id', 'ho', 'ten', 'username', 'ngay_tao', 'avatar']
+    column_labels = {
+        'ho': 'Họ',
+        'ten': 'Tên',
+        'username': 'Tài khoản',
+        'ngay_tao': 'Ngày tạo',
+        'avatar': 'Ảnh đại diện'
+    }
 
     can_edit = True
     can_create = True
@@ -563,7 +572,7 @@ class UserView(AuthenticatedView):
 
     def create_form(self):
         form = super().create_form()
-        form.ngay_tao.flags.hidden = True
+        del form.ngay_tao
         return form
 
     def edit_form(self, obj):
@@ -604,7 +613,7 @@ class UserView(AuthenticatedView):
 
     column_formatters_detail = {
         'avatar': lambda v, c, m, p: Markup(
-            f'<img src="{m.avatar}" style="max-width: 200px; max-height: 150px;" alt="Bìa sách">'
+            f'<img src="{m.avatar}" style="max-width: 200px; max-height: 150px;" alt="Không có ảnh">'
         ) if m.avatar else Markup('<p>No Image</p>')
     }
     form_widget_args = {
