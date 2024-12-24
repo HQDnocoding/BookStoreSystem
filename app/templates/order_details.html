@@ -3,47 +3,47 @@
 
 {% block content%}
 
- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
 
-
-<div class="container mt-4">
+<div  class="container mt-4">
     <!-- Order Information -->
-  <form>
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Đơn hàng</h5>
-            <div class="row">
-                <div class="col-md-6">
-                    <p><strong>ID:</strong> {{order.id}}</p>
-                    <p><strong>Ngày đặt :</strong> {{order.ngay_tao_don}}</p>
-                </div>
-                <div class="col-md-6">
-                    <p><strong>Tổng tiền:</strong> {{total_amount | format_currency}} VNĐ</p>
-                    <p>
-                        <strong>Trạng thái:</strong>
-                        <span class="badge badge-{{
+    <form action="{{ url_for('process_payment_in_order_details') }}" method="post">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Đơn hàng</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>ID:</strong> {{order.id}}</p>
+                        <input type="hidden" name="order_id" id="order_id" value="{{ order.id }}">
+                        <p><strong>Ngày đặt :</strong> {{order.ngay_tao_don}}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Tổng tiền:</strong> {{total_amount | format_currency}} VNĐ</p>
+                        <p>
+                            <strong>Trạng thái:</strong>
+                            <span class="badge badge-{{
                 'success' if trang_thai == 'PAID' else
                 'warning' if trang_thai == 'WAITING' else
                 'danger' if trang_thai == 'FAIL' }}">
                             {{trang_thai}}
                         </span>
-                    </p>
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-      {% if trang_thai != 'WAITING' %}
-      <div class="form-group text-center">
+        {% if trang_thai != 'WAITING' %}
+        <div class="form-group text-center">
             <button type="submit" class="btn btn-warning" disabled>Thanh Toán</button>
         </div>
 
-      {% else %}
-  <div class="form-group text-center">
+        {% else %}
+        <div class="form-group text-center">
             <button type="submit" class="btn btn-warning">Thanh Toán</button>
         </div>
     </form>
-        {% endif %}
+    {% endif %}
 
     <!-- Order Items -->
     <div class="card">
@@ -53,22 +53,22 @@
         <div class="card-body">
             <table class="table table-bordered">
                 <thead>
-                    <tr>
-                        <th>Bìa</th>
-                        <th>Tên sách</th>
-                        <th>Số lượng</th>
-                        <th>Tổng giá</th>
-                    </tr>
+                <tr>
+                    <th>Bìa</th>
+                    <th>Tên sách</th>
+                    <th>Số lượng</th>
+                    <th>Tổng giá</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {% for o in order_details %}
-                    <tr>
-                        <td><img src="{{ o.bia_sach}} " alt="Book Image" style="width: 50px; height: auto;"></td>
-                        <td>{{o.ten_sach}}</td>
-                        <td>{{o.so_luong}}</td>
-                        <td>{{o.tong_tien | format_currency}} VNĐ</td>
-                    </tr>
-                    {% endfor %}
+                {% for o in order_details %}
+                <tr>
+                    <td><img src="{{ o.bia_sach}} " alt="Book Image" style="width: 50px; height: auto;"></td>
+                    <td>{{o.ten_sach}}</td>
+                    <td>{{o.so_luong}}</td>
+                    <td>{{o.tong_tien | format_currency}} VNĐ</td>
+                </tr>
+                {% endfor %}
                 </tbody>
             </table>
         </div>

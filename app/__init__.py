@@ -79,3 +79,9 @@ class Rule(Enum):
 @app.template_filter('format_currency')
 def format_currency(value):
     return f"{value:,.0f}"
+
+class Rule(Enum):
+
+    SL_NHAP_MIN='SL_NHAP_MIN'
+    SL_MIN_TO_NHAP='SL_MIN_TO_NHAP'
+    OUT_OF_TIME_TO_PAY='OUT_OF_TIME_TO_PAY'

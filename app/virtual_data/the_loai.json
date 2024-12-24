@@ -1,0 +1,30 @@
+[
+    {
+        "id": 5,
+        "ten_the_loai": "Khoa học"
+    },
+    {
+        "id": 3,
+        "ten_the_loai": "Kinh dị"
+    },
+    {
+        "id": 6,
+        "ten_the_loai": "Phiêu lưu"
+    },
+    {
+        "id": 7,
+        "ten_the_loai": "Tâm lý"
+    },
+    {
+        "id": 4,
+        "ten_the_loai": "Thiếu nhi"
+    },
+    {
+        "id": 2,
+        "ten_the_loai": "Tình cảm"
+    },
+    {
+        "id": 1,
+        "ten_the_loai": "Trinh thám"
+    }
+]
