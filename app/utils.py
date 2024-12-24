@@ -9,8 +9,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from sqlalchemy.testing.config import db_url
 
 from app import Status, db
-from app.dao import get_trang_thai_by_name
-from app.models import DonHang, User
+from app.admin import SachForm
+from app.dao import get_trang_thai_by_name, get_sach_by_id
+from app.models import DonHang, User, Sach
 from app.models import DonHang
 
 from app import app
@@ -98,7 +99,7 @@ def check_if_expire_orders(user_id):
     don_hangs = User.query.get(user_id).don_hang
 
     for d in don_hangs:
-        if datetime.now() - d.ngay_tao_don > timedelta(hours=72):
+        if (datetime.now() - d.ngay_tao_don > timedelta(hours=72) ) and d.trang_thai_id == get_trang_thai_by_name(Status.WAITING.value):
             d.trang_thai_id = get_trang_thai_by_name(Status.FAIL.value).id
 
     db.session.commit()
@@ -151,3 +152,11 @@ def create_pdf_export_freq(data, file_name, month,year):
     # Kết thúc PDF
     pdf.save()
 
+def update_so_luong_by_ct_don_hang(ct_don_hang):
+    sachs = []
+    for ct in ct_don_hang:
+        sachs.append(get_sach_by_id(ct.sach_id))
+    for s, ct in zip(sachs, ct_don_hang):
+        s.so_luong -= ct.so_luong
+
+    db.session.commit()

@@ -18,7 +18,7 @@ from app import Role
 from flask_login import login_user, logout_user , current_user
 from enum import Enum
 
-from app.utils import cart_stats, check_if_expire_orders
+from app.utils import cart_stats, check_if_expire_orders, update_so_luong_by_ct_don_hang
 from decorators import annonymous_user, login_required
 
 
@@ -444,7 +444,13 @@ def payment_return():
 
                 donhang = get_order_by_order_id(order_id)
 
-                donhang.trang_thai_id = get_trang_thai_by_name(Status.PAID)
+                ct_don_hang = donhang.sach
+
+                update_so_luong_by_ct_don_hang(ct_don_hang)
+
+                donhang.trang_thai_id = get_trang_thai_by_name(Status.PAID.value).id
+
+                db.session.commit()
 
                 return redirect(url_for('payment_succeed'))  # Chuyển hướng đến trang thành công
             else:
