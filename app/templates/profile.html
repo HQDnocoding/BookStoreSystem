@@ -13,7 +13,8 @@
                     <div class="card-body text-center">
                         <!-- Avatar -->
                         {% if user.avatar != '' and user.avatar != None  %}
-                        <img src="{{user.avatar}}" alt="Avatar" class="rounded-circle mb-3" width="150" height="150">
+                        <img src="{{user.avatar}}" alt="Avatar" class="rounded-circle mb-3" width="150" height="150"
+                        onerror="this.onerror=null;this.src='https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';">
                         {% else %}
                          <img src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg" alt="Avatar" class="rounded-circle mb-3" width="150" height="150">
                         {% endif %}
