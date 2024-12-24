@@ -44,6 +44,7 @@ class AuthenticatedView(ModelView):
         quan_ly_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLY')).first()
         return current_user.is_authenticated and current_user.vai_tro_id == quan_ly_id.id
 
+
 class AuthenticatedStatsView(BaseView):
     def is_accessible(self):
         quan_ly_id = VaiTro.query.filter(VaiTro.ten_vai_tro.__eq__('QUANLY')).first()
@@ -71,8 +72,9 @@ class AuthenticatedQuanLyKhoViewMV(ModelView):
 class QuyDinhView(AuthenticatedView):
     can_create = False
     can_delete = False
-    column_editable_list = ['gia_tri','is_active']
-    form_excluded_columns = ['ten_quy_dinh','ngay_tao']
+    column_editable_list = ['gia_tri', 'is_active']
+    form_excluded_columns = ['ten_quy_dinh', 'ngay_tao']
+
 
 class CashierView(AuthenticatedNhanVienView):
     @expose('/')
@@ -183,9 +185,11 @@ class CashierView(AuthenticatedNhanVienView):
             } for p in products
         ])
 
-    @expose('/cart/cash', methods=['GET'])
+    @expose('/cart/cash', methods=['POST'])
     @login_required
     def cashier(self, **kwargs):
+
+
 
         nv = dao.get_user_by_id(current_user.id)
 
@@ -227,7 +231,7 @@ class CashierView(AuthenticatedNhanVienView):
             os.makedirs(output_dir, exist_ok=True)
             output_filename = os.path.join(output_dir, f"tch_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
-            utils.create_invoice_pdf(ten_kh, hoa_don.ngay_tao_hoa_don, cart_list_dict ,ten_nv ,output_filename)
+            utils.create_invoice_pdf(ten_kh, hoa_don.ngay_tao_hoa_don, cart_list_dict, ten_nv, output_filename)
             flash("Hóa đơn đã được tạo thành công.", "success")
         except Exception as e:
             app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
@@ -332,7 +336,7 @@ class FrequencyStatsView(AuthenticatedStatsView):
     def index(self):
         now = datetime.now()
 
-        current_year=now.year+1
+        current_year = now.year + 1
 
         last_month = (now - timedelta(days=now.day)).month
         last_year = (now - timedelta(days=now.day)).year
@@ -340,16 +344,15 @@ class FrequencyStatsView(AuthenticatedStatsView):
         # Lấy thông tin lọc từ người dùng
         thang = request.args.get("sel_monthf", last_month, type=int)
 
-        session['thang_stat']=thang
+        session['thang_stat'] = thang
 
         nam = request.args.get("sel_yearf", last_year, type=int)
 
-        session['nam_stat']=nam
+        session['nam_stat'] = nam
         the_loai = request.args.get("the_loaif", "Tất cả")
 
         # Dữ liệu thống kê
         fstats = get_frequency_stats(thang, nam)
-
 
         # Lọc theo thể loại (nếu có)
         if the_loai != "Tất cả":
@@ -405,9 +408,6 @@ class Logout(MyView):
         return redirect("/admin")
 
 
-
-
-
 class SachForm(Form):
     ten_sach = StringField('Tên sách', validators=[DataRequired()])
     don_gia = StringField('Đơn giá', validators=[DataRequired()])
@@ -440,9 +440,15 @@ class SachView(AuthenticatedView):
 
         return form
 
+    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong', 'tac_gia_id','the_loai_id']  # cot hiển thị
+    column_formatters = {
+        'tac_gia_id': lambda v, c, m, p: db.session.query(TacGia.ten_tac_gia).filter(TacGia.id == m.tac_gia_id).first()[
+            0] if m.tac_gia_id else 'Chưa có tác giả',
+        'the_loai_id': lambda v, c, m, p:
+        db.session.query(TheLoai.ten_the_loai).filter(TheLoai.id == m.the_loai_id).first()[
+            0] if m.the_loai_id else 'Chưa có thể loại'
 
-    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong','tac_gia_id']  # cot hiển thị
-
+    }
     column_labels = {  # sua ten hien thi
         'id': 'Mã SP',
         'ten_sach': 'Tên sách',
@@ -452,12 +458,8 @@ class SachView(AuthenticatedView):
         'so_luong': 'Số lượng',
     }
 
-    column_formatters = {
-        'so_luong_cuon_con_lai': lambda v, c, m, p: (
-                db.session.query(Sach.so_luong).filter(Sach.id == m.id).order_by(
-                    Sach.thoi_diem.desc()).first() or 'NaN'
-        )
-    }
+    column_editable_list = ['ten_sach','don_gia','so_luong']
+
     column_formatters_detail = {
         'bia_sach': lambda v, c, m, p: Markup(
             f'<img src="{m.bia_sach}" style="max-width: 200px; max-height: 150px;" alt="Bìa sách">'
@@ -529,8 +531,11 @@ class TheLoaiView(AuthenticatedView):
 
 
 class VaitroView(AuthenticatedView):
-    can_create = True
-    can_edit = True
+    can_create = False
+    can_edit = False
+    can_delete = False
+
+
 
 
 class UserForm(FlaskForm):
@@ -538,7 +543,8 @@ class UserForm(FlaskForm):
     ten = StringField('Tên', validators=[DataRequired()])
     username = StringField('Tên đăng nhập', validators=[DataRequired()])
     password = StringField('Mật khẩu', validators=[DataRequired()])
-    ngay_tao = ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S', default=datetime.now)  # Gán ngày giờ mặc định
+    ngay_tao = ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S',
+                                        default=datetime.now)  # Gán ngày giờ mặc định
     avatar = FileField('Avatar', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
                                                                          "Chỉ được phép upload file hình ảnh!")])
     vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
@@ -680,9 +686,9 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
 
 
 class PhuongThucThanhToanView(AuthenticatedView):
-    can_view_details = True
+    can_create = False
     can_edit = False
-    can_create = True
+    can_delete = False
     form_excluded_columns = ['don_hang']
     form_choices = {
         'ten_phuong_thuc': [
@@ -693,9 +699,9 @@ class PhuongThucThanhToanView(AuthenticatedView):
 
 
 class TrangThaiDonHangView(AuthenticatedView):
-    can_view_details = False
-    can_delete = True
-    can_create = True
+    can_create = False
+    can_edit = False
+    can_delete = False
     form_excluded_columns = ['don_hang']
     form_choices = {
         'ten_trang_thai': [

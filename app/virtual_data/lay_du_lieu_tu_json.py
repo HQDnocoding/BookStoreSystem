@@ -59,7 +59,7 @@ def load_the_loai_from_json(file_path):
 
 if __name__ == "__main__":
     with my_app.app_context():
-        load_tac_gia_from_json('tac_gia.json') # Đường dẫn đến file JSON tác giả
-        load_the_loai_from_json('the_loai.json') # Đường dẫn đến file JSON thể loại
+        # load_tac_gia_from_json('tac_gia.json') # Đường dẫn đến file JSON tác giả
+        # load_the_loai_from_json('the_loai.json') # Đường dẫn đến file JSON thể loại
         load_sach_from_json('sach.json')
         print("Dữ liệu đã được tải thành công!")

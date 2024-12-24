@@ -5,7 +5,7 @@ from datetime import date
 from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint, Date
 from sqlalchemy.orm import relationship, backref
 from datetime import datetime
-from app import app as my_app, db, Role, Status, PayingMethod, Rule 
+from app import app as my_app, db, Role, Status, PayingMethod, Rule
 from flask_login import UserMixin
 
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
         qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=3)
         u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
         #
-        db.session.add_all([admin])
+        db.session.add_all([nhan_vien,qlk,u])
 
         #
         # ten_qd1=Rule.SL_NHAP_MIN.value

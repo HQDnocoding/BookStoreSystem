@@ -1,7 +1,7 @@
 {% extends 'admin/master.html' %}
 
 {% block body %}
-<div class="container-fluid mt-4">
+<div class="container-fluid mt-4" xmlns="http://www.w3.org/1999/html">
 
     <div class="row">
  {% if request.path == '/admin/cashier2view/' %}
@@ -69,6 +69,7 @@
         </div>
    {%endif%}
         <!-- Phần thông tin thanh toán -->
+
         <div class="col-md-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -106,18 +107,23 @@
                         >
                     </div>
  {% if request.path == '/admin/cashierview/' %}
-                    <button id="btn-pay" onclick="window.location.href='/admin/cashierview/cart/cash'"
-                            class="btn btn-success btn-block font-weight-bold">
+                    <button id="btn-pay"
+                            disabled
+                            class="btn btn-success btn-block font-weight-bold"
+                   >
                         Thanh toán (F1)
                     </button>
                {%else%}
                     <button id="btn-pay2"
-                            class="btn btn-success btn-block font-weight-bold">
+                            disabled
+                            class="btn btn-success btn-block font-weight-bold"
+                    >
                         Thanh toán (F1)
                     </button>
                            {%endif%}
                 </div>
             </div>
+             </form>
              {% if request.path == '/admin/cashierview/' %}
             <div class="mt-3 text-center">
                 <button class="btn btn-secondary mx-2" id="clear-cart-btn">Gỡ toàn bộ sách trong giỏ</button>
@@ -125,6 +131,7 @@
             {%endif%}
         </div>
     </div>
+
 
 
 </div>

@@ -54,6 +54,39 @@ document.addEventListener('click', function (event) {
     // Xử lý nút xóa giỏ hàng
 document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
 });
+document.getElementById("amount-paid").addEventListener("keydown", function(event) {
+    // Kiểm tra nếu phím nhấn là Enter (keyCode 13)
+    if (event.key === "Enter") {
+        event.preventDefault();
+
+        const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
+        const totalPrice = parseFloat(document.getElementById("total-price").value) || 0;
+
+        const change = amountPaid - totalPrice;
+
+        if(change>=0){
+            document.getElementById('btn-pay').disabled=false
+        }else{
+        document.getElementById('btn-pay').disabled=true
+        }
+
+        document.getElementById("change").value = change >= 0 ? change : 0;
+    }
+});
+
+document.getElementById('btn-pay').addEventListener('click',function(event){
+
+     if(change>=0){
+           event.preventDefault();
+           alert('Không đủ tiền');
+        }else{
+            fetch('/admin/cashierview/cart/cash')
+            .then(response=>
+            window.location.href=response)
+            .catch(err=>console.error(err))
+        }
+})
+
 
 // Hàm tải giỏ hàng
 function loadCart() {
@@ -77,28 +110,22 @@ function loadCart() {
 
 
 
-document.getElementById("amount-paid").addEventListener("keydown", function(event) {
-    // Kiểm tra nếu phím nhấn là Enter (keyCode 13)
-    if (event.key === "Enter") {
-        event.preventDefault();
 
-        const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
-        const totalPrice = parseFloat(document.getElementById("total-price").value) || 0;
-
-        const change = amountPaid - totalPrice;
-
-        document.getElementById("change").value = change >= 0 ? change : 0;
-    }
-});
 
 document.getElementById('btn-change').addEventListener('click', function () {
         const totalPaid = parseFloat(document.getElementById('amount-paid').value.replace('₫', '').replace(',', '')) || 0;
         const totalAmount = parseFloat(document.getElementById('total-price').value.replace('₫', '').replace(',', '')) || 0;
 
         const changeAmount = totalPaid - totalAmount;
-
+        if(changeAmount>=0) {
+        document.getElementById('btn-pay').disabled=false
+        }else{
+        document.getElementById('btn-pay').disabled=true
+        }
         document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
     });
+
+
 
 // Hàm tìm kiếm sản phẩm
 function searchProducts(query) {
