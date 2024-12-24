@@ -1,17 +1,43 @@
 {% extends 'layout/base.html' %}
 
 {% block content %}
+ <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="text-center mb-0">Thông Tin Cá Nhân</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <!-- Avatar -->
+                        {% if user.avatar != '' and user.avatar != None  %}
+                        <img src="{{user.avatar}}" alt="Avatar" class="rounded-circle mb-3" width="150" height="150">
+                        {% else %}
+                         <img src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg" alt="Avatar" class="rounded-circle mb-3" width="150" height="150">
+                        {% endif %}
+                        <!-- Họ tên -->
+                        <h3 class="card-title">{{user.ho}} {{user.ten}}</h3>
 
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
-    <div class="container border border-dark my-5 py-3">
-        <div class="col-md-4 col-sm-12">
-            <img src="{{current_user.avatar}}" class="rounded-circle" alt="{{current_user.username}}"
-                 style="width: 100%; height: auto; object-fit: cover; border: 1px; border-radius: 5px;">
-        </div>
-        <div class="col-md-8 col-sm-12">
+                        <!-- Ngày tạo -->
+                        <p class="text-muted">Ngày tạo: {{user.ngay_tao}}</p>
 
+                        <!-- Username -->
+                        <p><strong>Username:</strong> {{user.username}}</p>
+
+                        <!-- Button actions -->
+<!--                        <a href="#" class="btn btn-primary btn-sm">Chỉnh sửa</a>-->
+<!--                        <a href="#" class="btn btn-secondary btn-sm">Đổi mật khẩu</a>-->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 {% endblock %}
