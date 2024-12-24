@@ -2,10 +2,12 @@
 import locale
 from datetime import datetime, timedelta
 
+from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import TableStyle, Table
 from sqlalchemy.testing.config import db_url
 
 from app import Status, db
@@ -44,7 +46,10 @@ def cart_stats(cart):
 font_path = 'C:\\Windows\\Fonts\\Tahoma.ttf'
 pdfmetrics.registerFont(TTFont('Tahoma', font_path))
 
-
+font_path2 = 'C:\\Windows\\Fonts\\arial.ttf'
+pdfmetrics.registerFont(TTFont('arial', font_path))
+font_path3 = 'C:\\Windows\\Fonts\\DejaVuSans.ttf'
+pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
 def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_filename="invoice.pdf"):
     # Tạo canvas
     pdf = canvas.Canvas(output_filename, pagesize=letter)
@@ -150,6 +155,58 @@ def create_pdf_export_freq(data, file_name, month,year):
             x += col_widths[i]
 
     # Kết thúc PDF
+    pdf.save()
+
+
+
+def create_pdf_export_rev(data, file_name, month, year):
+    pdf = canvas.Canvas(file_name, pagesize=letter)
+    pdf.setFont("DejaVuSans", 12)
+    width, height = letter
+
+    # Tiêu đề
+    pdf.drawCentredString(width / 2, height - 50, "BÁO CÁO DOANH THU THEO THÁNG")
+
+    # Tháng và năm
+    pdf.setFont("DejaVuSans", 8)
+    pdf.drawString(50, height - 80, f"Tháng: {month} / Năm: {year}")
+
+    # Dữ liệu bảng
+    table_data = [["STT", "Thể loại sách", "Doanh thu (VNĐ)", "Số lượt thuê", "Tỷ lệ (%)"]]
+    total_revenue = 0
+
+    for idx, row in enumerate(data, start=1):
+        table_data.append([
+            idx,
+            row[0],
+            f"{row[1]:,}",
+            row[2],
+            f"{row[3]:.2f}"
+        ])
+        total_revenue += row[1]
+
+    # Tổng doanh thu
+    table_data.append(["Tổng doanh thu","","", f"{total_revenue:,}",""])
+
+    # Tạo bảng
+    table = Table(table_data, colWidths=[50, 150, 150, 100, 100])
+    table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'DejaVuSans'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('SPAN', (0, -1), (2, -1)),  # Gộp cột cho dòng tổng
+        ('SPAN', (3, -1), (4, -1)),
+        ('ALIGN', (0, -1), (0, -1), 'CENTER'),  # Căn giữa "Tổng doanh thu"
+        ('ALIGN', (3, -1), (3, -1), 'CENTER'),  # Căn giữa giá trị tổng
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+
+    # Vẽ bảng vào PDF
+    table.wrapOn(pdf, width, height)
+    table.drawOn(pdf, 50, height - 400)
+
+    # Lưu file PDF
     pdf.save()
 
 def update_so_luong_by_ct_don_hang(ct_don_hang):

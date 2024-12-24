@@ -187,7 +187,6 @@ class CashierView(AuthenticatedNhanVienView):
     @login_required
     def cashier(self, **kwargs):
 
-
         nv = dao.get_user_by_id(current_user.id)
 
         if nv is not None:
@@ -303,7 +302,6 @@ class Cashier2View(AuthenticatedNhanVienView):
 
     @expose('/don_hang/<int:don_hang_id>', methods=['POST'])
     def create_invoice(self, don_hang_id):
-
         infor, sach = create_hoa_don_from_don_hang(don_hang_id)
 
         ten_kh = session.get('ten_kh', '')
@@ -326,7 +324,50 @@ class Cashier2View(AuthenticatedNhanVienView):
 class RevenueStatsView(AuthenticatedStatsView):
     @expose("/")
     def index(self):
-        return self.render("admin/revenue-stats.html", tl=get_the_loai())
+        now = datetime.now()
+
+        current_year = now.year + 1
+
+        last_month = (now - timedelta(days=now.day)).month
+        last_year = (now - timedelta(days=now.day)).year
+
+        # Lấy thông tin lọc từ người dùng
+        thang = request.args.get("sel_month", last_month, type=int)
+
+        session['thang_stat_'] = thang
+
+        nam = request.args.get("sel_year", last_year, type=int)
+
+        session['nam_stat_'] = nam
+        the_loai = request.args.get("the_loai", "Tất cả")
+        session['ten_the_loai_'] = the_loai
+
+        stats = get_stats(nam, thang, the_loai)
+
+        tl = get_the_loai()
+
+        return self.render("admin/revenue-stats.html", stats=stats, tl=tl, current_year=current_year, thang=thang,nam=nam,the_loai=the_loai)
+
+    @expose("/export/",methods=['get'])
+    def export(self):
+
+        try:
+            thang=session.get('thang_stat_',1)
+            nam=session.get('nam_stat_',2004)
+            the_loai=session.get('ten_the_loai_','Tất cả')
+
+            stat=get_stats(nam,thang,the_loai)
+
+            output_dir = "bieu mau thong ke doanh thu"
+            os.makedirs(output_dir, exist_ok=True)
+            output_filename = os.path.join(output_dir, f"tkdt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+
+            utils.create_pdf_export_rev(stat,output_filename,thang,nam)
+
+            return send_file(output_filename, as_attachment=True)
+
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
 
 
 class FrequencyStatsView(AuthenticatedStatsView):
@@ -348,10 +389,10 @@ class FrequencyStatsView(AuthenticatedStatsView):
 
         session['nam_stat'] = nam
         the_loai = request.args.get("the_loaif", "Tất cả")
-        session['ten_the_loai']=the_loai
+        session['ten_the_loai'] = the_loai
 
         # Dữ liệu thống kê
-        fstats = get_frequency_stats(thang, nam,the_loai)
+        fstats = get_frequency_stats(thang, nam, the_loai)
 
         # # Lọc theo thể loại (nếu có)
         # if the_loai != "Tất cả":
@@ -384,8 +425,8 @@ class FrequencyStatsView(AuthenticatedStatsView):
         try:
             thang = session.get('thang_stat', 1)
             nam = session.get('nam_stat', 2004)
-            the_loai=session.get('ten_the_loai','Tất cả')
-            fstats = get_frequency_stats(thang, nam,the_loai)
+            the_loai = session.get('ten_the_loai', 'Tất cả')
+            fstats = get_frequency_stats(thang, nam, the_loai)
 
             output_dir = "bieu mau thong ke tan suat"
             os.makedirs(output_dir, exist_ok=True)
@@ -443,7 +484,7 @@ class SachView(AuthenticatedView):
 
         return form
 
-    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong', 'tac_gia_id','the_loai_id']  # cot hiển thị
+    column_list = ['id', 'ten_sach', 'don_gia', 'so_luong', 'tac_gia_id', 'the_loai_id']  # cot hiển thị
     column_formatters = {
         'tac_gia_id': lambda v, c, m, p: db.session.query(TacGia.ten_tac_gia).filter(TacGia.id == m.tac_gia_id).first()[
             0] if m.tac_gia_id else 'Chưa có tác giả',
@@ -461,7 +502,7 @@ class SachView(AuthenticatedView):
         'so_luong': 'Số lượng',
     }
 
-    column_editable_list = ['ten_sach','don_gia','so_luong']
+    column_editable_list = ['ten_sach', 'don_gia', 'so_luong']
 
     column_formatters_detail = {
         'bia_sach': lambda v, c, m, p: Markup(
@@ -539,8 +580,6 @@ class VaitroView(AuthenticatedView):
     can_delete = False
 
 
-
-
 class UserForm(FlaskForm):
     ho = StringField('Họ', validators=[DataRequired()])
     ten = StringField('Tên', validators=[DataRequired()])
@@ -548,8 +587,8 @@ class UserForm(FlaskForm):
     password = StringField('Mật khẩu', validators=[DataRequired()])
     ngay_tao = ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S',
                                         default=datetime.now)  # Gán ngày giờ mặc định
-    avatar = FileField('Avatar', validators=[ FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
-                                                                         "Chỉ được phép upload file hình ảnh!")])
+    avatar = FileField('Avatar', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
+                                                         "Chỉ được phép upload file hình ảnh!")])
     vai_tro_id = QuerySelectField('Vai trò', query_factory=lambda: VaiTro.query.all(),
                                   get_label='ten_vai_tro', allow_blank=False)
 
