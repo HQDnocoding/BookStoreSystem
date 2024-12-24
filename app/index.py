@@ -51,7 +51,7 @@ def login_admin_process():
 
 
 @app.route('/register/', methods=['get', 'post'])
-# @annonymous_user
+@annonymous_user
 def register():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -84,7 +84,7 @@ def register():
 
 
 @app.route('/login/', methods=['get', 'post'])
-# @annonymous_user
+@annonymous_user
 def login_my_user():
     err_msg = ''
     if request.method.__eq__('POST'):
@@ -225,7 +225,7 @@ def common_attr():
 def orders():
     check_if_expire_orders(current_user.get_id())
 
-    page_size = 2
+    page_size = 10
     page = request.args.get('page',1)
 
     don_hangs = get_order_by_user_id(current_user.get_id(),page,page_size)
@@ -444,7 +444,13 @@ def payment_return():
 
                 donhang = get_order_by_order_id(order_id)
 
-                donhang.trang_thai_id = get_trang_thai_by_name(Status.PAID)
+                ct_don_hang = donhang.sach
+
+                update_so_luong_by_ct_don_hang(ct_don_hang)
+
+                donhang.trang_thai_id = get_trang_thai_by_name(Status.PAID.value).id
+
+                db.session.commit()
 
                 return redirect(url_for('payment_succeed'))  # Chuyển hướng đến trang thành công
             else:

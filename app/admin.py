@@ -24,7 +24,7 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 from app import admin, db, app, dao, utils
 from flask_admin.contrib.sqla import ModelView
 from app.dao import get_role_name_by_role_id
-from app.models import Sach, QuyDinh, SoLuongCuonConLai, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
+from app.models import Sach, QuyDinh, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user, UserMixin, login_required
 from flask import redirect, g, request, flash, url_for, session, jsonify
 from app.models import VaiTro

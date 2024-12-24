@@ -33,10 +33,17 @@
             </div>
         </div>
     </div>
+      {% if trang_thai != 'WAITING' %}
+      <div class="form-group text-center">
+            <button type="submit" class="btn btn-warning" disabled>Thanh Toán</button>
+        </div>
+
+      {% else %}
   <div class="form-group text-center">
             <button type="submit" class="btn btn-warning">Thanh Toán</button>
         </div>
     </form>
+        {% endif %}
 
     <!-- Order Items -->
     <div class="card">
