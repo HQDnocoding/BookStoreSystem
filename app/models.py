@@ -69,9 +69,9 @@ class User(db.Model, UserMixin):
     avatar = Column(String(225))
     vai_tro_id = Column(Integer, ForeignKey(VaiTro.id), nullable=False)
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
-    don_hang = relationship('DonHang', backref='user', lazy=True)
+    don_hang_kh = relationship('DonHang', backref='user', lazy=True)
+    don_hang_nv=relationship('DonHang',backref='user',lazy=True)
     # hoa_don_ban_sach=relationship('HoaDonBanSach',backref='user',lazy=True)
-    nhan_vien=relationship('NhanVien_DonHang',backref='user',lazy=True)
     def __str__(self):
         return self.ten
 
@@ -154,20 +154,19 @@ class DonHang(db.Model):
     phuong_thuc_id = Column(Integer, ForeignKey(PhuongThucThanhToan.id), nullable=False)
     trang_thai_id = Column(Integer, ForeignKey(TrangThaiDonHang.id), nullable=False)
     khach_hang_id = Column(Integer, ForeignKey(User.id), nullable=True)
-    # nhan_vien_id=Column(Integer,ForeignKey(User.id),nullable=False,default=1)
+    nhan_vien_id=Column(Integer,ForeignKey(User.id),nullable=True)
     thong_tin_nhan_hang = relationship('ThongTinNhanHang', uselist=False, backref='don_hang')
-    don_hang = relationship('NhanVien_DonHang', uselist=False, backref='don_hang')
     sach = relationship('ChiTietDonHang', backref='don_hang')
 
     # def __class__(self):
     #      return self
 
 
-class NhanVien_DonHang(db.Model):
-    donhang_id=Column(Integer,ForeignKey(DonHang.id, ondelete='CASCADE'),primary_key=True,nullable=False)
-    nhanvien_id=Column(Integer,ForeignKey(User.id),primary_key=False,nullable=False)
-
-    ngay_than_toan=Column(DateTime, nullable=False, default=datetime.now())
+# class NhanVien_DonHang(db.Model):
+#     donhang_id=Column(Integer,ForeignKey(DonHang.id, ondelete='CASCADE'),primary_key=True,nullable=False)
+#     nhanvien_id=Column(Integer,ForeignKey(User.id),primary_key=False,nullable=False)
+#
+#     ngay_than_toan=Column(DateTime, nullable=False, default=datetime.now())
 
 
 class ThongTinNhanHang(db.Model):

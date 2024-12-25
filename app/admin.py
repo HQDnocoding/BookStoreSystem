@@ -457,9 +457,9 @@ class SachForm(Form):
     don_gia = StringField('Đơn giá', validators=[DataRequired()])
     noi_dung = StringField('Nội dung', validators=[DataRequired()])
     tac_gia_id = SelectField('Tác giả', coerce=int, validators=[DataRequired()])
-    new_tac_gia = StringField('Tác giả mới (nếu không có)', validators=[DataRequired()])
+    new_tac_gia = StringField('Tác giả mới (nếu không có)')
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
-    new_the_loai = StringField('Thể loại mới (nếu không có)', validators=[DataRequired()])
+    new_the_loai = StringField('Thể loại mới (nếu không có)')
     bia_sach = FileField('Bìa sách', validators=[
         DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
 
