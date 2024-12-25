@@ -23,7 +23,6 @@ from wtforms_sqlalchemy.fields import QuerySelectField
 
 from app import admin, db, app, dao, utils
 from flask_admin.contrib.sqla import ModelView
-from app.dao import get_role_name_by_role_id
 from app.models import Sach, QuyDinh, TacGia, TheLoai, User, PhieuNhapSach, ChiTietPhieuNhapSach
 from flask_login import current_user, logout_user, UserMixin, login_required
 from flask import redirect, g, request, flash, url_for, session, jsonify, send_file
@@ -127,7 +126,7 @@ class CashierView(AuthenticatedNhanVienView):
         """Cập nhật số lượng sản phẩm trong giỏ hàng"""
         data = request.json
         new_quantity = int(data.get('so_luong', 0))  # Lấy số lượng mới từ request
-        cart = session.get('cart', {})
+        cart = session.get('cart_admin', {})
 
         # Kiểm tra nếu sản phẩm tồn tại trong giỏ hàng
         if str(product_id) in cart:

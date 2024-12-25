@@ -97,8 +97,12 @@ async function createInvoice(id_don_hang) {
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-pay2').addEventListener('click', function (event) {
-    const totalPaid = parseFloat(document.getElementById('amount-paid').value.replace('₫', '').replace(',', '')) || 0;
-        const totalAmount = parseFloat(document.getElementById('total-price').value.replace('₫', '').replace(',', '')) || 0;
+    const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+    const totalAmount = parseFloat(
+    document.getElementById('total-price').value
+        .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+        .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+) || 0;
 
 
 

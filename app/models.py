@@ -69,8 +69,8 @@ class User(db.Model, UserMixin):
     avatar = Column(String(225))
     vai_tro_id = Column(Integer, ForeignKey(VaiTro.id), nullable=False)
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
-    don_hang_kh = relationship('DonHang', backref='user', lazy=True)
-    don_hang_nv=relationship('DonHang',backref='user',lazy=True)
+    don_hang_kh = relationship('DonHang', backref='khach_hang', foreign_keys='DonHang.khach_hang_id', lazy=True)
+    don_hang_nv=relationship('DonHang',backref='nhan_vien', foreign_keys='DonHang.nhan_vien_id',lazy=True)
     # hoa_don_ban_sach=relationship('HoaDonBanSach',backref='user',lazy=True)
     def __str__(self):
         return self.ten
@@ -210,25 +210,17 @@ if __name__ == "__main__":
         # pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
         # pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
         # db.session.add_all([pt1, pt2])
-        #
+        # #
         # tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
         # tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
         # tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
         # db.session.add_all([tt1, tt2, tt3])
-        #
+        # #
         # r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
         # r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
         # r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
         # r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
         # db.session.add_all([r1,r2,r3,r4])
-
-        # admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
-        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=3)
-        # qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=2)
-        # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
-        # #
-        # db.session.add_all([admin,nhan_vien,qlk,u])
-
         #
         # ten_qd1=Rule.SL_NHAP_MIN.value
         # ten_qd2=Rule.SL_MIN_TO_NHAP.value
@@ -238,5 +230,15 @@ if __name__ == "__main__":
         # qd3=QuyDinh(ten_quy_dinh=ten_qd3,noi_dung='Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán',gia_tri=48)
         #
         # db.session.add_all([qd1,qd2,qd3])
+
+        admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
+        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=3)
+        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=2)
+        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
+        #
+        db.session.add_all([admin,nhan_vien,qlk,u])
+
+        #
+
         #
         db.session.commit()

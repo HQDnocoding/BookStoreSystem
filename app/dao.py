@@ -12,7 +12,7 @@ from sqlalchemy.sql.operators import desc_op
 
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, \
     Sach, ChiTietDonHang, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
-    ThongTinNhanHang, NhanVien_DonHang
+    ThongTinNhanHang
 from app import db, admin, app, Status, Role, PayingMethod
 import hashlib
 
@@ -363,11 +363,10 @@ def create_invoice_from_cart():
             raise ValueError("Người dùng chưa đăng nhập.")
 
         # Tạo hóa đơn bán sách
-        don_hang = DonHang(ngay_tao_don=datetime.now(), phuong_thuc_id=pt_tt, trang_thai_id=tt)
+        don_hang = DonHang(ngay_tao_don=datetime.now(), phuong_thuc_id=pt_tt, trang_thai_id=tt, nhan_vien_id=user.id )
         db.session.add(don_hang)
         db.session.commit()
-        nhanvien_donhang = NhanVien_DonHang(donhang_id=don_hang.id, nhanvien_id=user.id, ngay_than_toan=datetime.now())
-        db.session.add(nhanvien_donhang)
+
 
 
         # Thêm chi tiết hóa đơn
@@ -421,24 +420,18 @@ def create_hoa_don_from_don_hang(don_hang_id):
         # Cập nhật phương thức thanh toán và trạng thái
         pt_tt = get_id_by_phuong_thuc_name(PayingMethod.OFFLINE_PAY.value)
         tt = get_id_by_trang_thai(Status.PAID.value)
+        user = current_user
+
         if not pt_tt or not tt:
             raise ValueError("Không tìm thấy phương thức thanh toán hoặc trạng thái hợp lệ.")
 
-        don_hang.phuong_thuc_id = pt_tt
-        don_hang.trang_thai_id = tt
-
-        # Kiểm tra người dùng hiện tại
-        user = current_user
         if not user:
             raise ValueError("Người dùng chưa đăng nhập.")
 
-        # Tạo bản ghi nhân viên - đơn hàng
-        nhanvien_donhang = NhanVien_DonHang(
-            donhang_id=don_hang_id,
-            nhanvien_id=user.id,
-            ngay_than_toan=datetime.now()
-        )
-        db.session.add(nhanvien_donhang)
+        don_hang.phuong_thuc_id = pt_tt
+        don_hang.trang_thai_id = tt
+        don_hang.nhan_vien_id=user.id
+        don_hang.ngay_tao_don=datetime.now()
 
         # Lưu thay đổi vào cơ sở dữ liệu
         db.session.commit()
@@ -446,7 +439,7 @@ def create_hoa_don_from_don_hang(don_hang_id):
         # Trả về thông tin cần thiết
         return {
             "don_hang_id": don_hang_id,
-            "ngay_thanh_toan": nhanvien_donhang.ngay_than_toan.strftime("%Y-%m-%d %H:%M:%S"),
+            "ngay_thanh_toan": don_hang.ngay_tao_don.strftime("%Y-%m-%d %H:%M:%S"),
             "nhan_vien_id": current_user.id,
             "sach": [
                 {

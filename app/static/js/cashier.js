@@ -5,10 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Gắn sự kiện cho ô tìm kiếm
 document.addEventListener('keydown', function(event) {
     if (event.key === 'F3') {
-        // Ngừng hành động mặc định của phím F3 (tránh tìm kiếm của trình duyệt)
         event.preventDefault();
 
         // Focus vào ô tìm kiếm
@@ -21,8 +19,8 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keydown', function (event) {
         // Kiểm tra nếu phím nhấn là Esc (keyCode = 27)
         if (event.key === "Escape") {
-            document.getElementById('search-input').value = '';  // Làm rỗng ô tìm kiếm
-            document.getElementById('search-results').innerHTML = '';  // Xóa kết quả tìm kiếm
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').innerHTML = '';
         }
 });
 document.getElementById('search-input').addEventListener('input', function () {
@@ -46,6 +44,8 @@ document.addEventListener('click', function (event) {
 
         // Thêm sản phẩm vào giỏ hàng
         addToCart(productId, productName, productPrice, productImage,productTheLoai);
+        document.getElementById('btn-pay').disabled=true
+
         loadCart()
     }
 });
@@ -60,7 +60,11 @@ document.getElementById("amount-paid").addEventListener("keydown", function(even
         event.preventDefault();
 
         const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
-        const totalPrice = parseFloat(document.getElementById("total-price").value) || 0;
+        const totalPrice = parseFloat(
+    document.getElementById('total-price').value
+        .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+        .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+) || 0;
 
         const change = amountPaid - totalPrice;
 
@@ -72,36 +76,10 @@ document.getElementById("amount-paid").addEventListener("keydown", function(even
 
         document.getElementById("change").value = change >= 0 ? change : 0;
     }
+
 });
 
-//document.getElementById('btn-pay').addEventListener('click', function(event) {
-// const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
-//        const totalPrice = parseFloat(document.getElementById("total-price").value) || 0;
-//
-//        const change = amountPaid - totalPrice;
-//    if (change < 0) { // Sửa điều kiện kiểm tra
-//        event.preventDefault();
-//        alert('Không đủ tiền');
-//    } else {
-//        fetch('/admin/cashierview/cart/cash', {
-//            method: 'POST', // Thêm phương thức POST
-//            headers: {
-//                'Content-Type': 'application/json',
-//            },
-//            body: JSON.stringify({
-//                cart: sessionStorage.getItem('cart') // Gửi dữ liệu giỏ hàng nếu cần
-//            })
-//        })
-//        .then(response => {
-//            if (!response.ok) {
-//                throw new Error('Lỗi khi thanh toán!');
-//            }
-//            alert('Thanh toán thành công!');
-//            location.reload();
-//        })
-//        .catch(err => console.error(err));
-//    }
-//});
+
 
 
 
@@ -116,6 +94,7 @@ function loadCart() {
                 renderCart([]);
                 updateCartSummary(0, 0);
                 document.getElementById('amount-paid').value=""
+                document.getElementById('btn-pay').disabled=true
                 return;
             }
 
@@ -123,6 +102,8 @@ function loadCart() {
             updateCartSummary(data.total_quantity, data.total_amount);
         })
         .catch(err => console.error('Lỗi khi tải giỏ hàng:', err));
+        document.getElementById('btn-pay').disabled=true
+
 }
 
 
@@ -130,8 +111,14 @@ function loadCart() {
 
 
 document.getElementById('btn-change').addEventListener('click', function () {
-        const totalPaid = parseFloat(document.getElementById('amount-paid').value.replace('₫', '').replace(',', '')) || 0;
-        const totalAmount = parseFloat(document.getElementById('total-price').value.replace('₫', '').replace(',', '')) || 0;
+        const totalPaid = parseFloat(document.getElementById('amount-paid').value)||0
+const totalAmount = parseFloat(
+    document.getElementById('total-price').value
+        .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+        .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+) || 0;
+        console.log('a: ', totalPaid)
+        console.log('b: ', totalAmount)
 
         const changeAmount = totalPaid - totalAmount;
         if(changeAmount>=0) {
@@ -158,7 +145,7 @@ function searchProducts(query) {
                         <img src="${product.image}" alt="${product.name}" class="img-thumbnail mr-3" style="width: 60px; height: 60px;">
                         <div class="flex-grow-1">
                             <h6 class="mb-1">${product.name}</h6>
-                            <small class="text-muted">${product.price}₫</small>
+                            <small class="text-muted">${product.price.toLocaleString()}₫</small>
                         </div>
                         <button class="btn btn-sm btn-primary add-to-cart-btn"
                             data-id="${product.id}"
@@ -222,6 +209,9 @@ function clearCart() {
             loadCart()
             document.getElementById('change').value =0
         });
+
+    document.getElementById('btn-pay').disabled=true
+
 }
 
 function renderCart(cart) {

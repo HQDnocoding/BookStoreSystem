@@ -1,5 +1,5 @@
-
 import locale
+import textwrap
 from datetime import datetime, timedelta
 
 from reportlab.lib import colors
@@ -22,10 +22,6 @@ from app import app
 def cart_stats(cart):
     total_amount, total_quantity = 0, 0
 
-
-
-
-
     if cart:
         for c in cart.values():
             total_quantity += c['so_luong']
@@ -40,8 +36,6 @@ def cart_stats(cart):
     }
 
 
-
-
 # Đăng ký font Tahoma
 font_path = 'C:\\Windows\\Fonts\\Tahoma.ttf'
 pdfmetrics.registerFont(TTFont('Tahoma', font_path))
@@ -50,23 +44,39 @@ font_path2 = 'C:\\Windows\\Fonts\\arial.ttf'
 pdfmetrics.registerFont(TTFont('arial', font_path))
 font_path3 = 'C:\\Windows\\Fonts\\DejaVuSans.ttf'
 pdfmetrics.registerFont(TTFont('DejaVuSans', font_path))
+
+
+def draw_wrapped_text(pdf, x, y, text, max_width, line_height):
+    """
+    Vẽ văn bản tự động xuống dòng và trả về tọa độ y cuối cùng.
+    """
+    lines = textwrap.wrap(text, width=max_width)
+    for line in lines:
+        pdf.drawString(x, y, line)
+        y -= line_height
+    return y, len(lines) * line_height
+
+
 def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_filename="invoice.pdf"):
-    # Tạo canvas
     pdf = canvas.Canvas(output_filename, pagesize=letter)
     pdf.setTitle("Hóa đơn bán sách")
+    pdf.setFont("Tahoma", 10)
+
+    page_width, page_height = letter
 
     # Tiêu đề
-    pdf.setFont("Tahoma", 14)
-    pdf.drawCentredString(300, 750, "HÓA ĐƠN BÁN SÁCH")
+    pdf.drawCentredString(page_width / 2, 750, "HÓA ĐƠN BÁN SÁCH")
 
-    # Thông tin khách hàng và ngày lập hóa đơn
-    pdf.setFont("Tahoma", 12)
+    # Thông tin khách hàng
+    pdf.setFont("Tahoma", 8)
     pdf.drawString(50, 720, f"Họ tên khách hàng: {customer_name}")
-    pdf.drawString(350, 720, f"Ngày lập hóa đơn: {invoice_date}")
+
+    invoice_date_str = invoice_date.strftime("%d-%m-%Y %H:%M:%S")
+    pdf.drawString(350, 720, f"Ngày lập hóa đơn: {invoice_date_str}")
 
     # Bảng tiêu đề
-    pdf.line(50, 710, 550, 710)  # Dòng ngang đầu bảng
-    pdf.setFont("Tahoma", 12)
+    pdf.line(50, 710, 550, 710)
+    pdf.setFont("Tahoma", 10)
     pdf.drawString(60, 690, "STT")
     pdf.drawString(100, 690, "Sách")
     pdf.drawString(250, 690, "Thể loại")
@@ -74,51 +84,64 @@ def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_
     pdf.drawString(470, 690, "Đơn giá")
     pdf.line(50, 680, 550, 680)
 
-    locale.setlocale(locale.LC_ALL, 'vi_VN.UTF-8')
-
-    pdf.setFont("Tahoma", 12)
+    # Nội dung bảng
+    pdf.setFont("Tahoma", 8)
     y_position = 660
+    line_height = 12
+
+    try:
+        locale.setlocale(locale.LC_ALL, 'vi_VN.UTF-8')
+    except locale.Error:
+        print("Không thể thiết lập locale. Sử dụng định dạng mặc định.")
+
     for idx, item in enumerate(items):
+        stt_height = line_height
+        ten_sach_height = len(textwrap.wrap(item['ten_sach'], width=30)) * line_height
+        the_loai_height = len(textwrap.wrap(item['the_loai'], width=20)) * line_height
+        max_height = max(stt_height, ten_sach_height, the_loai_height)
+
         pdf.drawString(60, y_position, str(idx + 1))
-        pdf.drawString(100, y_position, item['ten_sach'])
-        pdf.drawString(250, y_position, item['the_loai'])
-        pdf.drawString(370, y_position, str(item['so_luong']))
+
+        _, used_height_ten_sach = draw_wrapped_text(pdf, 100, y_position, item['ten_sach'], max_width=30,
+                                                    line_height=line_height)
+
+        _, used_height_the_loai = draw_wrapped_text(pdf, 250, y_position, item['the_loai'], max_width=20,
+                                                    line_height=line_height)
+
+        pdf.drawRightString(400, y_position, str(item['so_luong']))
 
         formatted_price = locale.format_string("%d", item['don_gia'], grouping=True)
-        pdf.drawString(470, y_position, f"{formatted_price} VND")
-        y_position -= 20
+        pdf.drawRightString(510, y_position, f"{formatted_price} VND")
 
+        y_position -= max_height
 
     pdf.line(50, y_position - 10, 550, y_position - 10)
     pdf.drawString(50, y_position - 40, f"Nhân viên thanh toán: {cashier_name}")
 
-    # Lưu file PDF
     pdf.save()
-    print(f"Hóa đơn đã được tạo tại {output_filename}")
+
 
 def count_orders(khach_hang_id):
     return DonHang.query.filter_by(khach_hang_id=khach_hang_id).count()
 
 
 def check_if_expire_orders(user_id):
-    don_hangs = User.query.get(user_id).don_hang
+    don_hangs = User.query.get(user_id).don_hang_kh
 
     for d in don_hangs:
-        if (datetime.now() - d.ngay_tao_don > timedelta(hours=72) ) and d.trang_thai_id == get_trang_thai_by_name(Status.WAITING.value):
+        if (datetime.now() - d.ngay_tao_don > timedelta(hours=72)) and d.trang_thai_id == get_trang_thai_by_name(
+                Status.WAITING.value):
             d.trang_thai_id = get_trang_thai_by_name(Status.FAIL.value).id
 
     db.session.commit()
+
 
 def get_freq(tu, mau):
     return tu / mau
 
 
-
-
-
 # Hàm tạo PDF
-def create_pdf_export_freq(data, file_name, month,year):
-
+def create_pdf_export_freq(data, file_name, month, year):
     pdf = canvas.Canvas(file_name, pagesize=letter)
     pdf.setFont("Tahoma", 12)
     width, height = letter
@@ -158,7 +181,6 @@ def create_pdf_export_freq(data, file_name, month,year):
     pdf.save()
 
 
-
 def create_pdf_export_rev(data, file_name, month, year):
     pdf = canvas.Canvas(file_name, pagesize=letter)
     pdf.setFont("DejaVuSans", 12)
@@ -169,10 +191,12 @@ def create_pdf_export_rev(data, file_name, month, year):
 
     # Tháng và năm
     pdf.setFont("DejaVuSans", 8)
-    pdf.drawString(50, height - 80, f"Tháng: {month} / Năm: {year}")
+    text=f"Tháng: {month} , Năm: {year}"
+    x_position = (width - pdf.stringWidth(text, "DejaVuSans", 8)) / 2
+    pdf.drawString(x_position, height - 80, text)
 
     # Dữ liệu bảng
-    table_data = [["STT", "Thể loại sách", "Doanh thu (VNĐ)", "Số lượt thuê", "Tỷ lệ (%)"]]
+    table_data = [["STT", "Thể loại sách", "Số lượng bán", "Doanh thu (VNĐ)", "Tỷ lệ (%)"]]
     total_revenue = 0
 
     for idx, row in enumerate(data, start=1):
@@ -180,13 +204,13 @@ def create_pdf_export_rev(data, file_name, month, year):
             idx,
             row[0],
             f"{row[1]:,}",
-            row[2],
+            locale.format_string("%d", row[2], grouping=True),
             f"{row[3]:.2f}"
         ])
-        total_revenue += row[1]
+        total_revenue += row[2]
 
     # Tổng doanh thu
-    table_data.append(["Tổng doanh thu","","", f"{total_revenue:,}",""])
+    table_data.append(["Tổng doanh thu", "", "", f"{locale.format_string("%d", total_revenue, grouping=True)}VNĐ", ""])
 
     # Tạo bảng
     table = Table(table_data, colWidths=[50, 150, 150, 100, 100])
@@ -204,10 +228,11 @@ def create_pdf_export_rev(data, file_name, month, year):
 
     # Vẽ bảng vào PDF
     table.wrapOn(pdf, width, height)
-    table.drawOn(pdf, 50, height - 400)
+    table.drawOn(pdf, 50, height - 250)
 
     # Lưu file PDF
     pdf.save()
+
 
 def update_so_luong_by_ct_don_hang(ct_don_hang):
     sachs = []
