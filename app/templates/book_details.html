@@ -20,6 +20,9 @@
                     <strong>Thể loại:</strong> {{sach.the_loai.ten_the_loai}}
                 </p>
                 <p>
+                    <strong>Số lượng:</strong> {{sach.so_luong}}
+                </p>
+                <p>
                     {{sach.noi_dung}}
                 </p>
                 <h4 style="color: green; font-weight: bold;">{{ "{:,.0f}".format(sach.don_gia) }} ₫</h4>
@@ -27,6 +30,7 @@
 
                 <hr>
 
+                {% if sach.so_luong>0 %}
                 <div class="col-2 d-flex align-items-center">
                     <input type="button" value="-" class="minus button ís-form"
                     onclick="changeInputNumericValue(-1, document.getElementById('inputQuantity'))">
@@ -48,6 +52,9 @@ font-weight: bold;">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span>Thêm vô giỏ hàng</span>
                 </a>
+                {% else %}
+                <h1 style="color: red;">Hết hàng</h1>
+                {% endif %}
 
             </div>
         </div>
