@@ -63,7 +63,14 @@
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button"
                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            {% if current_user.is_authenticated %}
+                                            <img src="{{current_user.avatar}}" alt="Avatar"
+                                                 style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;"
+                                             onError="this.onerror=null; this.src='https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';">
+                                            {{current_user.ho}} {{current_user.ten}}
+                                            {% else %}
                                             <i class="fas fa-user"></i> Tài khoản
+                                            {% endif %}
                                         </a>
                                         <ul class="dropdown-menu" aria-labelledby="accountDropdown">
                                             {% if current_user.is_authenticated %}
