@@ -18,7 +18,9 @@ from app import Role
 from flask_login import login_user, logout_user , current_user
 from enum import Enum
 
-from app.utils import cart_stats, check_if_expire_orders
+from app.utils import cart_stats, check_if_expire_orders, update_so_luong_by_ct_don_hang
+
+
 # from decorators import annonymous_user, login_required
 
 
