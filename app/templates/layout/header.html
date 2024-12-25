@@ -53,7 +53,7 @@
                                                 <form action="/shop" method="GET" id="search-form">
                                                     <input type="text" name="kw" class="form-control"
                                                            placeholder="Nhập từ khóa tìm kiếm..."
-                                                           value="{{ request.args.get('query', '') }}">
+                                                           value="{{kw}}">
                                                     <input type="hidden" name="page" value="1">
                                                     </button>
                                                 </form>

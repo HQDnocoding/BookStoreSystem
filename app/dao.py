@@ -279,7 +279,7 @@ def get_the_loai():
 
 
 def load_products(cate_id=None, kw=None, page=1):
-    query = Sach.query
+    query = Sach.query.order_by(Sach.id.desc())
 
     if kw:
         query = query.filter(Sach.ten_sach.contains(kw))
