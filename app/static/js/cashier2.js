@@ -63,7 +63,7 @@ function renderOrderDetails(don_hang_data) {
         tong_tien += s.don_gia * s.so_luong
         orderBooksTable.appendChild(row);
     });
-    document.getElementById('total-price').value = tong_tien
+    document.getElementById('total-price').value = `${tong_tien.toLocaleString()}₫`
 
 
 
@@ -97,21 +97,21 @@ async function createInvoice(id_don_hang) {
 document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-pay2').addEventListener('click', function (event) {
-    const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
-    const totalAmount = parseFloat(
-    document.getElementById('total-price').value
-        .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
-        .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
-) || 0;
+        const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+        const totalAmount = parseFloat(
+            document.getElementById('total-price').value
+                .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+                .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+        ) || 0;
 
 
 
         const changeAmount = totalPaid - totalAmount;
-       if (changeAmount <= 0) {
-           event.preventDefault();
-           alert('Không đủ tiền');
+        if (changeAmount <= 0) {
+            event.preventDefault();
+            alert('Không đủ tiền');
         } else {
-            createInvoice(don_hang_id) ;
+            createInvoice(don_hang_id);
         }
 
     });
@@ -120,8 +120,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('search-don-hang-btn').addEventListener('click', function () { findOrder() });
 
     document.getElementById('btn-change').addEventListener('click', function () {
-        const totalPaid = parseFloat(document.getElementById('amount-paid').value.replace('₫', '').replace(',', '')) || 0;
-        const totalAmount = parseFloat(document.getElementById('total-price').value.replace('₫', '').replace(',', '')) || 0;
+        const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+        const totalAmount = parseFloat(
+            document.getElementById('total-price').value
+                .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+                .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+        ) || 0;
 
 
 
@@ -134,6 +138,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
+    });
+
+    document.addEventListener('keydown', function (event) {
+
+        if (event.key === "Enter" && document.activeElement === document.getElementById('amount-paid')) {
+            const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
+            const totalAmount = parseFloat(
+                document.getElementById('total-price').value
+                    .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+                    .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+            ) || 0;
+
+
+
+            const changeAmount = totalPaid - totalAmount;
+
+            if (changeAmount >= 0) {
+                document.getElementById('btn-pay2').disabled = false
+            } else {
+                document.getElementById('btn-pay2').disabled = true
+            }
+
+            document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
+        }
     });
 
 });

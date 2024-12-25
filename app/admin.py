@@ -301,24 +301,27 @@ class Cashier2View(AuthenticatedNhanVienView):
 
     @expose('/don_hang/<int:don_hang_id>', methods=['POST'])
     def create_invoice(self, don_hang_id):
-        infor, sach = create_hoa_don_from_don_hang(don_hang_id)
+        try:
+            infor, sach = create_hoa_don_from_don_hang(don_hang_id)
 
-        ten_kh = session.get('ten_kh', '')
-        sach_data = session.get('sach_data', [])
+            ten_kh = session.get('ten_kh', '')
+            sach_data = session.get('sach_data', [])
 
-        nv = current_user
-        ho_ten_nv = f"{nv.ho} {nv.ten}"
+            nv = current_user
+            ho_ten_nv = f"{nv.ho} {nv.ten}"
 
-        output_dir = "bieu_mau_hoa_don_mua_tai_cua_hang"
-        os.makedirs(output_dir, exist_ok=True)
-        output_filename = os.path.join(output_dir, f"dt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+            output_dir = "bieu_mau_hoa_don_mua_tai_cua_hang"
+            os.makedirs(output_dir, exist_ok=True)
+            output_filename = os.path.join(output_dir, f"dt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
-        app.logger.error(f"date {infor['don_hang_id']}")
+            app.logger.error(f"date {infor['don_hang_id']}")
 
-        utils.create_invoice_pdf(ten_kh, infor['ngay_thanh_toan'], sach_data, ho_ten_nv, output_filename)
+            utils.create_invoice_pdf(ten_kh, infor['ngay_thanh_toan'], sach_data, ho_ten_nv, output_filename)
 
-        return jsonify({"path": "/admin/cashier2view"}), 200
-
+            return jsonify({"path": "/admin/cashier2view"}), 200
+        except Exception as e:
+            flash(f"Lỗi: {e}", "error")
+            return jsonify({"error": str(e)}), 500
 
 class RevenueStatsView(AuthenticatedStatsView):
     @expose("/")

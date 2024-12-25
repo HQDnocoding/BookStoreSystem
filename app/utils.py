@@ -71,8 +71,10 @@ def create_invoice_pdf(customer_name, invoice_date, items, cashier_name, output_
     pdf.setFont("Tahoma", 8)
     pdf.drawString(50, 720, f"Họ tên khách hàng: {customer_name}")
 
-    invoice_date_str = invoice_date.strftime("%d-%m-%Y %H:%M:%S")
-    pdf.drawString(350, 720, f"Ngày lập hóa đơn: {invoice_date_str}")
+
+
+
+    pdf.drawString(350, 720, f"Ngày lập hóa đơn: {str(invoice_date)}")
 
     # Bảng tiêu đề
     pdf.line(50, 710, 550, 710)

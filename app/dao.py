@@ -2,7 +2,7 @@ import locale
 from datetime import datetime
 from xmlrpc.client import DateTime
 
-from flask import session, jsonify
+from flask import session, jsonify, flash
 from flask_login import current_user
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
@@ -108,11 +108,10 @@ def create_donhang(ngay_tao_don, phuong_thuc_id, trang_thai_id, khach_hang_id):
     db.session.add(new_donhang)
     db.session.commit()
 
-    return  new_donhang
+    return new_donhang
 
 
-
-def create_thongtinnhanhang( id,dien_thoai_nhan_hang, dia_chi_nhan_hang):
+def create_thongtinnhanhang(id, dien_thoai_nhan_hang, dia_chi_nhan_hang):
     new_thongtinnhanhang = ThongTinNhanHang(id=id, dien_thoai_nhan_hang=dien_thoai_nhan_hang,
                                             dia_chi_nhan_hang=dia_chi_nhan_hang)
     db.session.add(new_thongtinnhanhang)
@@ -120,7 +119,7 @@ def create_thongtinnhanhang( id,dien_thoai_nhan_hang, dia_chi_nhan_hang):
     return new_thongtinnhanhang
 
 
-def create_chitietdonhang( don_hang_id, sach_id, so_luong, tong_tien):
+def create_chitietdonhang(don_hang_id, sach_id, so_luong, tong_tien):
     new_chitietdonhang = ChiTietDonHang(don_hang_id=don_hang_id, sach_id=sach_id, so_luong=so_luong,
                                         tong_tien=tong_tien)
     db.session.add(new_chitietdonhang)
@@ -152,11 +151,14 @@ def auth_user(username, password, roles=None):
             users = users.filter(User.vai_tro_id.in_(roleID))
 
     return users.first()
+
+
 def update_user_password(user_id, new_password):
     user = get_user_by_id(user_id)
     new_password_hash = str(hashlib.md5(new_password.strip().encode('utf-8')).hexdigest())
     user.password = new_password_hash
     db.session.commit()
+
 
 def get_stats(nam, thang, ten_the_loai):
     from sqlalchemy.exc import SQLAlchemyError
@@ -268,7 +270,6 @@ def get_frequency_stats(thang, nam, ten_the_loai):
     return results
 
 
-
 def get_id_from_ten_vai_tro(ten_vai_tro):
     vai_tro = VaiTro.query.filter_by(ten_vai_tro=ten_vai_tro).first()
     return vai_tro.id if vai_tro else None
@@ -345,8 +346,10 @@ def add_so_luong(sach_id, so_luong):
 def get_id_by_phuong_thuc_name(name):
     return PhuongThucThanhToan.query.filter_by(ten_phuong_thuc=name).first().id
 
+
 def get_id_by_trang_thai(name):
     return TrangThaiDonHang.query.filter_by(ten_trang_thai=name).first().id
+
 
 def create_invoice_from_cart():
     try:
@@ -363,16 +366,23 @@ def create_invoice_from_cart():
             raise ValueError("Người dùng chưa đăng nhập.")
 
         # Tạo hóa đơn bán sách
-        don_hang = DonHang(ngay_tao_don=datetime.now(), phuong_thuc_id=pt_tt, trang_thai_id=tt, nhan_vien_id=user.id )
+        don_hang = DonHang(ngay_tao_don=datetime.now(), phuong_thuc_id=pt_tt, trang_thai_id=tt, nhan_vien_id=user.id)
         db.session.add(don_hang)
         db.session.commit()
-
-
 
         # Thêm chi tiết hóa đơn
         for item in cart.values():
             sach = Sach.query.get(int(item['id']))
+            if sach.so_luong < item['so_luong']:
+                flash(f"Sách '{sach.ten_sach}' không đủ số lượng",
+                      "error")
+                raise ValueError(
+                    f"Sách '{sach.ten_sach}' không đủ số lượng")
+
+            sach.so_luong -= item['so_luong']
+
             if not sach:
+                flash(f"Không tồn tại sách {item['ten_sach']}",'error')
                 raise ValueError(f"Không tìm thấy sách với ID: {item['id']}")
 
             chi_tiet = ChiTietDonHang(
@@ -404,10 +414,9 @@ def get_nhan_vien(id):
     # Truy vấn đơn hàng theo mã đơn hàng
     return User.query.filter_by(id=id).first()
 
+
 def get_chi_tiet_don_hang(id):
     return ChiTietDonHang.query.filter(id=id)
-
-
 
 
 def create_hoa_don_from_don_hang(don_hang_id):
@@ -430,8 +439,21 @@ def create_hoa_don_from_don_hang(don_hang_id):
 
         don_hang.phuong_thuc_id = pt_tt
         don_hang.trang_thai_id = tt
-        don_hang.nhan_vien_id=user.id
-        don_hang.ngay_tao_don=datetime.now()
+        don_hang.nhan_vien_id = user.id
+        don_hang.ngay_tao_don = datetime.now()
+
+        # Cập nhật số lượng sách
+        for chi_tiet in don_hang.sach:
+            sach = db.session.query(Sach).filter_by(id=chi_tiet.sach_id).first()
+            if not sach:
+                raise ValueError(f"Sách với ID {chi_tiet.sach_id} không tồn tại.")
+
+            if sach.so_luong < chi_tiet.so_luong:
+                flash( f"Sách '{sach.ten_sach}' không đủ số lượng.","error")
+                raise ValueError(
+                    f"Sách '{sach.ten_sach}' không đủ số lượng (còn {sach.so_luong}, yêu cầu {chi_tiet.so_luong}).")
+
+            sach.so_luong -= chi_tiet.so_luong
 
         # Lưu thay đổi vào cơ sở dữ liệu
         db.session.commit()
@@ -440,7 +462,7 @@ def create_hoa_don_from_don_hang(don_hang_id):
         return {
             "don_hang_id": don_hang_id,
             "ngay_thanh_toan": don_hang.ngay_tao_don.strftime("%Y-%m-%d %H:%M:%S"),
-            "nhan_vien_id": current_user.id,
+            "nhan_vien_id": user.id,
             "sach": [
                 {
                     "sach_id": chi_tiet.sach_id,
@@ -454,7 +476,6 @@ def create_hoa_don_from_don_hang(don_hang_id):
         db.session.rollback()
         app.logger.error(f"Lỗi khi tạo hóa đơn: {str(e)}")
         return {"error": f"Lỗi hệ thống: {str(e)}"}, 500
-
 
 
 def get_or_create_phuong_thuc_id(ten_phuong_thuc):
@@ -489,31 +510,34 @@ def get_so_luong_cuon_con_lai(sach_id):
     sach = Sach.query.get(sach_id)
     return sach.so_luong
 
+
 def get_order_by_order_id(order_id):
     order = DonHang.query.get(order_id)
 
     return order
 
 
-
 def get_trang_thai_by_name(ten):
     return TrangThaiDonHang.query.filter_by(ten_trang_thai=ten).first()
 
 
-def get_order_by_user_id(khach_hang_id,page,page_size):
+def get_order_by_user_id(khach_hang_id, page, page_size):
     don_hangs = DonHang.query.filter_by(khach_hang_id=khach_hang_id).order_by(DonHang.id.desc())
 
-    start = (int(page)-1)* page_size
+    start = (int(page) - 1) * page_size
     end = start + page_size
-    return don_hangs.slice(start,end).all()
+    return don_hangs.slice(start, end).all()
+
 
 def get_phuong_thuc_by_id(phuong_thuc_id):
     phuong_thuc = PhuongThucThanhToan.query.get(phuong_thuc_id)
     return phuong_thuc
 
+
 def get_trang_thai_by_id(trang_thai_id):
     trang_thai = TrangThaiDonHang.query.get(trang_thai_id)
     return trang_thai
+
 
 def get_order_total_price_by_id(id):
     don_hang = DonHang.query.get(id)
@@ -524,6 +548,7 @@ def get_order_total_price_by_id(id):
         total_amount += o.tong_tien
 
     return total_amount
+
 
 def get_sach_by_id(sach_id):
     return Sach.query.get(sach_id)

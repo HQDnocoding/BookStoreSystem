@@ -1,29 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Tải giỏ hàng khi trang được tải
-    if (window.location.pathname === '/admin/cashierview/'){
-    loadCart();
+    if (window.location.pathname === '/admin/cashierview/') {
+        loadCart();
     }
 
 
-document.addEventListener('keydown', function(event) {
-    if (event.key === 'F3') {
-        event.preventDefault();
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'F3') {
+            event.preventDefault();
 
-        // Focus vào ô tìm kiếm
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.focus();
+            // Focus vào ô tìm kiếm
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.focus();
+            }
         }
-    }
-});
-document.addEventListener('keydown', function (event) {
+    });
+    document.addEventListener('keydown', function (event) {
         // Kiểm tra nếu phím nhấn là Esc (keyCode = 27)
         if (event.key === "Escape") {
             document.getElementById('search-input').value = '';
             document.getElementById('search-results').innerHTML = '';
         }
-});
-document.getElementById('search-input').addEventListener('input', function () {
+    });
+    document.getElementById('search-input').addEventListener('input', function () {
 
 
         const query = this.value.trim();
@@ -32,49 +32,48 @@ document.getElementById('search-input').addEventListener('input', function () {
         } else {
             document.getElementById('search-results').innerHTML = '';
         }
-});
+    });
 
-document.addEventListener('click', function (event) {
-    if (event.target.classList.contains('add-to-cart-btn')) {
-        const productId = event.target.dataset.id;
-        const productName = event.target.dataset.name;
-        const productPrice = parseFloat(event.target.dataset.price);
-        const productImage = event.target.dataset.image;
-        const productTheLoai = event.target.dataset.theloai;
+    document.addEventListener('click', function (event) {
+        if (event.target.classList.contains('add-to-cart-btn')) {
+            const productId = event.target.dataset.id;
+            const productName = event.target.dataset.name;
+            const productPrice = parseFloat(event.target.dataset.price);
+            const productImage = event.target.dataset.image;
+            const productTheLoai = event.target.dataset.theloai;
 
-        // Thêm sản phẩm vào giỏ hàng
-        addToCart(productId, productName, productPrice, productImage,productTheLoai);
-        document.getElementById('btn-pay').disabled=true
+            // Thêm sản phẩm vào giỏ hàng
+            addToCart(productId, productName, productPrice, productImage, productTheLoai);
+            document.getElementById('btn-pay').disabled = true
 
-        loadCart()
-    }
-});
+            loadCart()
+        }
+    });
 
 
     // Xử lý nút xóa giỏ hàng
-document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
+    document.getElementById('clear-cart-btn').addEventListener('click', clearCart);
 });
-document.getElementById("amount-paid").addEventListener("keydown", function(event) {
-    // Kiểm tra nếu phím nhấn là Enter (keyCode 13)
+document.getElementById("amount-paid").addEventListener("keydown", function (event) {
     if (event.key === "Enter") {
         event.preventDefault();
 
         const amountPaid = parseFloat(document.getElementById("amount-paid").value) || 0;
         const totalPrice = parseFloat(
-    document.getElementById('total-price').value
-        .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
-        .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
-) || 0;
+            document.getElementById('total-price').value
+                .replace(/₫/g, '')
+                .replace(/,/g, '')
+        ) || 0;
 
         const change = amountPaid - totalPrice;
 
-        if(change>=0){
-            document.getElementById('btn-pay').disabled=false
-        }else{
-        document.getElementById('btn-pay').disabled=true
+        if (change >= 0) {
+            document.getElementById('btn-pay').disabled = false
+        } else {
+            document.getElementById('btn-pay').disabled = true
         }
 
-        document.getElementById("change").value = change >= 0 ? change : 0;
+        document.getElementById("change").value =  (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
     }
 
 });
@@ -93,8 +92,8 @@ function loadCart() {
             if (data.cart && data.cart.length === 0) {
                 renderCart([]);
                 updateCartSummary(0, 0);
-                document.getElementById('amount-paid').value=""
-                document.getElementById('btn-pay').disabled=true
+                document.getElementById('amount-paid').value = ""
+                document.getElementById('btn-pay').disabled = true
                 return;
             }
 
@@ -102,7 +101,7 @@ function loadCart() {
             updateCartSummary(data.total_quantity, data.total_amount);
         })
         .catch(err => console.error('Lỗi khi tải giỏ hàng:', err));
-        document.getElementById('btn-pay').disabled=true
+    document.getElementById('btn-pay').disabled = true
 
 }
 
@@ -111,23 +110,23 @@ function loadCart() {
 
 
 document.getElementById('btn-change').addEventListener('click', function () {
-        const totalPaid = parseFloat(document.getElementById('amount-paid').value)||0
-const totalAmount = parseFloat(
-    document.getElementById('total-price').value
-        .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
-        .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
-) || 0;
-        console.log('a: ', totalPaid)
-        console.log('b: ', totalAmount)
+    const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0
+    const totalAmount = parseFloat(
+        document.getElementById('total-price').value
+            .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
+            .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+    ) || 0;
+    console.log('a: ', totalPaid)
+    console.log('b: ', totalAmount)
 
-        const changeAmount = totalPaid - totalAmount;
-        if(changeAmount>=0) {
-        document.getElementById('btn-pay').disabled=false
-        }else{
-        document.getElementById('btn-pay').disabled=true
-        }
-        document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
-    });
+    const changeAmount = totalPaid - totalAmount;
+    if (changeAmount >= 0) {
+        document.getElementById('btn-pay').disabled = false
+    } else {
+        document.getElementById('btn-pay').disabled = true
+    }
+    document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
+});
 
 
 
@@ -158,7 +157,7 @@ function searchProducts(query) {
                     </li>`;
             });
 
-             if (products.length === 0) {
+            if (products.length === 0) {
                 resultsList.innerHTML = `
                     <li class="list-group-item text-center text-muted">
                         Không tìm thấy sản phẩm nào.
@@ -175,7 +174,7 @@ function searchProducts(query) {
 }
 
 
-async function addToCart(productId, productName, productPrice, productImage,theLoaiId) {
+async function addToCart(productId, productName, productPrice, productImage, theLoaiId) {
     try {
         // Gửi yêu cầu thêm sản phẩm
         const response = await fetch('/admin/cashierview/cart', {
@@ -186,7 +185,7 @@ async function addToCart(productId, productName, productPrice, productImage,theL
                 ten_sach: productName,
                 don_gia: productPrice,
                 bia_sach: productImage,
-                the_loai_id:theLoaiId,
+                the_loai_id: theLoaiId,
                 so_luong: 1
             })
         });
@@ -207,10 +206,10 @@ function clearCart() {
     fetch('/admin/cashierview/cart', { method: 'DELETE' })
         .then(() => {
             loadCart()
-            document.getElementById('change').value =0
+            document.getElementById('change').value = 0
         });
 
-    document.getElementById('btn-pay').disabled=true
+    document.getElementById('btn-pay').disabled = true
 
 }
 
@@ -304,12 +303,12 @@ async function updateCart(productId, newQuantity) {
 
 function removeFromCart(productId) {
     fetch(`/admin/cashierview/cart/${productId}`, { method: 'DELETE' })
-    .then(response => response.json())
-    .then(data => {
-        console.info("Đã xóa sản phẩm:", data.cart);
-        loadCart()
-    })
-    .catch(error => console.error("Lỗi khi xóa sản phẩm:", error));
+        .then(response => response.json())
+        .then(data => {
+            console.info("Đã xóa sản phẩm:", data.cart);
+            loadCart()
+        })
+        .catch(error => console.error("Lỗi khi xóa sản phẩm:", error));
 }
 
 
