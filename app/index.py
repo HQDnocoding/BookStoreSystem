@@ -150,15 +150,16 @@ def shopping():
     the_loai = dao.get_the_loai()
 
     the_loai_id = request.args.get('the_loai_id', 1)
-    kw = request.args.get('kw')
+    kw = request.args.get('kw', '')
+
     page = request.args.get('page', 1)
 
     prods = dao.load_products(cate_id=the_loai_id, kw=kw, page=int(page))
 
     page_size = app.config.get('PAGE_SIZE', 2)
-    total = dao.count_sach()
+    total = dao.count_sach(kw = kw)
 
-    return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai)
+    return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai, kw = kw)
 
 
 @app.route('/search/')

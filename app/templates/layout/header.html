@@ -50,10 +50,11 @@
                                         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSearch"
                                              aria-labelledby="offcanvasSearchLabel">
                                             <div class="offcanvas-body">
-                                                <form action="/search" method="GET" id="search-form">
+                                                <form action="/shop" method="GET" id="search-form">
                                                     <input type="text" name="kw" class="form-control"
                                                            placeholder="Nhập từ khóa tìm kiếm..."
                                                            value="{{ request.args.get('query', '') }}">
+                                                    <input type="hidden" name="page" value="1">
                                                     </button>
                                                 </form>
                                             </div>

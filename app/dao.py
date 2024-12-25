@@ -294,8 +294,13 @@ def load_products(cate_id=None, kw=None, page=1):
     return query.all()
 
 
-def count_sach():
-    return Sach.query.count()
+def count_sach(kw=None):
+    query = Sach.query
+
+    if kw:
+        query = query.filter(Sach.ten_sach.contains(kw))
+
+    return query.count()
 
 
 def load_all_tacgia():
