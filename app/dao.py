@@ -285,9 +285,9 @@ def load_products(cate_id=None, kw=None, page=1):
     if kw:
         query = query.filter(Sach.ten_sach.contains(kw))
 
-    # if cate_id:
-    #     query = query.filter(Sach.the_loai_id == cate_id)
-    #
+    if cate_id:
+        query = query.filter(Sach.the_loai_id == cate_id)
+
     page_size = app.config.get('PAGE_SIZE')
     start = (page - 1) * page_size
     query = query.slice(start, start + page_size)
@@ -295,11 +295,13 @@ def load_products(cate_id=None, kw=None, page=1):
     return query.all()
 
 
-def count_sach(kw=None):
+def count_sach(kw=None, the_loai_id=None):
     query = Sach.query
 
     if kw:
         query = query.filter(Sach.ten_sach.contains(kw))
+    if the_loai_id:
+        query=query.filter(Sach.the_loai_id == the_loai_id)
 
     return query.count()
 
@@ -552,3 +554,10 @@ def get_order_total_price_by_id(id):
 
 def get_sach_by_id(sach_id):
     return Sach.query.get(sach_id)
+
+def get_id_the_loai(name):
+    if name is not None:
+        the_loai = TheLoai.query.filter_by(ten_the_loai=name).first()
+        if the_loai:
+            return the_loai.id
+    return None

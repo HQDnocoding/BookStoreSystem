@@ -15,7 +15,7 @@ from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_AP
 from app.admin import *
 import app.dao as dao
 from app import Role
-from flask_login import login_user, logout_user , current_user
+from flask_login import login_user, logout_user, current_user
 from enum import Enum
 
 from app.utils import cart_stats, check_if_expire_orders, update_so_luong_by_ct_don_hang
@@ -91,13 +91,13 @@ def login_my_user():
     err_msg = ''
     success_msg = request.args.get('success_msg')
     if request.method.__eq__('POST'):
-        success_msg=''
+        success_msg = ''
         username = request.form['username']
         password = request.form['password']
         user = dao.auth_user(username, password)
         if user:
             login_user(user=user)
-            n=request.args.get('next')
+            n = request.args.get('next')
             return redirect(n if n else '/')
         else:
             if not dao.user_exists(request.form['username']):
@@ -134,34 +134,40 @@ def update_password():
             return redirect('/login?success_msg=Đã đổi mật khẩu thành công, vui lòng đăng nhập')
         else:
             err_msg = 'SAI mật khẩu'
-    return render_template('update_password.html', err_msg = err_msg)
-
+    return render_template('update_password.html', err_msg=err_msg)
 
 
 @app.route('/profile/')
 @login_required
 def profile():
-
     user = get_user_by_id(current_user.get_id())
 
-    return render_template('profile.html',user=user)
+    return render_template('profile.html', user=user)
 
 
-@app.route('/shop/')
-def shopping():
+@app.route('/shop', defaults={'cate': 'None'}, strict_slashes=False)
+@app.route('/shop/<cate>', strict_slashes=False)
+def shopping(cate):
     the_loai = dao.get_the_loai()
-
-    the_loai_id = request.args.get('the_loai_id', 1)
     kw = request.args.get('kw', '')
-
     page = request.args.get('page', 1)
+    print(cate)
+    if cate is not None:
+        the_loai_id = dao.get_id_the_loai(cate)
 
-    prods = dao.load_products(cate_id=the_loai_id, kw=kw, page=int(page))
+        prods = dao.load_products(cate_id=the_loai_id, kw=kw, page=int(page))
+        page_size = app.config.get('PAGE_SIZE', 2)
+        total = dao.count_sach(kw=kw, the_loai_id=the_loai_id)
 
-    page_size = app.config.get('PAGE_SIZE', 2)
-    total = dao.count_sach(kw = kw)
+        return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai, kw=kw,
+                               the_loais=the_loai)
 
-    return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai, kw = kw)
+    else:
+        prods = dao.load_products(kw=kw, page=int(page))
+        page_size = app.config.get('PAGE_SIZE', 2)
+        total = dao.count_sach(kw=kw)
+        return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai, kw=kw,
+                               the_loais=the_loai)
 
 
 @app.route('/search/')
@@ -181,6 +187,11 @@ def search():
     return render_template('search_results.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai)
 
 
+@app.route('/filter/')
+def filter_genre():
+    pass
+
+
 @app.route('/books/<int:sach_id>')
 def details(sach_id):
     sach = Sach.query.get(sach_id)
@@ -194,7 +205,6 @@ def cart():
 
 @app.route('/api/cart', methods=['post'])
 def add_to_cart():
-
     data = request.json
     id = str(data['id'])
 
@@ -204,7 +214,7 @@ def add_to_cart():
     key = app.config['CART_KEY']
     cart = session[key] if key in session else {}
     if id in cart:
-        cart[id]['so_luong']+=so_luong_moi
+        cart[id]['so_luong'] += so_luong_moi
     else:
         ten_sach = data['ten_sach']
         don_gia = data['don_gia']
@@ -251,8 +261,10 @@ def delete_cart(product_id):
 @app.context_processor
 def common_attr():
     return {
-        'cart': utils.cart_stats(session.get(app.config['CART_KEY']))
+        'cart': utils.cart_stats(session.get(app.config['CART_KEY'])),
+        'the_loais': dao.get_the_loai()
     }
+
 
 @app.route('/orders/', methods=['get'])
 @login_required
@@ -260,22 +272,22 @@ def orders():
     check_if_expire_orders(current_user.get_id())
 
     page_size = 10
-    page = request.args.get('page',1)
+    page = request.args.get('page', 1)
 
-    don_hangs = get_order_by_user_id(current_user.get_id(),page,page_size)
+    don_hangs = get_order_by_user_id(current_user.get_id(), page, page_size)
     counter = utils.count_orders(current_user.get_id())
     order_json = []
     for o in don_hangs:
         order_json.append(
-        {
-            "id": o.id,
-            "ngay_tao_don": o.ngay_tao_don,
-            "phuong_thuc": get_phuong_thuc_by_id(o.phuong_thuc_id).ten_phuong_thuc,
-            "trang_thai": get_trang_thai_by_id(o.trang_thai_id).ten_trang_thai,
-            "total_price": get_order_total_price_by_id(o.id)
-        })
+            {
+                "id": o.id,
+                "ngay_tao_don": o.ngay_tao_don,
+                "phuong_thuc": get_phuong_thuc_by_id(o.phuong_thuc_id).ten_phuong_thuc,
+                "trang_thai": get_trang_thai_by_id(o.trang_thai_id).ten_trang_thai,
+                "total_price": get_order_total_price_by_id(o.id)
+            })
 
-    return render_template('orders_view.html',orders = order_json,pages= math.ceil(counter/page_size))
+    return render_template('orders_view.html', orders=order_json, pages=math.ceil(counter / page_size))
 
 
 @app.route('/order_details/<int:order_id>', methods=['get'])
@@ -287,7 +299,7 @@ def order_details(order_id):
     total_amount = get_order_total_price_by_id(order_id)
     order_status = get_trang_thai_by_id(don_hang.trang_thai_id).ten_trang_thai
 
-    sachs=[]
+    sachs = []
 
     for ct in ct_don_hang:
         sachs.append(get_sach_by_id(ct.sach_id))
@@ -296,19 +308,19 @@ def order_details(order_id):
 
     for s, ct in zip(sachs, ct_don_hang):
         order_details.append({
-            'bia_sach' : s.bia_sach,
-            'ten_sach' : s.ten_sach,
-            'so_luong' : ct.so_luong,
-            'tong_tien' : ct.tong_tien
+            'bia_sach': s.bia_sach,
+            'ten_sach': s.ten_sach,
+            'so_luong': ct.so_luong,
+            'tong_tien': ct.tong_tien
         })
 
     print(order_details)
 
+    return render_template('order_details.html', order=don_hang, order_details=order_details, total_amount=total_amount,
+                           trang_thai=order_status)
 
-    return render_template('order_details.html',order = don_hang,order_details = order_details,total_amount=total_amount,trang_thai = order_status)
 
-
-#class vnpay để thanh toán online code mẫu dijango của VNPAY
+# class vnpay để thanh toán online code mẫu dijango của VNPAY
 class vnpay:
     requestData = {}
     responseData = {}
@@ -358,13 +370,12 @@ class vnpay:
     def __hmacsha512(key, data):
         byteKey = key.encode('utf-8')
         byteData = data.encode('utf-8')
-        return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest() #
+        return hmac.new(byteKey, byteData, hashlib.sha512).hexdigest()  #
 
 
 @app.route('/payment_offline/')
 @login_required
 def payment_offline():
-
     return render_template('payment_offline.html')
 
 
@@ -401,29 +412,28 @@ def payment():
     return render_template('payment.html')
 
 
-
-
-
 @app.route('/process_payment', methods=['post'])
 @login_required
 def process_payment():
-
-
     cart_key = app.config['CART_KEY']
     dien_thoai_nhan_hang = request.form['phone']
     dia_chi_nhan_hang = request.form['address']
     is_pay_later = request.form.get('switch_isThanhToanSau', False)
-    #print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
-    #print('user_id : ',current_user.get_id())
-    donhang = create_donhang( ngay_tao_don=datetime.now(),phuong_thuc_id= get_or_create_phuong_thuc_id(PayingMethod.ONLINE_PAY.value),trang_thai_id= get_or_create_trang_thai_id(Status.WAITING.value), khach_hang_id=current_user.get_id())
+    # print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
+    # print('user_id : ',current_user.get_id())
+    donhang = create_donhang(ngay_tao_don=datetime.now(),
+                             phuong_thuc_id=get_or_create_phuong_thuc_id(PayingMethod.ONLINE_PAY.value),
+                             trang_thai_id=get_or_create_trang_thai_id(Status.WAITING.value),
+                             khach_hang_id=current_user.get_id())
     cart_items = session[cart_key]
 
-    #print(donhang)
-    thongtinnhanhang = create_thongtinnhanhang(id=donhang.id,dien_thoai_nhan_hang=dien_thoai_nhan_hang,
+    # print(donhang)
+    thongtinnhanhang = create_thongtinnhanhang(id=donhang.id, dien_thoai_nhan_hang=dien_thoai_nhan_hang,
                                                dia_chi_nhan_hang=dia_chi_nhan_hang)
 
     for ci in cart_items.values():
-        create_chitietdonhang(don_hang_id=donhang.id,sach_id=ci['id'],so_luong=ci['so_luong'],tong_tien=ci['don_gia']*ci['so_luong'])
+        create_chitietdonhang(don_hang_id=donhang.id, sach_id=ci['id'], so_luong=ci['so_luong'],
+                              tong_tien=ci['don_gia'] * ci['so_luong'])
 
     session['order_id'] = donhang.id
 
@@ -462,7 +472,7 @@ def process_payment_in_order_details():
     session['order_id'] = order_id
     total_amount = get_order_total_price_by_id(order_id)
 
-####################################
+    ####################################
     vnp = vnpay()
     vnp.requestData['vnp_Version'] = '2.1.0'
     vnp.requestData['vnp_Command'] = 'pay'
@@ -483,7 +493,7 @@ def process_payment_in_order_details():
 
 @app.route('/vnpay_return', methods=['get'])
 def payment_return():
-    input_data = request.args # Lấy dữ liệu từ query string
+    input_data = request.args  # Lấy dữ liệu từ query string
     if input_data:
         vnp = vnpay()
         vnp.responseData = input_data.to_dict()  # Chuyển đổi thành dictionary
@@ -518,19 +528,17 @@ def payment_return():
                 return redirect(url_for('payment_failed'))  # Chuyển hướng đến trang thất bại
     return "Invalid request", 400
 
+
 @app.route('/payment_succeed')
 def payment_succeed():
     return render_template('payment_succeed.html')
+
 
 @app.route('/payment_failed')
 def payment_failed():
     return render_template('payment_failed.html')
 
-@app.route('/search_tac_gia', methods=['GET'])
-def search_tac_gia():
-    search_term = request.args.get('q', '').strip()
-    authors = TacGia.query.filter(TacGia.ten_tac_gia.ilike(f'%{search_term}%')).all()
-    return jsonify([{'id': author.id, 'ten_tac_gia': author.ten_tac_gia} for author in authors])
+
 if __name__ == "__main__":
     with app.app_context():
-        app.run(debug=True,port=5001)
+        app.run(debug=True, port=5001)

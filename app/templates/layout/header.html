@@ -32,8 +32,13 @@
                                     <li class="nav-item">
                                         <a class="nav-link active" aria-current="page" href="/">Home</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="/shop">Mua sách</a>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="/shop" aria-expanded="false">Mua sách</a>
+                                        <ul class="dropdown-menu" aria-labelledby="booksDropdown">
+                                            {% for the_loai in the_loais%}
+                                             <li><a class="dropdown-item" href="/shop/{{the_loai.ten_the_loai}}">{{the_loai.ten_the_loai}}</a></li>
+                                            {% endfor%}
+                                        </ul>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="/orders">Đơn hàng</a>
@@ -50,7 +55,7 @@
                                         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasSearch"
                                              aria-labelledby="offcanvasSearchLabel">
                                             <div class="offcanvas-body">
-                                                <form action="/shop" method="GET" id="search-form">
+                                                <form action=""  method="GET" id="search-form">
                                                     <input type="text" name="kw" class="form-control"
                                                            placeholder="Nhập từ khóa tìm kiếm..."
                                                            value="{{kw}}">
