@@ -686,56 +686,116 @@ class XemChiTietPhieuNhapSach(AuthenticatedQuanLyKhoViewMV):
 class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
     @expose("/")
     def index(self):
-
+        err_msg = request.args.get('err_msg')
         ten_the_loai = request.args.get('theloai_search')
         ten_tac_gia = request.args.get('tacgia_search')
 
         theloais = load_all_theloai()
         tacgias = load_all_tacgia()
         sachs = load_sach(ten_the_loai=ten_the_loai, ten_tac_gia=ten_tac_gia)
+        sl_nhap_min = get_quydinh_by_id(1).gia_tri
+        sl_min_to_nhap = get_quydinh_by_id(2).gia_tri
 
-        return self.render("admin/booksimport.html", theloais=theloais, tacgias=tacgias, sachs=sachs)
+        key = app.config['BOOK_IMPORT_CART_KEY']
+        cart = session.get(key, {})
 
-    @expose("/create", methods=["POST"])
+        return self.render("admin/booksimport.html", theloais=theloais, tacgias=tacgias,
+                           sachs=sachs, sl_nhap_min=sl_nhap_min, sl_min_to_nhap=sl_min_to_nhap, cart=cart,
+                           err_msg=err_msg)
+
+    @expose("/api/cart", methods=["POST"])
+    def add_to_cart(self):
+        sl_min_to_nhap = get_quydinh_by_id(2).gia_tri
+        data = request.json
+        id = str(data['id'])
+        # kiem tra dieu kien
+        sach = Sach.query.get(data['id'])
+        if sach.so_luong>sl_min_to_nhap:
+            # flash(f" Sách {data['ten_sach']} lớn hơn {sl_min_to_nhap} ", "error")
+            return jsonify({"error":f" Số lượng sách {data['ten_sach']} đã lớn hơn {sl_min_to_nhap} !!!"})
+
+        so_luong_moi = data.get('so_luong', 1)
+        key = app.config['BOOK_IMPORT_CART_KEY']
+        cart = session[key] if key in session else {}
+
+        result = {}
+        if id in cart:
+            return jsonify({"error":f" Sách {data['ten_sach']} đã có trong giỏ !!!"})
+        else:
+            ten_sach = data['ten_sach']
+            bia_sach = data['bia_sach']
+
+            cart[id] = {
+                'id': id,
+                'ten_sach': ten_sach,
+                'bia_sach': bia_sach,
+                'so_luong': so_luong_moi,
+            }
+            result = {
+                "add": cart[id]
+            }
+
+        session[key] = cart
+        return jsonify(result)
+
+    @expose('/api/cart/<product_id>', methods=["put"])
+    def update_cart(self, product_id):
+        key = app.config['BOOK_IMPORT_CART_KEY']
+        cart = session.get(key)
+
+        if cart and product_id in cart:
+            cart[product_id]['so_luong']=int(request.json['so_luong'])
+
+        session[key] = cart
+
+        print(cart)
+
+        return jsonify({})
+
+    @expose('/api/cart/<product_id>', methods=["delete"])
+    def delete_cart(self, product_id):
+        key = app.config['BOOK_IMPORT_CART_KEY']
+        cart = session.get(key)
+
+        if cart and product_id in cart:
+            del cart[product_id]
+
+        session[key] = cart
+        return jsonify(cart)
+
+    @expose('/create', methods=["POST"])
     def create_invoice(self):
-        # Lấy dữ liệu từ form
-        books_data = request.form.get("books_data")
-        if not books_data:
-            flash("Danh sách sách trống!", "error")
-            return redirect(url_for(".index"))
+        key = app.config['BOOK_IMPORT_CART_KEY']
+        cart = session[key] if key in session else {}
+        if not cart:
+            flash("Hoá đơn RỖNG!!!", "error")
+            return redirect('/admin/nhapphieuview')
 
-        try:
-            books = json.loads(books_data)
+        sl_nhap_min = get_quydinh_by_id(1).gia_tri
+        sl_min_to_nhap = get_quydinh_by_id(2).gia_tri
+        # kiểm tra điều kiện đặt hàng
+        for c in cart.values():
+            if c['so_luong']<sl_nhap_min:
+                flash(f"sách {c['ten_sach']} có số lượng nhỏ hơn {sl_nhap_min}", "error")
+                return redirect('/admin/nhapphieuview')
 
-            # Tạo phiếu nhập mới
-            phieu_nhap = PhieuNhapSach(quan_ly_kho_id=current_user.get_id())
-            db.session.add(phieu_nhap)
-            db.session.commit()
+        phieu_nhap = PhieuNhapSach(quan_ly_kho_id=current_user.get_id())
+        db.session.add(phieu_nhap)
 
-            # Thêm sách vào phiếu nhập
-            for book in books:
-                sach = Sach.query.filter_by(ten_sach=book["ten_sach"]).first()
-                if sach:
-                    chi_tiet = ChiTietPhieuNhapSach(
-                        phieu_nhap_sach_id=phieu_nhap.id,
-                        sach_id=sach.id,
-                        so_luong=book["so_luong"]
-                    )
-                    soluongconlai = get_so_luong_cuon_con_lai(sach.id)
-                    if (soluongconlai >= 300):
-                        pass
-                    else:
-                        add_so_luong(so_luong=book["so_luong"], sach_id=sach.id)
+        for c in cart.values():
+            sach = Sach.query.get(int(c['id']))  # Lấy đối tượng sach từ cơ sở dữ liệu
+            if sach:  # Kiểm tra xem sach có tồn tại không
+                chi_tiet = ChiTietPhieuNhapSach(phieu_nhap_sach_id=phieu_nhap.id,
+                                                sach_id=sach.id,
+                                                so_luong=c['so_luong'])
+                db.session.add(chi_tiet)
+                add_so_luong(so_luong=c['so_luong'],sach_id= int(c['id']))
 
-                    db.session.add(chi_tiet)
-
-            db.session.commit()
-            flash("Tạo phiếu nhập sách thành công!", "success")
-        except Exception as e:
-            db.session.rollback()
-            flash(f"Đã xảy ra lỗi: {e}", "error")
-
-        return redirect(url_for(".index"))
+        db.session.commit()
+        key_to_delete = app.config['BOOK_IMPORT_CART_KEY']
+        session.pop(key_to_delete, None)
+        flash("Tạo phiếu thành công!!!", "success")
+        return redirect('/admin/nhapphieuview')
 
 
 class PhuongThucThanhToanView(AuthenticatedView):

@@ -561,3 +561,6 @@ def get_id_the_loai(name):
         if the_loai:
             return the_loai.id
     return None
+
+def get_quydinh_by_id(id):
+    return QuyDinh.query.get(id)

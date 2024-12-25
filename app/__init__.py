@@ -18,6 +18,7 @@ app.config['BABEL_DEFAULT_LOCALE'] = 'vi'  # Đặt ngôn ngữ mặc định l�
 app.config["PAGE_SIZE"] = 6
 app.config['DEBUG'] = True
 app.config['CART_KEY'] = 'cart'
+app.config['BOOK_IMPORT_CART_KEY'] = 'book_import_cart'
 
 
 # VNPAY thông tin cấu hình
