@@ -50,13 +50,13 @@
             </p>
             <form action="/payment/">
                 <input type="submit" value="Tạo đơn ONLINE" class="plus button ís-form"
-                       {% if not current_user.is_authenticated %} disabled {% endif %}/>
+       {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %} disabled {% endif %}/>
             </form>
              <form action="/payment_offline/">
                 <input type="submit" value="Tạo đơn OFFLINE" class="plus button ís-form"
-                       {% if not current_user.is_authenticated %} disabled {% endif %}/>
+                       {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %} disabled {% endif %}/>
             </form>
-            {% if not current_user.is_authenticated %}
+            {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %}
             <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> bằng tài khoản KHÁCH HÀNG.</p>
             {% endif %}
         </div>

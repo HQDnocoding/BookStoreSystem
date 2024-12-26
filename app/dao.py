@@ -571,3 +571,9 @@ def get_id_the_loai(name):
         if the_loai:
             return the_loai.id
     return None
+
+def get_quydinh_by_id(id):
+    return QuyDinh.query.get(id)
+
+def get_quy_dinh(ten_quy_dinh):
+    return QuyDinh.query.filter_by(ten_quy_dinh=ten_quy_dinh).first()

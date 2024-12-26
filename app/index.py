@@ -11,13 +11,14 @@ from flask import render_template, redirect, request, session, jsonify
 from sqlalchemy.sql.sqltypes import NullType
 
 from app import app, login, utils, VNPAY_MERCHANT_ID, VNPAY_RETURN_URL, VNPAY_API_KEY, VNPAY_PAYMENT_URL, PayingMethod, \
-    Status
+    Status, Rule
 from app.admin import *
 import app.dao as dao
 from app import Role
 from flask_login import login_user, logout_user, current_user
 from enum import Enum
 
+from app.decorators import customer_login_required
 from app.utils import cart_stats, check_if_expire_orders, update_so_luong_by_ct_don_hang
 
 
@@ -270,12 +271,13 @@ def common_attr():
 
 
 @app.route('/orders/', methods=['get'])
-@login_required
+@customer_login_required
 def orders():
     check_if_expire_orders(current_user.get_id())
 
     page_size = 10
     page = request.args.get('page', 1)
+    expire_hours = get_quy_dinh(Rule.OUT_OF_TIME_TO_PAY.value).gia_tri
 
     don_hangs = get_order_by_user_id(current_user.get_id(), page, page_size)
     counter = utils.count_orders(current_user.get_id())
@@ -290,7 +292,7 @@ def orders():
                 "total_price": get_order_total_price_by_id(o.id)
             })
 
-    return render_template('orders_view.html', orders=order_json, pages=math.ceil(counter / page_size))
+    return render_template('orders_view.html', orders=order_json, pages=math.ceil(counter / page_size),eh = expire_hours)
 
 
 @app.route('/order_details/<int:order_id>', methods=['get'])
@@ -301,6 +303,7 @@ def order_details(order_id):
 
     total_amount = get_order_total_price_by_id(order_id)
     order_status = get_trang_thai_by_id(don_hang.trang_thai_id).ten_trang_thai
+    order_paying_method = get_phuong_thuc_by_id(don_hang.phuong_thuc_id).ten_phuong_thuc
 
     sachs = []
 
@@ -320,7 +323,7 @@ def order_details(order_id):
     print(order_details)
 
     return render_template('order_details.html', order=don_hang, order_details=order_details, total_amount=total_amount,
-                           trang_thai=order_status)
+                           trang_thai=order_status,paying_method = order_paying_method)
 
 
 # class vnpay để thanh toán online code mẫu dijango của VNPAY
@@ -474,6 +477,10 @@ def process_payment_in_order_details():
 
     session['order_id'] = order_id
     total_amount = get_order_total_price_by_id(order_id)
+
+    order = get_order_by_order_id(order_id)
+    if get_trang_thai_by_id(order.trang_thai_id).ten_trang_thai.__eq__(Status.FAIL.value) or get_trang_thai_by_id(order.trang_thai_id).ten_trang_thai.__eq__(Status.PAID.value) or get_phuong_thuc_by_id(order.phuong_thuc_id).__eq__( PayingMethod.OFFLINE_PAY.value):
+        return "<h1>Error can't create a payment with this order !</h1>"
 
     ####################################
     vnp = vnpay()

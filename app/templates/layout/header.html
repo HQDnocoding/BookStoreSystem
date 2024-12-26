@@ -1,13 +1,13 @@
 <header id="header"
-        class="bsb-tpl-bg-50 sticky-top bsb-spacer-top-3 bsb-spacer-top-md-5 bsb-spacer-top-xl-6 bsb-tpl-header-sticky bsb-tpl-header-sticky-animation fw-bold">
-
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
+        class="bsb-tpl-bg-50 sticky-top bsb-spacer-top-3 bsb-spacer-top-md-5 bsb-spacer-top-xl-6 bsb-tpl-header-sticky bsb-tpl-header-sticky-animation fw-bold"  >
+<div style="background-color: #ffd342">
+    <div class="container"  >
+        <div class="row" >
+            <div class="col-12" >
                 <!-- Navbar 1 - Bootstrap Brain Component -->
                 <nav class="navbar navbar-expand-lg bsb-navbar bsb-navbar-hover bsb-navbar-caret bsb-tpl-navbar-sticky bg-white border border-dark px-xl-3"
-                     data-bsb-sticky-target="#header">
-                    <div class="container">
+                     data-bsb-sticky-target="#header"  >
+                    <div class="container" style="background-color: #ffd342">
                         <a class="navbar-brand" href="/">
                             <img src="https://res.cloudinary.com/dmbvjjg5a/image/upload/v1733314021/rb_2149325326_fzgk1t.png"
                                  style="width: 100px; height: auto;" alt="Logo">
@@ -21,13 +21,13 @@
                             </svg>
                         </button>
                         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
-                             aria-labelledby="offcanvasNavbarLabel">
-                            <div class="offcanvas-header">
+                             aria-labelledby="offcanvasNavbarLabel" >
+                            <div class="offcanvas-header" >
                                 <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
                                         aria-label="Close"></button>
                             </div>
-                            <div class="offcanvas-body">
+                            <div class="offcanvas-body"  >
                                 <ul class="navbar-nav justify-content-end flex-grow-1">
                                     <li class="nav-item">
                                         <a class="nav-link active" aria-current="page" href="/">Home</a>
@@ -41,7 +41,9 @@
                                         </ul>
                                     </li>
                                     <li class="nav-item">
+                                        {% if current_user.is_authenticated and current_user.vai_tro_id == 4 %}
                                         <a class="nav-link" href="/orders">Đơn hàng</a>
+                                        {% endif %}
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" href="/cart"><i class="fas fa-shopping-cart"></i>
@@ -99,5 +101,6 @@
             </div>
         </div>
     </div>
+</div>
 
 </header>
