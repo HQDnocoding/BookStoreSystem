@@ -199,7 +199,24 @@ def filter_genre():
 @app.route('/books/<int:sach_id>')
 def details(sach_id):
     sach = Sach.query.get(sach_id)
-    return render_template('book_details.html', sach=sach)
+    return render_template('book_details.html', sach=sach, comments=dao.load_comments(sach_id))
+
+
+@app.route('/api/books/<int:sach_id>/comments', methods=['post'])
+def add_comment(sach_id):
+    content = request.json.get('content')
+
+    c = dao.create_comment(content, sach_id, current_user)
+
+    return jsonify({
+        'content': c.content,
+        'ngay_tao': c.ngay_tao,
+        'user': {
+            'avatar': c.user.avatar,
+            'ho': c.user.ho,
+            'ten': c.user.ten,
+        }
+    })
 
 
 @app.route('/cart/')

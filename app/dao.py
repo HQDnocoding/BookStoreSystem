@@ -12,7 +12,7 @@ from sqlalchemy.sql.operators import desc_op
 
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, \
     Sach, ChiTietDonHang, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
-    ThongTinNhanHang
+    ThongTinNhanHang, Comment
 from app import db, admin, app, Status, Rule, PayingMethod
 import hashlib
 
@@ -124,6 +124,14 @@ def create_chitietdonhang(don_hang_id, sach_id, so_luong, tong_tien):
                                         tong_tien=tong_tien)
     db.session.add(new_chitietdonhang)
     db.session.commit()
+
+
+def create_comment(content, sach_id, user):
+    c = Comment(content=content, sach_id=sach_id, user=user)
+    db.session.add(c)
+    db.session.commit()
+
+    return c
 
 
 def get_role_name_by_role_id(role_id):
@@ -585,3 +593,6 @@ def get_quydinh_by_id(id):
 
 def get_quy_dinh(ten_quy_dinh):
     return QuyDinh.query.filter_by(ten_quy_dinh=ten_quy_dinh).first()
+
+def load_comments(product_id):
+    return Comment.query.filter(Comment.sach_id.__eq__(product_id)).order_by(-Comment.id).all()

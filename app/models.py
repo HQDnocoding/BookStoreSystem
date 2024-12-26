@@ -68,9 +68,11 @@ class User(db.Model, UserMixin):
     ngay_tao = Column(DateTime, nullable=False, default=datetime.now())
     avatar = Column(String(225))
     vai_tro_id = Column(Integer, ForeignKey(VaiTro.id), nullable=False)
+
     phieu_nhap_sach = relationship('PhieuNhapSach', backref='user', lazy=True)
     don_hang_kh = relationship('DonHang', backref='khach_hang', foreign_keys='DonHang.khach_hang_id', lazy=True)
     don_hang_nv=relationship('DonHang',backref='nhan_vien', foreign_keys='DonHang.nhan_vien_id',lazy=True)
+    comments = relationship('Comment', backref='user', lazy=True)
     # hoa_don_ban_sach=relationship('HoaDonBanSach',backref='user',lazy=True)
     def __str__(self):
         return self.ten
@@ -96,8 +98,9 @@ class Sach(db.Model):
     tac_gia_id = Column(Integer, ForeignKey(TacGia.id), nullable=False)
 
     # hoa_don_ban_sach = relationship('ChiTietHoaDon', backref='sach')
-    phieu_nhap_sach = relationship('ChiTietPhieuNhapSach', backref='sach')
-    don_hang = relationship('ChiTietDonHang', backref='sach')
+    phieu_nhap_sach = relationship('ChiTietPhieuNhapSach', backref='sach', lazy=True)
+    don_hang = relationship('ChiTietDonHang', backref='sach', lazy=True)
+    comments = relationship('Comment', backref='sach', lazy=True)
 
     def __str__(self):
         return self.ten_sach
@@ -155,7 +158,7 @@ class ThongTinNhanHang(db.Model):
     dia_chi_nhan_hang = Column(String(225), nullable=False)
 
 
-class   ChiTietDonHang(db.Model):
+class ChiTietDonHang(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
 
     don_hang_id = Column(Integer, ForeignKey(DonHang.id),
@@ -170,6 +173,13 @@ class   ChiTietDonHang(db.Model):
     )
 
 
+class Comment(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(Text,nullable=False)
+
+    user_id = Column(Integer, ForeignKey(User.id, ondelete='CASCADE'), nullable = False)
+    sach_id = Column(Integer, ForeignKey(Sach.id, ondelete='CASCADE'), nullable = False)
+    ngay_tao = Column(DateTime, default=datetime.now())
 
 
 if __name__ == "__main__":
