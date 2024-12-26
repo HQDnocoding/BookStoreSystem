@@ -559,6 +559,7 @@ class SachView(AuthenticatedView):
                 upload_result = cloudinary.uploader.upload(os.path.join('upload/bia_sach', file_data.filename), folder="upload/bia_sach")
                 print(upload_result.get('secure_url') )
                 model.bia_sach = upload_result.get('secure_url')  # Lưu URL vào model
+                os.remove(os.path.join('upload/bia_sach', file_data.filename))
             except Exception as e:
 
                 raise ValueError(f"Lỗi khi upload hình ảnh: {e} {model.bia_sach}")
