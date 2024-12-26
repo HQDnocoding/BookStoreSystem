@@ -217,19 +217,30 @@ def add_to_cart():
 
     key = app.config['CART_KEY']
     cart = session[key] if key in session else {}
+
     if id in cart:
+        if cart[id]['so_luong']+so_luong_moi > data['so_luong_con_lai']:
+            response = utils.cart_stats(cart=cart)
+            response['alert'] = " KHÔNG đủ sách để mua "
+            return jsonify(response)
         cart[id]['so_luong'] += so_luong_moi
     else:
+        if so_luong_moi > data['so_luong_con_lai']:
+            response = utils.cart_stats(cart=cart)
+            response['alert'] = " Đã HẾT sách."
+            return jsonify(response)
         ten_sach = data['ten_sach']
         don_gia = data['don_gia']
         bia_sach = data['bia_sach']
+        so_luong_con_lai = data['so_luong_con_lai']
 
         cart[id] = {
             "id": id,
             "ten_sach": ten_sach,
             "don_gia": don_gia,
             "so_luong": so_luong_moi,
-            "bia_sach": bia_sach
+            "bia_sach": bia_sach,
+            "so_luong_con_lai": so_luong_con_lai
         }
 
     session[key] = cart
@@ -238,11 +249,19 @@ def add_to_cart():
 
 @app.route('/api/cart/<product_id>', methods=['put'])
 def update_cart(product_id):
+    data = request.json
     key = app.config['CART_KEY']
     cart = session.get(key)
 
     if cart and product_id in cart:
-        cart[product_id]['so_luong'] = int(request.json['so_luong'])
+
+        if int(data['so_luong']) > cart[product_id]['so_luong_con_lai']:
+            response = utils.cart_stats(cart=cart)
+            response['old_quantity'] = cart[product_id]['so_luong']
+            response['p_id'] = product_id
+            return jsonify(response)
+
+        cart[product_id]['so_luong'] = int(data['so_luong'])
 
     session[key] = cart
 
