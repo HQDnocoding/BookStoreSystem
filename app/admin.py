@@ -466,7 +466,7 @@ class SachForm(Form):
     new_tac_gia = StringField('Tác giả mới (nếu không có)')
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
     new_the_loai = StringField('Thể loại mới (nếu không có)')
-    bia_sach = FileUploadField('Bìa sách', validators=[
+    bia_sach = FileUploadField('Bìa sách',base_path='upload/bia_sach', validators=[
         DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
 
 
@@ -547,22 +547,26 @@ class SachView(AuthenticatedView):
             model.the_loai_id = form.the_loai_id.data
 
         file_data = form.bia_sach.data
-        if file_data and hasattr(file_data, 'content_type'):  # Kiểm tra nếu là file hợp lệ
+
+
+        if file_data and hasattr(file_data, 'content_type') and hasattr(file_data, 'filename'):  # Kiểm tra nếu là file hợp lệ
             # Kiểm tra loại file
             if not file_data.content_type.startswith("image/"):
                 raise ValueError("Chỉ được upload hình ảnh (JPEG, PNG, GIF, v.v.)")
 
             # Upload lên Cloudinary
             try:
-                upload_result = cloudinary.uploader.upload(file_data, folder="upload/bia_sach")
+                upload_result = cloudinary.uploader.upload(os.path.join('upload/bia_sach', file_data.filename), folder="upload/bia_sach")
+                print(upload_result.get('secure_url') )
                 model.bia_sach = upload_result.get('secure_url')  # Lưu URL vào model
             except Exception as e:
-                raise ValueError(f"Lỗi khi upload hình ảnh: {e}")
+
+                raise ValueError(f"Lỗi khi upload hình ảnh: {e} {model.bia_sach}")
         elif isinstance(file_data, str):
             # Nếu file_data là chuỗi (URL cũ), giữ nguyên giá trị
             model.bia_sach = file_data
         else:
-            model.bia_sach = None  # Không có hình ảnh
+            model.bia_sach = model.bia_sach  # Không có hình ảnh
 
         return super().on_model_change(form, model, is_created)
 

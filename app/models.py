@@ -102,30 +102,6 @@ class Sach(db.Model):
     def __str__(self):
         return self.ten_sach
 
-# class ChiTietHoaDon(db.Model):
-#     sach_id = Column(ForeignKey(Sach.id), primary_key=True)
-#     hoa_don_id = Column(ForeignKey(HoaDonBanSach.id), primary_key=True)
-#     so_luong = Column(Integer, nullable=False)
-#     tong_tien = Column(Float, nullable=False)
-
-
-# class SoLuongCuonConLai(db.Model):
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     so_luong = Column(Integer, nullable=False)
-#     thoi_diem = Column(DateTime, nullable=False, default=datetime.now())
-#
-#     sach_id = Column(Integer, ForeignKey(Sach.id), nullable=False)
-#
-#     def __int__(self):
-#         return self.so_luong
-
-
-# class ChiTietChinhSuaQuyDinh(db.Model):
-#     quy_dinh_id=Column(Integer,ForeignKey(QuyDinh.id),primary_key=True)
-#     user_id=Column(Integer,ForeignKey(User.id),primary_key=True)
-#
-#     thoi_diem_chinh_sua=Column  (DateTime,nullable=False,default=datetime.now())
-
 
 class PhieuNhapSach(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -138,12 +114,16 @@ class PhieuNhapSach(db.Model):
          return self.id
 
 class ChiTietPhieuNhapSach(db.Model):
-    phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id, ondelete='CASCADE'),
-                                primary_key=True)
-    sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
+    id= Column(Integer, primary_key=True, autoincrement=True)
+    phieu_nhap_sach_id = Column(Integer, ForeignKey(PhieuNhapSach.id, ondelete='CASCADE'),)
+    sach_id = Column(Integer, ForeignKey(Sach.id))
 
     so_luong = Column(Integer, nullable=False)
 
+
+    __table_args__ = (
+        UniqueConstraint('sach_id', 'phieu_nhap_sach_id', name='uix_sach_phieunhap'),
+    )
 
 
 
@@ -176,14 +156,18 @@ class ThongTinNhanHang(db.Model):
 
 
 class   ChiTietDonHang(db.Model):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
     don_hang_id = Column(Integer, ForeignKey(DonHang.id),
-                         primary_key=True)
-    sach_id = Column(Integer, ForeignKey(Sach.id), primary_key=True)
+                        )
+    sach_id = Column(Integer, ForeignKey(Sach.id))
 
     so_luong = Column(Integer, nullable=False, default=0)
     tong_tien = Column(Integer, nullable=False, default=0)
 
-
+    __table_args__ = (
+        UniqueConstraint('sach_id', 'don_hang_id', name='uix_sach_donhang'),
+    )
 
 
 
