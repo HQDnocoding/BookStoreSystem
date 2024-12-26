@@ -139,3 +139,43 @@ form button:hover {
     margin-top: 1rem; /* Khoảng cách giữa nút và phần nội dung */
 }
 
+
+/* Thiết lập tổng thể cho phần phân trang */
+.navigation {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Căn giữa các phần tử trong phân trang */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+}
+
+/* Định dạng các nút phân trang */
+.page-numbers {
+    text-decoration: none;
+    color: #007bff; /* Màu xanh dương cho các số trang */
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Thêm hiệu ứng hover */
+.page-numbers:hover {
+    background-color: #007bff; /* Đổi màu nền khi hover */
+    color: white; /* Đổi màu chữ khi hover */
+}
+
+/* Định dạng các nút điều hướng trái và phải */
+.d-flex svg {
+    fill: #007bff;
+    transition: fill 0.3s;
+}
+
+/* Thay đổi màu icon
+

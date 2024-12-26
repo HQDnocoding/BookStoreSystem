@@ -22,9 +22,15 @@
                 <p>
                     <strong>Số lượng:</strong> {{sach.so_luong}}
                 </p>
+                {%if sach.nam_phat_hanh != None%}
                 <p>
                     <strong>Năm phát hành:</strong> {{sach.nam_phat_hanh}}
                 </p>
+                {%else%}
+                 <p>
+                    <strong>Năm phát hành:</strong> Không có thông tin
+                </p>
+                {%endif%}
                 <p>
                     {{sach.noi_dung}}
                 </p>

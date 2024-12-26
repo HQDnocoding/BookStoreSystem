@@ -27,8 +27,7 @@
         {%else%}
         {%if count>0%}
         <strong class="text-succes">Đã tìm thấy {{count}} kết quả phù hợp</strong>
-        {%else%}
-        <strong class="text-danger">Không có kết quả phù hợp</strong>
+
         {%endif%}
          {%endif%}
 
@@ -68,7 +67,7 @@
     </div>
     {% endfor %}
     {% else %}
-    <div class="alert alert-info mt-1">Không có sản phẩm nào!</div>
+    <div class="alert alert-info mt-5">Không có sản phẩm nào!</div>
     {% endif %}
 </div>
 
@@ -77,14 +76,19 @@
 
 <nav class="navigation paging-navigation text-center padding-medium" role="navigation">
     <div class="pagination loop-pagination d-flex justify-content-center align-items-center">
+        <!-- Nút "Trái" -->
         <a href="#" class="d-flex pe-2">
             <svg width="24" height="24">
                 <use xlink:href="#angle-left"></use>
             </svg>
         </a>
+
+        <!-- Lặp qua các trang -->
         {% for i in range(1, pages + 1) %}
-        <a class="page-numbers pe-3" href="/shop/?kw={{ kw }}&page={{i}}">{{i}}</a>
+            <a class="page-numbers pe-3 {% if i == current_page %}current{% endif %}" href="?kw={{ kw }}&page={{i}}&sort_by={{sort_by}}">{{i}}</a>
         {% endfor %}
+
+        <!-- Nút "Phải" -->
         <a href="#" class="d-flex ps-2">
             <svg width="24" height="24">
                 <use xlink:href="#angle-right"></use>
@@ -92,6 +96,7 @@
         </a>
     </div>
 </nav>
+
 
 
 

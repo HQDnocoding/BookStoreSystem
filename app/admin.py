@@ -462,6 +462,7 @@ class SachForm(Form):
     ten_sach = StringField('Tên sách', validators=[DataRequired()])
     don_gia = StringField('Đơn giá', validators=[DataRequired()])
     noi_dung = StringField('Nội dung', validators=[DataRequired()])
+    nam_phat_hanh=StringField('Năm phát hành')
     tac_gia_id = SelectField('Tác giả', coerce=int, validators=[DataRequired()])
     new_tac_gia = StringField('Tác giả mới (nếu không có)')
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
@@ -506,6 +507,7 @@ class SachView(AuthenticatedView):
         'tac_gia_id': 'Tác giả',
         'the_loai_id': 'Thể loại',
         'so_luong': 'Số lượng',
+        'nam_phat_hanh':"Năm phát hành"
     }
 
     column_formatters_detail = {
@@ -568,6 +570,11 @@ class SachView(AuthenticatedView):
             model.bia_sach = file_data
         else:
             model.bia_sach = model.bia_sach  # Không có hình ảnh
+
+        if form.nam_phat_hanh.data:
+            model.nam_phat_hanh=form.nam_phat_hanh.data
+        else:
+            model.nam_phat_hanh=None
 
         return super().on_model_change(form, model, is_created)
 
