@@ -244,3 +244,48 @@ def update_so_luong_by_ct_don_hang(ct_don_hang):
         s.so_luong -= ct.so_luong
 
     db.session.commit()
+
+
+
+def create_pdf_export_nhap_sach(data, file_name):
+
+    pdf = canvas.Canvas(file_name, pagesize=letter)
+    pdf.setFont("DejaVuSans", 12)
+    width, height = letter
+
+    # Dữ liệu bảng
+    table_data = [["PHIẾU NHẬP SÁCH", "", "", "", ""]]  # Tiêu đề gộp 5 cột
+    current_date = datetime.now().strftime("%d/%m/%Y")  # Lấy ngày hiện tại
+    table_data.append([f"Ngày nhập: {current_date}", "", "", "", ""])  # Ngày nhập gộp 5 cột
+    table_data.append(["STT", "Sách", "Thể loại", "Tác giả", "Số lượng"])
+
+    if data:  # Kiểm tra xem data có dữ liệu không
+        for idx, row in enumerate(data, start=1):
+            if len(row) >= 4:  # Đảm bảo mỗi hàng đủ số cột
+                table_data.append([
+                    idx,
+                    row[0],
+                    row[1],
+                    row[2],
+                    row[3]  # Chuyển Decimal sang float nếu cần
+                ])
+
+    # Tạo bảng
+    table = Table(table_data, colWidths=[50, 150, 150, 100, 100])
+    table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'DejaVuSans'),
+        ('FONTSIZE', (0, 0), (-1, -1), 12),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('SPAN', (0, 0), (4, 0)),
+        ('SPAN', (0, 1), (4, 1)),
+        ('WORDRAP', (0, 0), (-1, -1), 'CJK'),
+    ]))
+
+    # Vẽ bảng vào PDF
+    table.wrapOn(pdf, width, height)
+    table.drawOn(pdf, 50, height - 250)
+
+    # Lưu file PDF
+    pdf.save()

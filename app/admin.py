@@ -782,19 +782,37 @@ class NhapPhieuView(AuthenticatedQuanLyKhoViewBV):
         phieu_nhap = PhieuNhapSach(quan_ly_kho_id=current_user.get_id())
         db.session.add(phieu_nhap)
 
+        data = []  # Tạo danh sách trống để lưu thông tin sách
+
         for c in cart.values():
             sach = Sach.query.get(int(c['id']))  # Lấy đối tượng sach từ cơ sở dữ liệu
             if sach:  # Kiểm tra xem sach có tồn tại không
-                chi_tiet = ChiTietPhieuNhapSach(phieu_nhap_sach_id=phieu_nhap.id,
-                                                sach_id=sach.id,
-                                                so_luong=c['so_luong'])
-                db.session.add(chi_tiet)
-                add_so_luong(so_luong=c['so_luong'],sach_id= int(c['id']))
+                # Thêm thông tin sách vào data
+                data.append([sach.ten_sach, sach.the_loai.ten_the_loai,
+                             sach.tac_gia.ten_tac_gia, c['so_luong']])  # Chuyển Decimal thành float nếu cần
 
+                # Lưu chi tiết phiếu nhập sách vào cơ sở dữ liệu
+                chi_tiet = ChiTietPhieuNhapSach(
+                    phieu_nhap_sach_id=phieu_nhap.id,
+                    sach_id=sach.id,
+                    so_luong=c['so_luong']
+                )
+                db.session.add(chi_tiet)
+                add_so_luong(so_luong=c['so_luong'], sach_id=int(c['id']))
+
+        print(data)
         db.session.commit()
         key_to_delete = app.config['BOOK_IMPORT_CART_KEY']
         session.pop(key_to_delete, None)
         flash("Tạo phiếu thành công!!!", "success")
+
+        #in file
+        output_dir="phieu nhap sach"
+        os.makedirs(output_dir, exist_ok=True)
+        output_filename = os.path.join(output_dir, f"Phieu_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
+
+        utils.create_pdf_export_nhap_sach(data, output_filename)
+
         return redirect('/admin/nhapphieuview')
 
 
