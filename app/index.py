@@ -150,24 +150,27 @@ def profile():
 def shopping(cate):
     the_loai = dao.get_the_loai()
     kw = request.args.get('kw', '')
-    page = request.args.get('page', 1)
-    print(cate)
+
+    sort=False if kw else True
+
+
+
+    print(f"kw: {kw}")
+    page = request.args.get('page', 1, type=int)
+    sort_by = request.args.get('sort_by', '')
     if cate is not None:
         the_loai_id = dao.get_id_the_loai(cate)
-
-        prods = dao.load_products(cate_id=the_loai_id, kw=kw, page=int(page))
-        page_size = app.config.get('PAGE_SIZE', 2)
+        prods = dao.load_products(cate_id=the_loai_id, kw=kw, page=page, sort_by=sort_by)
         total = dao.count_sach(kw=kw, the_loai_id=the_loai_id)
-
-        return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai, kw=kw,
-                               the_loais=the_loai)
-
     else:
-        prods = dao.load_products(kw=kw, page=int(page))
-        page_size = app.config.get('PAGE_SIZE', 2)
+        prods = dao.load_products(kw=kw, page=page, sort_by=sort_by)
         total = dao.count_sach(kw=kw)
-        return render_template('shop.html', products=prods, pages=math.ceil(total / page_size), cates=the_loai, kw=kw,
-                               the_loais=the_loai)
+
+
+    page_size = app.config.get('PAGE_SIZE', 2)
+    return render_template('shop.html', products=prods, pages=math.ceil(total / page_size),
+                           cates=the_loai, kw=kw, sort_by=sort_by, the_loais=the_loai, count=total,sort=sort)
+
 
 
 @app.route('/search/')
@@ -538,7 +541,12 @@ def payment_succeed():
 def payment_failed():
     return render_template('payment_failed.html')
 
+def format_price(price):
+    return f"{price:,.0f}".replace(",", ".")
 
+@app.template_filter('format_price')
+def format_price_filter(price):
+    return format_price(price)
 if __name__ == "__main__":
     with app.app_context():
         app.run(debug=True, port=5001)

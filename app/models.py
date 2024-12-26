@@ -89,7 +89,7 @@ class Sach(db.Model):
     don_gia = Column(Float, nullable=False)
     bia_sach = Column(String(225))
     noi_dung=Column(Text,nullable=True)
-    # ngay_xuat_ban=Column(Date,nullable=True)
+    nam_phat_hanh=Column(Integer,nullable=True)
     so_luong = Column(Integer, default=0)
 
     the_loai_id = Column(Integer, ForeignKey(TheLoai.id), nullable=False)
@@ -190,7 +190,7 @@ class   ChiTietDonHang(db.Model):
 
 if __name__ == "__main__":
     with my_app.app_context():
-        
+
         # db.drop_all()
         # db.create_all()
 
@@ -230,13 +230,13 @@ if __name__ == "__main__":
         # qd3=QuyDinh(ten_quy_dinh=ten_qd3,noi_dung='Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán',gia_tri=48)
         #
         # db.session.add_all([qd1,qd2,qd3])
-
-        admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
-        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=3)
-        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=2)
-        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
         #
-        db.session.add_all([admin,nhan_vien,qlk,u])
+        # admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
+        # nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=3)
+        # qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=2)
+        # u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
+        # #
+        # db.session.add_all([admin,nhan_vien,qlk,u])
 
         #
 

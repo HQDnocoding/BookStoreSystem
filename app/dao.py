@@ -279,14 +279,24 @@ def get_the_loai():
     return TheLoai.query.order_by('id').all()
 
 
-def load_products(cate_id=None, kw=None, page=1):
-    query = Sach.query.order_by(Sach.id.desc())
+def load_products(cate_id=None, kw=None,sort_by=None, page=1):
+    query = Sach.query
 
     if kw:
         query = query.filter(Sach.ten_sach.contains(kw))
 
     if cate_id:
         query = query.filter(Sach.the_loai_id == cate_id)
+
+    if sort_by == 'price_asc':
+        query = query.order_by(Sach.don_gia.asc())
+    elif sort_by == 'price_desc':
+        query = query.order_by(Sach.don_gia.desc())
+        print(query)
+    elif sort_by == 'newest':
+        query = query.order_by(Sach.nam_phat_hanh.desc())
+    elif sort_by == 'oldest':
+        query = query.order_by(Sach.nam_phat_hanh.asc())
 
     page_size = app.config.get('PAGE_SIZE')
     start = (page - 1) * page_size

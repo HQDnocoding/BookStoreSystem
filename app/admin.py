@@ -28,7 +28,7 @@ from flask_login import current_user, logout_user, UserMixin, login_required
 from flask import redirect, g, request, flash, url_for, session, jsonify, send_file
 from app.models import VaiTro
 from wtforms import StringField, SelectField, FileField, Form
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 from flask_wtf.file import FileAllowed
 from markupsafe import Markup
 
@@ -323,6 +323,7 @@ class Cashier2View(AuthenticatedNhanVienView):
             flash(f"Lỗi: {e}", "error")
             return jsonify({"error": str(e)}), 500
 
+
 class RevenueStatsView(AuthenticatedStatsView):
     @expose("/")
     def index(self):
@@ -348,23 +349,24 @@ class RevenueStatsView(AuthenticatedStatsView):
 
         tl = get_the_loai()
 
-        return self.render("admin/revenue-stats.html", stats=stats, tl=tl, current_year=current_year, thang=thang,nam=nam,the_loai=the_loai)
+        return self.render("admin/revenue-stats.html", stats=stats, tl=tl, current_year=current_year, thang=thang,
+                           nam=nam, the_loai=the_loai)
 
-    @expose("/export/",methods=['get'])
+    @expose("/export/", methods=['get'])
     def export(self):
 
         try:
-            thang=session.get('thang_stat_',1)
-            nam=session.get('nam_stat_',2004)
-            the_loai=session.get('ten_the_loai_','Tất cả')
+            thang = session.get('thang_stat_', 1)
+            nam = session.get('nam_stat_', 2004)
+            the_loai = session.get('ten_the_loai_', 'Tất cả')
 
-            stat=get_stats(nam,thang,the_loai)
+            stat = get_stats(nam, thang, the_loai)
 
             output_dir = "bieu mau thong ke doanh thu"
             os.makedirs(output_dir, exist_ok=True)
             output_filename = os.path.join(output_dir, f"tkdt_{datetime.now().strftime('%Y%m%d%H%M%S')}.pdf")
 
-            utils.create_pdf_export_rev(stat,output_filename,thang,nam)
+            utils.create_pdf_export_rev(stat, output_filename, thang, nam)
 
             return send_file(output_filename, as_attachment=True)
 
@@ -462,8 +464,7 @@ class SachForm(Form):
     new_tac_gia = StringField('Tác giả mới (nếu không có)')
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
     new_the_loai = StringField('Thể loại mới (nếu không có)')
-    bia_sach = FileField('Bìa sách', validators=[
-        DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
+    bia_sach = StringField('Bìa sách')
 
 
 class SachView(AuthenticatedView):
@@ -480,9 +481,10 @@ class SachView(AuthenticatedView):
         return form
 
     def edit_form(self, obj):
-        form = super().edit_form(obj)  # Gọi phương thức gốc
-        form.tac_gia_id.choices = [(a.id, a.ten_tac_gia) for a in TacGia.query.all()]  # Thêm danh sách tác giả
-        form.the_loai_id.choices = [(a.id, a.ten_the_loai) for a in TheLoai.query.all()]
+        form = super().edit_form(obj)  # Gọi phương thức gốc để lấy form mặc định
+        form.tac_gia_id.choices = [(a.id, a.ten_tac_gia) for a in TacGia.query.all()]  # Cập nhật danh sách tác giả
+        form.the_loai_id.choices = [(a.id, a.ten_the_loai) for a in TheLoai.query.all()]  # Cập nhật danh sách thể loại
+
 
         return form
 
@@ -504,7 +506,6 @@ class SachView(AuthenticatedView):
         'so_luong': 'Số lượng',
     }
 
-    column_editable_list = ['ten_sach', 'don_gia', 'so_luong']
 
     column_formatters_detail = {
         'bia_sach': lambda v, c, m, p: Markup(
@@ -552,7 +553,9 @@ class SachView(AuthenticatedView):
 
             upload_result = cloudinary.uploader.upload(file_data, folder="upload/bia_sach")
             model.bia_sach = upload_result.get('secure_url')
-
+        else:
+            if not model.bia_sach:
+                flash("Không có thay đổi về bìa sách.", 'info')
         return super().on_model_change(form, model, is_created)
 
 
@@ -766,15 +769,16 @@ class TrangThaiDonHangView(AuthenticatedView):
     }
 
 
+admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
+admin.add_view(UserView(User, db.session, name='Quản lý User'))
 admin.add_view(SachView(Sach, db.session, name='Sách', category='Quản lý sách'))
 admin.add_view(TheLoaiView(TheLoai, db.session, name='Thể loại', category='Quản lý sách'))
 admin.add_view(TacGiaView(TacGia, db.session, name='Tác giả', category='Quản lý sách'))
-admin.add_view(QuyDinhView(QuyDinh, db.session, name='Quy định'))
-admin.add_view(UserView(User, db.session, name='Quản lý User'))
-admin.add_view(VaitroView(VaiTro, db.session, name='Vai trò'))
-admin.add_view(TrangThaiDonHangView(TrangThaiDonHang, db.session, name='Trạng thái đơn hàng'))
 
-admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan, db.session, name='Phương thức thanh toán'))
+admin.add_view(VaitroView(VaiTro, db.session, name='Vai trò', category='Khác'))
+admin.add_view(TrangThaiDonHangView(TrangThaiDonHang, db.session, name='Trạng thái đơn hàng', category='Khác'))
+
+admin.add_view(PhuongThucThanhToanView(PhuongThucThanhToan, db.session, name='Phương thức thanh toán', category='Khác'))
 
 admin.add_view(NhapPhieuView(name="Nhập sách"))
 admin.add_view(XemPhieuNhapSach(PhieuNhapSach, db.session, name="Xem Phiếu Nhập sách", category="XEM PHIẾU NHẬP"))

@@ -16,6 +16,7 @@ def load_sach_from_json(file_path):
             bia_sach=item['bia_sach'],
             noi_dung=item['noi_dung'],
             so_luong=item['so_luong'],
+            nam_phat_hanh=item['nam_phat_hanh'],
             the_loai_id=item['the_loai_id'],
             tac_gia_id=item['tac_gia_id']
         )

@@ -21,8 +21,6 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Tùy chọn: thêm bóng đổ */
 }
 
-
-<style>
     .list-group-item {
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -80,4 +78,64 @@
     display: block;
     margin-top: 0;
 }
-</style>
+
+form select {
+    border-color: #ced4da; /* Màu viền */
+    border-radius: 4px;   /* Bo góc nhẹ */
+    padding: 0.25rem 0.5rem; /* Tăng khoảng cách bên trong */
+    font-size: 0.875rem;  /* Kích thước chữ nhỏ hơn */
+}
+
+
+form label {
+    margin-right: 0.5rem; /* Khoảng cách giữa label và dropdown */
+}
+
+form button {
+    background-color: #007bff; /* Màu xanh Bootstrap */
+    color: #fff;             /* Chữ trắng */
+    border: none;            /* Bỏ viền */
+    border-radius: 4px;      /* Bo góc nhẹ */
+    padding: 0.25rem 0.5rem; /* Kích thước nút nhỏ gọn */
+    transition: background-color 0.3s ease; /* Hiệu ứng hover */
+}
+
+form button:hover {
+    background-color: #0056b3; /* Màu đậm hơn khi hover */
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+     flex-grow: 1;
+     width:300px;
+}
+
+.card-body figure {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.card-body img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card-body figcaption {
+    margin-top: 1rem;
+}
+
+.card-body .btn {
+    margin-top: 1rem; /* Khoảng cách giữa nút và phần nội dung */
+}
+

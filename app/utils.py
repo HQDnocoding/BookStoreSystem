@@ -11,7 +11,6 @@ from reportlab.platypus import TableStyle, Table
 from sqlalchemy.testing.config import db_url
 
 from app import Status, db
-from app.admin import SachForm
 from app.dao import get_trang_thai_by_name, get_sach_by_id
 from app.models import DonHang, User, Sach
 from app.models import DonHang
@@ -170,18 +169,41 @@ def create_pdf_export_freq(data, file_name, month, year):
         pdf.drawString(x + 5, y - 20, header)
         x += col_widths[i]
 
+    # Hàm xử lý xuống dòng tên sách
+    def draw_multiline_text(x, y, text, width, pdf):
+        # Chia nhỏ text thành các dòng nếu dài hơn chiều rộng cột
+        lines = []
+        current_line = ""
+        for word in text.split():
+            if pdf.stringWidth(current_line + word, "Tahoma", 8) < width - 10:
+                current_line += " " + word
+            else:
+                lines.append(current_line)
+                current_line = word
+        lines.append(current_line)  # thêm dòng cuối cùng
+        # Vẽ từng dòng
+        for line in lines:
+            pdf.drawString(x + 5, y, line)
+            y -= 10  # Dịch xuống cho dòng tiếp theo
+
     # Nội dung bảng
+    index=1
     for row in data:
         y -= row_height
         pdf.rect(x_start, y, sum(col_widths), -row_height)  # Vẽ từng hàng
         x = x_start
         for i, cell in enumerate(row):
-            pdf.drawString(x + 5, y - 20, str(cell))
+            if i == 1:  # Cột "Tên sách" xử lý xuống dòng
+                draw_multiline_text(x, y - 15, str(cell), col_widths[i], pdf)
+            elif i==0:
+                pdf.drawString(x + 5, y - 20, str(index))
+                index+=1
+            else:
+                pdf.drawString(x + 5, y - 20, str(cell))
             x += col_widths[i]
 
     # Kết thúc PDF
     pdf.save()
-
 
 def create_pdf_export_rev(data, file_name, month, year):
     pdf = canvas.Canvas(file_name, pagesize=letter)
