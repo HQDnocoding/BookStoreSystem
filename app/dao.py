@@ -13,7 +13,7 @@ from sqlalchemy.sql.operators import desc_op
 from app.models import TheLoai, VaiTro, QuyDinh, TacGia, TrangThaiDonHang, PhuongThucThanhToan, User, \
     Sach, ChiTietDonHang, PhieuNhapSach, ChiTietPhieuNhapSach, DonHang, \
     ThongTinNhanHang
-from app import db, admin, app, Status, Role, PayingMethod
+from app import db, admin, app, Status, Rule, PayingMethod
 import hashlib
 
 locale.setlocale(locale.LC_ALL, 'vi_VN')
@@ -386,15 +386,14 @@ def create_invoice_from_cart():
         for item in cart.values():
             sach = Sach.query.get(int(item['id']))
             if sach.so_luong < item['so_luong']:
-                flash(f"Sách '{sach.ten_sach}' không đủ số lượng",
-                      "error")
+
                 raise ValueError(
                     f"Sách '{sach.ten_sach}' không đủ số lượng")
 
             sach.so_luong -= item['so_luong']
 
             if not sach:
-                flash(f"Không tồn tại sách {item['ten_sach']}",'error')
+
                 raise ValueError(f"Không tìm thấy sách với ID: {item['id']}")
 
             chi_tiet = ChiTietDonHang(
@@ -435,8 +434,17 @@ def create_hoa_don_from_don_hang(don_hang_id):
     try:
         # Lấy thông tin đơn hàng
         don_hang = get_don_hang(don_hang_id)
+        quy_dinh=get_quy_dinh(Rule.OUT_OF_TIME_TO_PAY.value)
         if not don_hang:
             raise ValueError(f"Không tìm thấy đơn hàng với ID {don_hang_id}")
+
+        #Tính thời gian
+        time_diff=datetime.now()-don_hang.ngay_tao_don
+        hours_diff=time_diff.total_seconds()/3600
+
+        if hours_diff >= int(quy_dinh.gia_tri):
+            raise ValueError(f"Thời hạn trả quá {quy_dinh.gia_tri} giờ")
+
 
         # Cập nhật phương thức thanh toán và trạng thái
         pt_tt = get_id_by_phuong_thuc_name(PayingMethod.OFFLINE_PAY.value)

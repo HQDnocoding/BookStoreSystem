@@ -11,8 +11,10 @@ import cloudinary.uploader
 import flask_login
 import wtforms
 from flask_admin import Admin, BaseView, expose
+from flask_admin.form import FileUploadField, Select2Field
 from flask_wtf import FlaskForm
 from unicodedata import category
+from werkzeug.utils import secure_filename
 
 from app.dao import *
 from sqlalchemy import false
@@ -184,7 +186,7 @@ class CashierView(AuthenticatedNhanVienView):
 
     @expose('/cart/cash', methods=['GET'])
     @login_required
-    def cashier(self, **kwargs):
+    def cashier(self):
 
         nv = dao.get_user_by_id(current_user.id)
 
@@ -196,8 +198,7 @@ class CashierView(AuthenticatedNhanVienView):
         ten_kh = "Khách hàng mua tại nhà sách"
 
         cart = session.get('cart_admin', {})
-        print("Cart contents:", cart)
-        print("Cart values:", cart.values())
+
 
         cart_list_dict = []
 
@@ -230,7 +231,8 @@ class CashierView(AuthenticatedNhanVienView):
             flash("Hóa đơn đã được tạo thành công.", "success")
         except Exception as e:
             app.logger.error(f"Lỗi khi tạo hóa đơn: {e}")
-            flash("Đã xảy ra lỗi khi tạo hóa đơn.", "danger")
+            flash(f"Đã xảy ra lỗi khi tạo hóa đơn {e}", "danger")
+            return redirect('/admin/cashierview')
         return redirect('/admin/cashierview')
 
 
@@ -302,8 +304,9 @@ class Cashier2View(AuthenticatedNhanVienView):
     @expose('/don_hang/<int:don_hang_id>', methods=['POST'])
     def create_invoice(self, don_hang_id):
         try:
-            infor, sach = create_hoa_don_from_don_hang(don_hang_id)
-
+            infor, status = create_hoa_don_from_don_hang(don_hang_id)
+            if status==500:
+                return jsonify({"error": infor['error']}), 500
             ten_kh = session.get('ten_kh', '')
             sach_data = session.get('sach_data', [])
 
@@ -320,7 +323,6 @@ class Cashier2View(AuthenticatedNhanVienView):
 
             return jsonify({"path": "/admin/cashier2view"}), 200
         except Exception as e:
-            flash(f"Lỗi: {e}", "error")
             return jsonify({"error": str(e)}), 500
 
 
@@ -464,7 +466,8 @@ class SachForm(Form):
     new_tac_gia = StringField('Tác giả mới (nếu không có)')
     the_loai_id = SelectField('Thể loại', coerce=int, validators=[DataRequired()])
     new_the_loai = StringField('Thể loại mới (nếu không có)')
-    bia_sach = StringField('Bìa sách')
+    bia_sach = FileUploadField('Bìa sách', validators=[
+        DataRequired(), FileAllowed(['jpg', 'jpeg', 'png', 'gif'], "Chỉ được phép upload file hình ảnh!")])
 
 
 class SachView(AuthenticatedView):
@@ -481,10 +484,9 @@ class SachView(AuthenticatedView):
         return form
 
     def edit_form(self, obj):
-        form = super().edit_form(obj)  # Gọi phương thức gốc để lấy form mặc định
-        form.tac_gia_id.choices = [(a.id, a.ten_tac_gia) for a in TacGia.query.all()]  # Cập nhật danh sách tác giả
-        form.the_loai_id.choices = [(a.id, a.ten_the_loai) for a in TheLoai.query.all()]  # Cập nhật danh sách thể loại
-
+        form = super().edit_form(obj)  # Gọi phương thức gốc
+        form.tac_gia_id.choices = [(a.id, a.ten_tac_gia) for a in TacGia.query.all()]  # Thêm danh sách tác giả
+        form.the_loai_id.choices = [(a.id, a.ten_the_loai) for a in TheLoai.query.all()]
 
         return form
 
@@ -505,7 +507,6 @@ class SachView(AuthenticatedView):
         'the_loai_id': 'Thể loại',
         'so_luong': 'Số lượng',
     }
-
 
     column_formatters_detail = {
         'bia_sach': lambda v, c, m, p: Markup(
@@ -546,16 +547,23 @@ class SachView(AuthenticatedView):
             model.the_loai_id = form.the_loai_id.data
 
         file_data = form.bia_sach.data
-        if file_data:
-
+        if file_data and hasattr(file_data, 'content_type'):  # Kiểm tra nếu là file hợp lệ
+            # Kiểm tra loại file
             if not file_data.content_type.startswith("image/"):
                 raise ValueError("Chỉ được upload hình ảnh (JPEG, PNG, GIF, v.v.)")
 
-            upload_result = cloudinary.uploader.upload(file_data, folder="upload/bia_sach")
-            model.bia_sach = upload_result.get('secure_url')
+            # Upload lên Cloudinary
+            try:
+                upload_result = cloudinary.uploader.upload(file_data, folder="upload/bia_sach")
+                model.bia_sach = upload_result.get('secure_url')  # Lưu URL vào model
+            except Exception as e:
+                raise ValueError(f"Lỗi khi upload hình ảnh: {e}")
+        elif isinstance(file_data, str):
+            # Nếu file_data là chuỗi (URL cũ), giữ nguyên giá trị
+            model.bia_sach = file_data
         else:
-            if not model.bia_sach:
-                flash("Không có thay đổi về bìa sách.", 'info')
+            model.bia_sach = None  # Không có hình ảnh
+
         return super().on_model_change(form, model, is_created)
 
 

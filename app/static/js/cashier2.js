@@ -2,7 +2,7 @@
 async function findOrder() {
 
 
-
+set_default()
     const id = document.getElementById('don-hang-id').value;
 
     if (!id) {
@@ -72,7 +72,7 @@ function renderOrderDetails(don_hang_data) {
 }
 
 async function createInvoice(id_don_hang) {
-
+    set_default()
     try {
         const response = await fetch(`/admin/cashier2view/don_hang/${id_don_hang}`, {
             method: 'POST',
@@ -86,12 +86,20 @@ async function createInvoice(id_don_hang) {
             window.location.href = data.path
             alert('Hóa đơn đã được tạo thành công!');
         } else {
-            alert('Đã xảy ra lỗi khi tạo hóa đơn');
+          const errorData = await response.json();
+            alert(`Đã xảy ra lỗi khi tạo hóa đơn ${errorData.error}`);
         }
     } catch (error) {
         console.error('Lỗi khi gọi API:', error);
         alert('Không thể kết nối đến máy chủ');
     }
+}
+
+function set_default(){
+    document.getElementById('amount-paid').value=''
+    document.getElementById('total-price').value=''
+    document.getElementById('change').value=''
+    document.getElementById('btn-pay2').disabled = true
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -163,5 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('change').value = (changeAmount > 0 ? changeAmount.toLocaleString() : '0') + '₫';
         }
     });
+
+
 
 });
