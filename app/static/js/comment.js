@@ -17,7 +17,7 @@ function addComment(sachId) {
                      onError="this.onerror=null; this.src='https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';"/>
                 </div>
                 <div class="col-md-11 col-8">
-                    <p> <strong>${c.user.ho} ${c.user.ten}</strong>   ${c.ngay_tao}</p>
+                    <p> <strong>${c.user.ho} ${c.user.ten}</strong>   ${ moment(c.created_date).locale("vi").fromNow() }</p>
                     <p>${ c.content }</p>
                 </div>
             </div>
