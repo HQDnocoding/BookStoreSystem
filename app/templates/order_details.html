@@ -33,7 +33,7 @@
                 </div>
             </div>
         </div>
-        {% if trang_thai != 'WAITING' %}
+        {% if trang_thai != 'WAITING' or paying_method == 'OFFLINE_PAY' %}
         <div class="form-group text-center">
             <button type="submit" class="btn btn-warning" disabled>Thanh Toán</button>
         </div>

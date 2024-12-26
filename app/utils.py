@@ -10,9 +10,9 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import TableStyle, Table
 from sqlalchemy.testing.config import db_url
 
-from app import Status, db
+from app import Status, db, Rule
 from app.admin import SachForm
-from app.dao import get_trang_thai_by_name, get_sach_by_id
+from app.dao import get_trang_thai_by_name, get_sach_by_id, get_quy_dinh
 from app.models import DonHang, User, Sach
 from app.models import DonHang
 
@@ -130,8 +130,10 @@ def count_orders(khach_hang_id):
 def check_if_expire_orders(user_id):
     don_hangs = User.query.get(user_id).don_hang_kh
 
+    expire_hours = get_quy_dinh(Rule.OUT_OF_TIME_TO_PAY.value).gia_tri
+
     for d in don_hangs:
-        if (datetime.now() - d.ngay_tao_don > timedelta(hours=72)) and d.trang_thai_id == get_trang_thai_by_name(
+        if (datetime.now() - d.ngay_tao_don > timedelta(hours=expire_hours)) and d.trang_thai_id == get_trang_thai_by_name(
                 Status.WAITING.value):
             d.trang_thai_id = get_trang_thai_by_name(Status.FAIL.value).id
 
