@@ -1,10 +1,11 @@
-function addToCart(id, ten_sach, don_gia, bia_sach, quantity = 1) {
+function addToCart(id, ten_sach, don_gia, bia_sach, quantity = 1, so_luong_con_lai) {
     console.log({
     "id": id,
     "ten_sach": ten_sach,
     "don_gia": don_gia,
     "bia_sach": bia_sach,
-    "so_luong": quantity
+    "so_luong": quantity,
+    "so_luong_con_lai": so_luong_con_lai
 });
     fetch('/api/cart', {
         method: "post",
@@ -13,13 +14,17 @@ function addToCart(id, ten_sach, don_gia, bia_sach, quantity = 1) {
             "ten_sach": ten_sach,
             "don_gia": don_gia,
             "bia_sach": bia_sach,
-            "so_luong": quantity
+            "so_luong": quantity,
+            "so_luong_con_lai": so_luong_con_lai
         }),
         headers: {
             "Content-Type": "application/json"
         }
     }).then(res => res.json()).then(data => {
         console.info(data);
+        if (data.alert) {
+            alert(data.alert);
+        }
 
         let d = document.getElementsByClassName("cart-counter");
         for (let i = 0; i < d.length; i++) {
@@ -41,13 +46,21 @@ function updateCart(productId, obj){
         }
     }).then(res => res.json()).then(data => {
         console.info(data)
-        let d = document.getElementsByClassName("cart-counter")
-        for (let i = 0; i<d.length;i++)
-            d[i].innerText = data.total_quantity
+        if (data.old_quantity) {
+            let d = document.getElementById(`cartQuantity${data.p_id}`);
+            d.value=data.old_quantity;
+            alert(" KHÔNG đủ số lượng sách ");
+            //cartQuantity{{ c.id }}
+        }
+        else{
+            let d = document.getElementsByClassName("cart-counter")
+            for (let i = 0; i<d.length;i++)
+                d[i].innerText = data.total_quantity
 
-        let d2 = document.getElementsByClassName("cart-amount")
-        for (let i = 0; i<d2.length;i++)
-            d2[i].innerText = data.total_amount.toLocaleString("en-US") + "₫"
+            let d2 = document.getElementsByClassName("cart-amount")
+            for (let i = 0; i<d2.length;i++)
+                d2[i].innerText = data.total_amount.toLocaleString("en-US") + "₫"
+        }
     })
 }
 
