@@ -18,6 +18,7 @@ from app import Role
 from flask_login import login_user, logout_user, current_user
 from enum import Enum
 
+from app.decorators import customer_login_required
 from app.utils import cart_stats, check_if_expire_orders, update_so_luong_by_ct_don_hang
 
 
@@ -267,7 +268,7 @@ def common_attr():
 
 
 @app.route('/orders/', methods=['get'])
-@login_required
+@customer_login_required
 def orders():
     check_if_expire_orders(current_user.get_id())
 
