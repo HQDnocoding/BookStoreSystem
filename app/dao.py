@@ -331,26 +331,23 @@ def load_all_tacgia():
 def load_all_theloai():
     return TheLoai.query.all()
 
+def get_id_tac_gia(name):
+    return TacGia.query.filter_by(ten_tac_gia=name).first().id
 
 def load_sach(ten_the_loai=None, ten_tac_gia=None):
     if ten_the_loai == 'None' and ten_tac_gia == 'None':
         return Sach.query.all()
 
-    query = Sach.query.options(
-        joinedload(Sach.the_loai),  # Tải trước thông tin thể loại
-        joinedload(Sach.tac_gia)  # Tải trước thông tin tác giả
-    )
+    if ten_the_loai != 'None' and ten_tac_gia == 'None':
+        return Sach.query.filter_by(the_loai_id=get_id_the_loai(ten_the_loai)).all()
 
-    # Lọc theo tên thể loại nếu có
-    if ten_the_loai and ten_tac_gia == 'None':
-        query = query.join(TheLoai).filter(TheLoai.ten_the_loai == ten_the_loai)
+    if ten_the_loai == 'None' and ten_tac_gia != 'None':
+        return Sach.query.filter_by(tac_gia_id=get_id_tac_gia(ten_tac_gia)).all()
 
-    # Lọc theo tên tác giả nếu có
-    if ten_tac_gia and ten_the_loai == 'None':
-        query = query.join(TacGia).filter(TacGia.ten_tac_gia == ten_tac_gia)
+    if ten_the_loai != 'None' and ten_tac_gia != 'None':
+        return  Sach.query.filter_by(the_loai_id=get_id_the_loai(ten_the_loai),tac_gia_id=get_id_tac_gia(ten_tac_gia))
 
-    # Thực thi truy vấn và trả về danh sách sách
-    return query.all()
+    return Sach.query.all()
 
 
 def user_exists(username):
