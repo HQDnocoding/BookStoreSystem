@@ -590,7 +590,7 @@ class UserForm(FlaskForm):
     ho = StringField('Họ', validators=[DataRequired()])
     ten = StringField('Tên', validators=[DataRequired()])
     username = StringField('Tên đăng nhập', validators=[DataRequired()])
-    password = StringField('Mật khẩu', validators=[DataRequired()])
+    password = PasswordField('Mật khẩu', validators=[DataRequired()])
     ngay_tao = ngay_tao = DateTimeField('Ngày tạo', format='%Y-%m-%d %H:%M:%S',
                                         default=datetime.now)  # Gán ngày giờ mặc định
     avatar = FileField('Avatar', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'],
