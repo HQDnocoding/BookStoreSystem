@@ -515,7 +515,8 @@ def process_payment_in_order_details():
     total_amount = get_order_total_price_by_id(order_id)
 
     order = get_order_by_order_id(order_id)
-    if get_trang_thai_by_id(order.trang_thai_id).ten_trang_thai.__eq__(Status.FAIL.value) or get_trang_thai_by_id(order.trang_thai_id).ten_trang_thai.__eq__(Status.PAID.value) or get_phuong_thuc_by_id(order.phuong_thuc_id).__eq__( PayingMethod.OFFLINE_PAY.value):
+    #print(get_phuong_thuc_by_id(order.phuong_thuc_id).ten_phuong_thuc)
+    if get_trang_thai_by_id(order.trang_thai_id).ten_trang_thai.__eq__(Status.FAIL.value) or get_trang_thai_by_id(order.trang_thai_id).ten_trang_thai.__eq__(Status.PAID.value) or get_phuong_thuc_by_id(order.phuong_thuc_id).ten_phuong_thuc.__eq__( PayingMethod.OFFLINE_PAY.value):
         return "<h1>Error can't create a payment with this order !</h1>"
 
     ####################################
