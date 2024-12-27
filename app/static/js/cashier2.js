@@ -91,7 +91,7 @@ async function createInvoice(id_don_hang) {
         }
     } catch (error) {
         console.error('Lỗi khi gọi API:', error);
-        alert('Không thể kết nối đến máy chủ');
+        alert('Không thể thực hiện yêu cầu');
     }
 }
 
