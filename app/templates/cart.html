@@ -48,12 +48,12 @@
             </p>
             <p class="order-layout">Tổng tiền: <span class="cart-amount" style="font-weight: bold;">{{ "{:,.0f}".format(cart.total_amount) }}₫</span>
             </p>
-            <form action="/payment/">
-                <input type="submit" value="Tạo đơn ONLINE" class="plus button ís-form"
+            <form class="m-2" action="/payment/">
+                <input type="submit" value="Tạo đơn ONLINE" class="btn btn-success plus button ís-form"
        {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %} disabled {% endif %}/>
             </form>
-             <form action="/payment_offline/">
-                <input type="submit" value="Tạo đơn OFFLINE" class="plus button ís-form"
+             <form class="m-2" action="/payment_offline/">
+                <input type="submit" value="Tạo đơn OFFLINE" class="btn btn-warning plus button ís-form"
                        {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %} disabled {% endif %}/>
             </form>
             {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %}

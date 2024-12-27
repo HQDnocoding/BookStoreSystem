@@ -23,16 +23,21 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('search-results').innerHTML = '';
         }
     });
-    document.getElementById('search-input').addEventListener('input', function () {
 
+let debounceTimeout;
+document.getElementById('search-input').addEventListener('input', function () {
+    const query = this.value.trim();
 
-        const query = this.value.trim();
+    clearTimeout(debounceTimeout);
+
+    debounceTimeout = setTimeout(() => {
         if (query) {
             searchProducts(query);
         } else {
             document.getElementById('search-results').innerHTML = '';
         }
-    });
+    }, 400); // Thời gian đợi (ms)
+});
 
     document.addEventListener('click', function (event) {
         if (event.target.classList.contains('add-to-cart-btn')) {

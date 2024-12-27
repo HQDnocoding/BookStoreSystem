@@ -125,14 +125,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('search-don-hang-btn').addEventListener('click', function () { findOrder() });
-    document.getElementById('search-don-hang-btn').addEventListener('click', function () { findOrder() });
+
+     document.addEventListener('keydown', function (event) {
+             if (event.key === "Enter" && document.activeElement === document.getElementById('don-hang-id')) {
+                findOrder();
+     }
+     });
 
     document.getElementById('btn-change').addEventListener('click', function () {
         const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
         const totalAmount = parseFloat(
             document.getElementById('total-price').value
-                .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
-                .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+                .replace(/₫/g, '')
+                .replace(/,/g, '')
         ) || 0;
 
 
@@ -154,8 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalPaid = parseFloat(document.getElementById('amount-paid').value) || 0;
             const totalAmount = parseFloat(
                 document.getElementById('total-price').value
-                    .replace(/₫/g, '') // Loại bỏ ký hiệu "₫"
-                    .replace(/,/g, '') // Loại bỏ tất cả dấu phẩy
+                    .replace(/₫/g, '')
+                    .replace(/,/g, '')
             ) || 0;
 
 

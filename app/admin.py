@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 from email.policy import default
 from math import trunc
-from operator import and_
+from operator import and_, or_
 from xmlrpc.client import DateTime
 
 import cloudinary.uploader
@@ -93,10 +93,8 @@ class CashierView(AuthenticatedNhanVienView):
         product_id = str(data['id'])
         quantity = int(data.get('so_luong', 1))
 
-        # Khởi tạo giỏ hàng nếu chưa có
         cart = session.get('cart_admin', {})
 
-        # Thêm hoặc cập nhật sản phẩm
         if product_id in cart:
             cart[product_id]['so_luong'] += quantity
         else:
@@ -118,30 +116,25 @@ class CashierView(AuthenticatedNhanVienView):
 
     @expose('/cart', methods=['DELETE'])
     def clear_cart(self):
-        """Xóa toàn bộ giỏ hàng"""
         session['cart_admin'] = {}
         session.modified = True
         return jsonify({"message": "Giỏ hàng đã được xóa."}), 204
 
     @expose('/cart/<int:product_id>', methods=['PUT'])
     def update_cart(self, product_id):
-        """Cập nhật số lượng sản phẩm trong giỏ hàng"""
         data = request.json
-        new_quantity = int(data.get('so_luong', 0))  # Lấy số lượng mới từ request
+        new_quantity = int(data.get('so_luong', 0))
         cart = session.get('cart_admin', {})
 
-        # Kiểm tra nếu sản phẩm tồn tại trong giỏ hàng
         if str(product_id) in cart:
             if new_quantity > 0:
-                cart[str(product_id)]['so_luong'] = new_quantity  # Cập nhật số lượng
+                cart[str(product_id)]['so_luong'] = new_quantity
             else:
-                del cart[str(product_id)]  # Xóa sản phẩm nếu số lượng = 0
+                del cart[str(product_id)]
 
-        # Lưu lại giỏ hàng vào session
         session['cart_admin'] = cart
         session.modified = True
 
-        # Trả về trạng thái giỏ hàng hiện tại
         return jsonify({
             "cart_admin": list(cart.values()),
             "total_quantity": sum(item['so_luong'] for item in cart.values()),
@@ -150,18 +143,14 @@ class CashierView(AuthenticatedNhanVienView):
 
     @expose('/cart/<int:product_id>', methods=['DELETE'])
     def remove_from_cart(self, product_id):
-        """Xóa sản phẩm khỏi giỏ hàng"""
         cart = session.get('cart_admin', {})
 
-        # Xóa sản phẩm khỏi giỏ hàng nếu tồn tại
         if str(product_id) in cart:
             del cart[str(product_id)]
 
-        # Lưu lại giỏ hàng vào session
         session['cart_admin'] = cart
         session.modified = True
 
-        # Trả về trạng thái giỏ hàng hiện tại
         return jsonify({
             "cart_admin": list(cart.values()),
             "total_quantity": sum(item['so_luong'] for item in cart.values()),
@@ -170,9 +159,9 @@ class CashierView(AuthenticatedNhanVienView):
 
     @expose('/search', methods=['GET'])
     def search_products(self):
-        """Tìm kiếm sản phẩm"""
+
         query = request.args.get('query', '').strip()
-        products = Sach.query.filter(Sach.ten_sach.ilike(f'%{query}%')).all()
+        products = Sach.query.filter(or_(Sach.ten_sach.ilike(f'%{query}%') , Sach.id == query)).all()
 
         return jsonify([
             {
@@ -254,12 +243,10 @@ class Cashier2View(AuthenticatedNhanVienView):
         if not don_hang:
             return jsonify({"error": "don_hang not found"}), 404
 
-        # Lấy thông tin người nhận hàng
         thong_tin_nhan_hang = ThongTinNhanHang.query.filter_by(id=don_hang.id).first()
 
         khach_hang = User.query.get(don_hang.khach_hang_id)
 
-        # Lấy danh sách sách trong đơn hàng
         chi_tiet_don_hang = ChiTietDonHang.query.filter_by(don_hang_id=don_hang.id).all()
 
         sach_data = [
@@ -386,7 +373,6 @@ class FrequencyStatsView(AuthenticatedStatsView):
         last_month = (now - timedelta(days=now.day)).month
         last_year = (now - timedelta(days=now.day)).year
 
-        # Lấy thông tin lọc từ người dùng
         thang = request.args.get("sel_monthf", last_month, type=int)
 
         session['thang_stat'] = thang
@@ -397,20 +383,15 @@ class FrequencyStatsView(AuthenticatedStatsView):
         the_loai = request.args.get("the_loaif", "Tất cả")
         session['ten_the_loai'] = the_loai
 
-        # Dữ liệu thống kê
         fstats = get_frequency_stats(thang, nam, the_loai)
 
-        # # Lọc theo thể loại (nếu có)
-        # if the_loai != "Tất cả":
-        #     fstats = [s for s in fstats if s[2] == the_loai]
 
-        # Truyền dữ liệu cho biểu đồ
+
         labels = [s[1] for s in fstats] or []  # Tên sách
         data = [s[3] for s in fstats]  # Số lượng bán
         percentages = [s[4] for s in fstats]  # Tỉ lệ
         data = [float(d) for d in data] or []
         percentages = [float(p) for p in percentages] or []
-        # Danh sách thể loại để hiển thị trong form lọc
         tl = get_the_loai()
 
         return self.render(
