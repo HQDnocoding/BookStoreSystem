@@ -335,6 +335,9 @@ def get_id_tac_gia(name):
     return TacGia.query.filter_by(ten_tac_gia=name).first().id
 
 def load_sach(ten_the_loai=None, ten_tac_gia=None):
+    if ten_tac_gia is None or ten_the_loai is None:
+        return Sach.query.all()
+
     if ten_the_loai == 'None' and ten_tac_gia == 'None':
         return Sach.query.all()
 
