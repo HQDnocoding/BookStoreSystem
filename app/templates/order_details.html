@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
 
-<div  class="container mt-4">
+<div class="container mt-4">
     <!-- Order Information -->
     <form action="{{ url_for('process_payment_in_order_details') }}" method="post">
         <div class="card mb-4">
@@ -45,34 +45,32 @@
     </form>
     {% endif %}
 
-    <!-- Order Items -->
-    <div class="card">
-        <div class="card-header">
-            <h5>Chi tiết</h5>
-        </div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>Bìa</th>
-                    <th>Tên sách</th>
-                    <th>Số lượng</th>
-                    <th>Tổng giá</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for o in order_details %}
-                <tr>
-                    <td><img src="{{ o.bia_sach}} " alt="Book Image" style="width: 50px; height: auto;"></td>
-                    <td>{{o.ten_sach}}</td>
-                    <td>{{o.so_luong}}</td>
-                    <td>{{o.tong_tien | format_currency}} VNĐ</td>
-                </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </div>
+
+    <div class="container">
+        <h2>Chi tiết</h2>
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th>Bìa</th>
+                <th>Tên sách</th>
+                <th>Số lượng</th>
+                <th>Tổng giá</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for o in order_details %}
+            <tr>
+                <td><img src="{{ o.bia_sach}} " alt="Book Image" style="width: 50px; height: auto;"></td>
+                <td>{{o.ten_sach}}</td>
+                <td>{{o.so_luong}}</td>
+                <td>{{o.tong_tien | format_currency}} VNĐ</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+
+
 </div>
 
 <!-- Bootstrap JS -->
