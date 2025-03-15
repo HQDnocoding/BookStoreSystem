@@ -1,106 +1,101 @@
-{% extends 'admin/master.html'%}
-
-{% block body %}
+{% extends 'admin/master.html'%} {% block body %}
 
 <div class="container">
-    <div class="col">
-        <div class="m-1 d-flex flex-row-reverse">
-            <button id="exportBtn" class="btn btn-primary">Xuất biểu mẫu</button>
-        </div>
-
-        <!-- Phần lọc -->
-        <div class="row">
-            <div class="col-lg-2">
-                <form method="get">
-                    <label for="sel_yearf">Chọn năm</label>
-                    <select class="form-control" id="sel_yearf" name="sel_yearf">
-                        {% for y in range(2004, current_year) %}
-                        <option value="{{ y }}" {% if y== nam %}selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <label for="sel_monthf">Chọn tháng</label>
-                    <select name="sel_monthf" id="sel_monthf" class="form-control">
-                        {% for m in range(1, 13) %}
-                        <option value="{{ m }}" {% if m== thang %}selected{% endif %}>{{ m }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <label for="the_loaif">Thể loại</label>
-                    <select name="the_loaif" id="the_loaif" class="form-control">
-                        {% for t in tl %}
-                        <option value="{{ t.ten_the_loai }}" {% if t.ten_the_loai== the_loai %}selected{% endif %}>
-                            {{ t.ten_the_loai }}
-                        </option>
-                        {% endfor %}
-                        <option value="Tất cả" {% if the_loai=="Tất cả" %}selected{% endif %}>Tất cả</option>
-                    </select>
-
-                    <button type="submit" class="mt-2 btn btn-primary">Lọc</button>
-                </form>
-            </div>
-            <div class="col-lg-10">
-                 <table class="table table-dark table-hover">
-                    <thead class="thead-light">
-                        <th>STT</th>
-                        <th>Mã sách</th>
-                        <th>Tên Sách</th>
-                        <th>Thể loại</th>
-                        <th>Số lượng bán</th>
-                        <th>Tỉ lệ</th>
-                    </thead>
-                    <tbody>
-                        {% for s in fstats %}
-                        <tr>
-                            <td>{{loop.index}}</td>
-
-                            <td>{{s[0]}}</td>
-                            <td>{{s[1]}}</td>
-                            <td>{{s[2]}}</td>
-                            <td>{{s[3]}}</td>
-                            <td>{{s[4]}}</td>
-                        </tr>
-                        {%endfor%}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Biểu đồ tròn -->
-        <div class="row">
-            <div class="col-md-12">
-                 <script>
-                const pieChartData = {
-                    labels: {{ labels | tojson | safe }},
-                    data: {{ data | tojson | safe }},
-                    percentages: {{ percentages | tojson | safe }}
-                };
-            </script>
-                <canvas id="pieChart" width="400" height="400"></canvas>
-            </div>
-        </div>
-
-
-
+  <div class="col">
+    <div class="m-1 d-flex flex-row-reverse">
+      <button id="exportBtn" class="btn btn-primary">Xuất biểu mẫu</button>
     </div>
+
+    <!-- Phần lọc -->
+    <div class="row">
+      <div class="col-lg-2">
+        <form method="get">
+          <label for="sel_yearf">Chọn năm</label>
+          <select class="form-control" id="sel_yearf" name="sel_yearf">
+            {% for y in range(2004, current_year) %}
+            <option value="{{ y }}" {% if y="" ="nam" %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="sel_monthf">Chọn tháng</label>
+          <select name="sel_monthf" id="sel_monthf" class="form-control">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if m="" ="thang" %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="the_loaif">Thể loại</label>
+          <select name="the_loaif" id="the_loaif" class="form-control">
+            {% for t in tl %}
+            <option value="{{ t.ten_the_loai }}" {% if t.ten_the_loai="" ="the_loai" %}selected{% endif %}>
+              {{ t.ten_the_loai }}
+            </option>
+            {% endfor %}
+            <option value="Tất cả" {% if the_loai="" ="Tất cả" %}selected{% endif %}>Tất cả</option>
+          </select>
+
+          <button type="submit" class="mt-2 btn btn-primary">Lọc</button>
+        </form>
+      </div>
+      <div class="col-lg-10">
+        <table class="table table-dark table-hover">
+          <thead class="thead-light">
+            <th>STT</th>
+            <th>Mã sách</th>
+            <th>Tên Sách</th>
+            <th>Thể loại</th>
+            <th>Số lượng bán</th>
+            <th>Tỉ lệ</th>
+          </thead>
+          <tbody>
+            {% for s in fstats %}
+            <tr>
+              <td>{{loop.index}}</td>
+
+              <td>{{s[0]}}</td>
+              <td>{{s[1]}}</td>
+              <td>{{s[2]}}</td>
+              <td>{{s[3]}}</td>
+              <td>{{s[4]}}</td>
+            </tr>
+            {%endfor%}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Biểu đồ tròn -->
+    <div class="row">
+      <div class="col-md-12">
+        <script>
+          const pieChartData = {
+              labels: {{ labels | tojson | safe }},
+              data: {{ data | tojson | safe }},
+              percentages: {{ percentages | tojson | safe }}
+          };
+        </script>
+        <canvas id="pieChart" width="400" height="400"></canvas>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/pie-chart.js') }}"></script>
 <script>
-document.getElementById('exportBtn').addEventListener('click', function() {
-    fetch('/admin/frequencystatsview/export', { method: 'GET' })
-        .then(response => {
-            if (response.ok) {
-                alert("Báo cáo đã được tạo thành công!");
-            } else {
-                alert("Đã xảy ra lỗi khi tạo báo cáo.");
-            }
-        })
-        .catch(error => {
-            alert("Lỗi kết nối: " + error);
-        });
-});
+  document.getElementById("exportBtn").addEventListener("click", function () {
+    fetch("/admin/frequencystatsview/export", { method: "GET" })
+      .then(response => {
+        if (response.ok) {
+          alert("Báo cáo đã được tạo thành công!");
+        } else {
+          alert("Đã xảy ra lỗi khi tạo báo cáo.");
+        }
+      })
+      .catch(error => {
+        alert("Lỗi kết nối: " + error);
+      });
+  });
 </script>
 
 {% endblock %}

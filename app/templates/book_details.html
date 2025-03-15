@@ -1,113 +1,123 @@
-{% extends 'layout/base.html' %}
-
-{% block content %}
-
+{% extends 'layout/base.html' %} {% block content %}
 
 <div class="container border border-dark my-5 py-3">
-    <div class="row success">
-        <div class="col-md-4 col-sm-12">
-            <img src="{{sach.bia_sach}}" class="img-fluid" alt="{{sach.ten_sach}}"
-                 style="width: 100%; height: auto; object-fit: cover; border: 1px; border-radius: 5px;">
-        </div>
-        <div class="col-md-8 col-sm-12">
-            <h1 style="margin-bottom: 20px;">{{sach.ten_sach}}</h1>
-            <p>
-                <i class="fa-solid fa-user"></i>
-                <strong>Tác giả:</strong> {{sach.tac_gia.ten_tac_gia}}
-            </p>
-            <p>
-                <i class="fa-solid fa-tag"></i>
-                <strong>Thể loại:</strong> {{sach.the_loai.ten_the_loai}}
-            </p>
-            <p>
-                <strong>Số lượng:</strong> {{sach.so_luong}}
-            </p>
-            {%if sach.nam_phat_hanh != None%}
-            <p>
-                <strong>Năm phát hành:</strong> {{sach.nam_phat_hanh}}
-            </p>
-            {%else%}
-            <p>
-                <strong>Năm phát hành:</strong> Không có thông tin
-            </p>
-            {%endif%}
-            <p>
-                {{sach.noi_dung}}
-            </p>
-            <h4 style="color: green; font-weight: bold;">{{ "{:,.0f}".format(sach.don_gia) }} ₫</h4>
+  <div class="row success">
+    <div class="col-md-4 col-sm-12">
+      <img
+        src="{{sach.bia_sach}}"
+        class="img-fluid"
+        alt="{{sach.ten_sach}}"
+        style="width: 100%; height: auto; object-fit: cover; border: 1px; border-radius: 5px"
+      />
+    </div>
+    <div class="col-md-8 col-sm-12">
+      <h1 style="margin-bottom: 20px">{{sach.ten_sach}}</h1>
+      <p>
+        <i class="fa-solid fa-user"></i>
+        <strong>Tác giả:</strong> {{sach.tac_gia.ten_tac_gia}}
+      </p>
+      <p>
+        <i class="fa-solid fa-tag"></i>
+        <strong>Thể loại:</strong> {{sach.the_loai.ten_the_loai}}
+      </p>
+      <p><strong>Số lượng:</strong> {{sach.so_luong}}</p>
+      {%if sach.nam_phat_hanh != None%}
+      <p><strong>Năm phát hành:</strong> {{sach.nam_phat_hanh}}</p>
+      {%else%}
+      <p><strong>Năm phát hành:</strong> Không có thông tin</p>
+      {%endif%}
+      <p>{{sach.noi_dung}}</p>
+      <h4 style="color: green; font-weight: bold">{{ "{:,.0f}".format(sach.don_gia) }} ₫</h4>
 
+      <hr />
 
-            <hr>
+      {% if sach.so_luong>0 %}
+      <div class="col-2 d-flex align-items-center">
+        <input
+          type="button"
+          value="-"
+          class="minus button ís-form"
+          onclick="changeInputNumericValue(-1, document.getElementById('inputQuantity'))"
+        />
 
-            {% if sach.so_luong>0 %}
-            <div class="col-2 d-flex align-items-center">
-                <input type="button" value="-" class="minus button ís-form"
-                       onclick="changeInputNumericValue(-1, document.getElementById('inputQuantity'))">
+        <input
+          type="number"
+          class="input-text qty text"
+          title="SL"
+          size="4"
+          min="1"
+          max="99"
+          step="1"
+          placeholder=""
+          inputmode="numeric"
+          autocomplete="off"
+          value="1"
+          id="inputQuantity"
+        />
 
-                <input type="number" class="input-text qty text" title="SL" size="4" min="1" max="99"
-                       step="1" placeholder="" inputmode="numeric" autocomplete="off"
-                       value="1" id="inputQuantity"/>
+        <input
+          type="button"
+          value="+"
+          class="plus button ís-form"
+          onclick="changeInputNumericValue(1, document.getElementById('inputQuantity'))"
+        />
+      </div>
 
-                <input type="button" value="+" class="plus button ís-form"
-                       onclick="changeInputNumericValue(1, document.getElementById('inputQuantity'))">
-            </div>
-
-            <a href="javascript:;"
-               onclick="addToCart({{sach.id}}, '{{sach.ten_sach}}', {{sach.don_gia}},
+      <a
+        href="javascript:;"
+        onclick="addToCart({{sach.id}}, '{{sach.ten_sach}}', {{sach.don_gia}},
                    '{{sach.bia_sach}}', parseInt(document.getElementById('inputQuantity').value), {{sach.so_luong}})"
-               class="btn btn-accent mt-4 align-items-center gap-2"
-               style="border: 1px solid green; border-radius: 5px; padding: 5px 10px; color: green;
-font-weight: bold;">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>Thêm vô giỏ hàng</span>
-            </a>
-            {% else %}
-            <h1 style="color: red;">Hết hàng</h1>
-            {% endif %}
+        class="btn btn-accent mt-4 align-items-center gap-2"
+        style="border: 1px solid green; border-radius: 5px; padding: 5px 10px; color: green; font-weight: bold"
+      >
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Thêm vô giỏ hàng</span>
+      </a>
+      {% else %}
+      <h1 style="color: red">Hết hàng</h1>
+      {% endif %}
+    </div>
+  </div>
 
+  <hr />
+
+  <h2 style="color: green; margin: 10px"><i class="fa-solid fa-comment"></i> Bình luận</h2>
+
+  {% if current_user.is_authenticated %}
+  <div class="mt-2">
+    <textarea class="form-control" rows="5" id="comment" name="text" placeholder="Nội dung bình luận..."></textarea>
+    <button class="btn btn-success mt-1" onclick="addComment({{sach.id}})">Thêm bình luận</button>
+  </div>
+  {% endif %}
+
+  <ul class="list-group mt-2" id="comments">
+    {% for c in comments %}
+    <li class="list-group-item">
+      <div class="row">
+        <div class="col-md-1 col-4">
+          <img
+            src="{{ c.user.avatar }}"
+            class="img-fluid rounded-circle"
+            onError="this.onerror=null; this.src='https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';"
+          />
         </div>
-    </div>
-
-    <hr>
-
-    <h2 style="color: green; margin: 10px;"><i class="fa-solid fa-comment"></i> Bình luận </h2>
-
-    {% if current_user.is_authenticated %}
-    <div class="mt-2">
-            <textarea class="form-control" rows="5" id="comment" name="text"
-                      placeholder="Nội dung bình luận..."></textarea>
-        <button class="btn btn-success mt-1" onclick="addComment({{sach.id}})">Thêm bình luận</button>
-    </div>
-    {% endif %}
-
-
-    <ul class="list-group mt-2" id="comments">
-        {% for c in comments %}
-        <li class="list-group-item">
-            <div class="row">
-                <div class="col-md-1 col-4">
-                    <img src="{{ c.user.avatar }}" class="img-fluid rounded-circle"
-                         onError="this.onerror=null; this.src='https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';"/>
-                </div>
-                <div class="col-md-11 col-8">
-                    <p><strong>{{c.user.ho}} {{c.user.ten}}</strong> <span class="date">{{c.ngay_tao}}</span></p>
-                    <p>{{ c.content }}</p>
-                </div>
-            </div>
-
-        </li>
-        {% endfor %}
-    </ul>
+        <div class="col-md-11 col-8">
+          <p><strong>{{c.user.ho}} {{c.user.ten}}</strong> <span class="date">{{c.ngay_tao}}</span></p>
+          <p>{{ c.content }}</p>
+        </div>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
 </div>
 
 <script src="{{ url_for('static', filename='js/comment.js')}}"></script>
 <script src="{{ url_for('static', filename='js/moment.js')}}"></script>
 <script>
-    window.onload = function() {
-        let dates = document.getElementsByClassName("date");
-        for (let d of dates)
-            d.innerText = moment(d.innerText).locale("vi").fromNow();
-    }
+  window.onload = function () {
+    let dates = document.getElementsByClassName("date");
+    for (let d of dates) d.innerText = moment(d.innerText).locale("vi").fromNow();
+  };
 </script>
 
 {% endblock %}

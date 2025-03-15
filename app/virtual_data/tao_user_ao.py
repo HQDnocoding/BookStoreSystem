@@ -1,23 +1,23 @@
 import random
 from datetime import datetime, timedelta
-from app import app as my_app, db
+
+from app import app as my_app
+from app import db
 from app.models import User
 
 
 def create_random_users(num_users: int, vai_tro_id: int = 4):
     total_users = db.session.query(User).count()
     for i in range(1, num_users + 1):
-        username = f"kh{total_users+i}"  # Tạo username theo định dạng "khX", với X là id
+        username = (
+            f"kh{total_users+i}"  # Tạo username theo định dạng "khX", với X là id
+        )
         password = "123"  # Mật khẩu cố định
         ho = f"Họ {i}"  # Tùy chỉnh họ cho người dùng
         ten = f"Tên {i}"  # Tùy chỉnh tên cho người dùng
 
         new_user = User(
-            ho=ho,
-            ten=ten,
-            username=username,
-            password=password,
-            vai_tro_id=vai_tro_id
+            ho=ho, ten=ten, username=username, password=password, vai_tro_id=vai_tro_id
         )
 
         db.session.add(new_user)

@@ -1,74 +1,117 @@
-{% extends 'layout/base.html' %}
+{% extends 'layout/base.html' %} {% block content %}
 
-{% block content %}
+<div class="container" style="padding: 20px">
+  {% if 'cart' in session and session['cart'] is not none %} {% if session['cart']|length > 0 %}
 
-<div class="container" style="padding: 20px;">
-
-    {% if 'cart' in session and session['cart'] is not none %}
-    {% if session['cart']|length > 0 %}
-    
-    <div class="row">
-        <div class="col-md-8 col-sm-12 align-items-center">
-            {% for c in session['cart'].values() %}
-            <div class="row" id="cart{{ c.id }}">
-                <div class="col-3 d-flex align-items-center">
-                    <img src="{{ c.bia_sach }}" class="img-fluid" alt="Book Image">
-                </div>
-                <div class="col-4 d-flex align-items-center">
-                    <h6>{{ c.ten_sach }}</h6>
-                </div>
-                <div class="col-2 d-flex align-items-center">
-                    <bdi>{{ "{:,.0f}".format(c.don_gia) }}₫</bdi>
-                </div>
-                <div class="col-2 d-flex align-items-center">
-                    <input type="button" value="-" class="minus button ís-form"
-                           onclick="changeQuantity({{ c.id }}, -1, document.getElementById('cartQuantity{{ c.id }}'))">
-
-                    <input onblur="updateCart({{ c.id }}, this)" type="number" class="input-text qty text"
-                           value="{{ c.so_luong }}" title="SL" size="4" min="1" max="99"
-                           step="1" placeholder="" inputmode="numeric" autocomplete="off"
-                           id="cartQuantity{{ c.id }}"/>
-
-                    <input type="button" value="+" class="plus button ís-form"
-                           onclick="changeQuantity({{ c.id }}, 1, document.getElementById('cartQuantity{{ c.id }}'))">
-                </div>
-                <div class="col-1 d-flex align-items-center">
-                    <a onclick="deleteCart({{c.id}})"
-                       class="btn btn-accent d-flex align-items-center justify-content-center">
-                        <i class="fa-solid fa-trash"></i>
-                    </a>
-                </div>
-            </div>
-            {% endfor %}
-
+  <div class="row">
+    <div class="col-md-8 col-sm-12 align-items-center">
+      {% for c in session['cart'].values() %}
+      <div class="row" id="cart{{ c.id }}">
+        <div class="col-3 d-flex align-items-center">
+          <img src="{{ c.bia_sach }}" class="img-fluid" alt="Book Image" />
         </div>
-        <div class="col-md-4 col-sm-12 fixed-order">
-            <h3>Đơn hàng</h3>
-            <p class="order-layout">Tổng sản phẩm: <span class="cart-counter" style="font-weight: bold;">{{cart.total_quantity}}</span>
-            </p>
-            <p class="order-layout">Tổng tiền: <span class="cart-amount" style="font-weight: bold;">{{ "{:,.0f}".format(cart.total_amount) }}₫</span>
-            </p>
-            <form class="m-2" action="/payment/">
-                <input type="submit" value="Tạo đơn ONLINE" class="btn btn-success plus button ís-form"
-       {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %} disabled {% endif %}/>
-            </form>
-             <form class="m-2" action="/payment_offline/">
-                <input type="submit" value="Tạo đơn OFFLINE" class="btn btn-warning plus button ís-form"
-                       {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %} disabled {% endif %}/>
-            </form>
-            {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %}
-            <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> bằng tài khoản KHÁCH HÀNG.</p>
-            {% endif %}
+        <div class="col-4 d-flex align-items-center">
+          <h6>{{ c.ten_sach }}</h6>
         </div>
+        <div class="col-2 d-flex align-items-center">
+          <bdi>{{ "{:,.0f}".format(c.don_gia) }}₫</bdi>
+        </div>
+        <div class="col-2 d-flex align-items-center">
+          <input
+            type="button"
+            value="-"
+            class="minus button ís-form"
+            onclick="changeQuantity({{ c.id }}, -1, document.getElementById('cartQuantity{{ c.id }}'))"
+          />
+
+          <input
+            onblur="updateCart({{ c.id }}, this)"
+            type="number"
+            class="input-text qty text"
+            value="{{ c.so_luong }}"
+            title="SL"
+            size="4"
+            min="1"
+            max="99"
+            step="1"
+            placeholder=""
+            inputmode="numeric"
+            autocomplete="off"
+            id="cartQuantity{{ c.id }}"
+          />
+
+          <input
+            type="button"
+            value="+"
+            class="plus button ís-form"
+            onclick="changeQuantity({{ c.id }}, 1, document.getElementById('cartQuantity{{ c.id }}'))"
+          />
+        </div>
+        <div class="col-1 d-flex align-items-center">
+          <a onclick="deleteCart({{c.id}})" class="btn btn-accent d-flex align-items-center justify-content-center">
+            <i class="fa-solid fa-trash"></i>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
     </div>
+    <div class="col-md-4 col-sm-12 fixed-order">
+      <h3>Đơn hàng</h3>
+      <p class="order-layout">
+        Tổng sản phẩm: <span class="cart-counter" style="font-weight: bold">{{cart.total_quantity}}</span>
+      </p>
+      <p class="order-layout">
+        Tổng tiền: <span class="cart-amount" style="font-weight: bold">{{ "{:,.0f}".format(cart.total_amount) }}₫</span>
+      </p>
+      <form class="m-2" action="/payment/">
+        <input
+          type="submit"
+          value="Tạo đơn ONLINE"
+          class="btn btn-success plus button ís-form"
+          {%
+          if
+          not
+          current_user.is_authenticated
+          or
+          current_user.vai_tro_id
+          !="4"
+          %}
+          disabled
+          {%
+          endif
+          %}
+        />
+      </form>
+      <form class="m-2" action="/payment_offline/">
+        <input
+          type="submit"
+          value="Tạo đơn OFFLINE"
+          class="btn btn-warning plus button ís-form"
+          {%
+          if
+          not
+          current_user.is_authenticated
+          or
+          current_user.vai_tro_id
+          !="4"
+          %}
+          disabled
+          {%
+          endif
+          %}
+        />
+      </form>
+      {% if not current_user.is_authenticated or current_user.vai_tro_id != 4 %}
+      <p>Vui lòng <a href="/login?next=/cart">đăng nhập</a> bằng tài khoản KHÁCH HÀNG.</p>
+      {% endif %}
+    </div>
+  </div>
 
-    {% else %}
-    <p>Giỏ hàng của bạn hiện đang trống.</p>
-    {% endif %}
-    {% else %}
-    <p>Giỏ hàng của bạn hiện đang trống.</p>
-    {% endif %}
-
+  {% else %}
+  <p>Giỏ hàng của bạn hiện đang trống.</p>
+  {% endif %} {% else %}
+  <p>Giỏ hàng của bạn hiện đang trống.</p>
+  {% endif %}
 </div>
 
 {% endblock %}

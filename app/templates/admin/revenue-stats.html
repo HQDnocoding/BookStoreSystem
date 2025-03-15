@@ -1,84 +1,75 @@
-{% extends 'admin/master.html'%}
-
-
-{% block body %}
-
+{% extends 'admin/master.html'%} {% block body %}
 
 <div class="conainer">
-    <div class="col">
-        <div class="d-flex flex-row-reverse">
-            <button id="export-btn" type="button" class="m-2 float-right btn btn-dark">Xuất file</button>
-        </div>
-        <div class="row">
-            <div class="col-lg-2">
-                <form method="get">
-                    <label for="sel_year">Chọn năm</label>
-                    <select class="form-control" id="sel_year" name="sel_year">
-                        {% for y in range(2004, current_year) %}
-                        <option value="{{ y }}" {% if y== nam %}selected{% endif %}>{{ y }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <label for="sel_month">Chọn tháng</label>
-                    <select name="sel_month" id="sel_month" class="form-control">
-                        {% for m in range(1, 13) %}
-                        <option value="{{ m }}" {% if m== thang %}selected{% endif %}>{{ m }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <label for="the_loai">Thể loại</label>
-                    <select name="the_loai" id="the_loai" class="form-control">
-                        {% for t in tl %}
-                        <option value="{{ t.ten_the_loai }}" {% if t.ten_the_loai== the_loai %}selected{% endif %}>
-                            {{ t.ten_the_loai }}
-                        </option>
-                        {% endfor %}
-                        <option value="Tất cả" {% if the_loai=="Tất cả" %}selected{% endif %}>Tất cả</option>
-                    </select>
-
-                    <button type="submit" class="mt-2 btn btn-primary">Lọc</button>
-                </form>
-            </div>
-            <div class="col-lg-10">
-
-                <table class="table table-dark table-hover">
-                    <thead class="thead-light">
-                    <th>STT</th>
-                    <th>Thể loại</th>
-                    <th>Số lượng bán</th>
-                    <th>Doanh thu</th>
-                    <th>Tỉ lệ</th>
-                    </thead>
-                    <tbody>
-                    {% for s in stats%}
-                    <tr>
-                        <td>{{loop.index}}</td>
-                        <td>{{s[0]}}</td>
-                        <td style="padding-left: 60px;">{{s[1]}}</td>
-                        <td style="text-align: left;">{{s[2] }}</td>
-                        <td>{{s[3]}}</td>
-                    </tr>
-                    {%endfor%}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="row">
-            <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 600px;">
-                <canvas class="justified" width="1000" id="salesChart"></canvas>
-            </div>
-        </div>
-        <div class="row">
-            <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 600px;">
-                <canvas class="justified" width="1000" id="pieChart2"></canvas>
-
-            </div>
-        </div>
+  <div class="col">
+    <div class="d-flex flex-row-reverse">
+      <button id="export-btn" type="button" class="m-2 float-right btn btn-dark">Xuất file</button>
     </div>
-    <div>
+    <div class="row">
+      <div class="col-lg-2">
+        <form method="get">
+          <label for="sel_year">Chọn năm</label>
+          <select class="form-control" id="sel_year" name="sel_year">
+            {% for y in range(2004, current_year) %}
+            <option value="{{ y }}" {% if y="" ="nam" %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+          </select>
 
+          <label for="sel_month">Chọn tháng</label>
+          <select name="sel_month" id="sel_month" class="form-control">
+            {% for m in range(1, 13) %}
+            <option value="{{ m }}" {% if m="" ="thang" %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+
+          <label for="the_loai">Thể loại</label>
+          <select name="the_loai" id="the_loai" class="form-control">
+            {% for t in tl %}
+            <option value="{{ t.ten_the_loai }}" {% if t.ten_the_loai="" ="the_loai" %}selected{% endif %}>
+              {{ t.ten_the_loai }}
+            </option>
+            {% endfor %}
+            <option value="Tất cả" {% if the_loai="" ="Tất cả" %}selected{% endif %}>Tất cả</option>
+          </select>
+
+          <button type="submit" class="mt-2 btn btn-primary">Lọc</button>
+        </form>
+      </div>
+      <div class="col-lg-10">
+        <table class="table table-dark table-hover">
+          <thead class="thead-light">
+            <th>STT</th>
+            <th>Thể loại</th>
+            <th>Số lượng bán</th>
+            <th>Doanh thu</th>
+            <th>Tỉ lệ</th>
+          </thead>
+          <tbody>
+            {% for s in stats%}
+            <tr>
+              <td>{{loop.index}}</td>
+              <td>{{s[0]}}</td>
+              <td style="padding-left: 60px">{{s[1]}}</td>
+              <td style="text-align: left">{{s[2] }}</td>
+              <td>{{s[3]}}</td>
+            </tr>
+            {%endfor%}
+          </tbody>
+        </table>
+      </div>
     </div>
-
+    <div class="row">
+      <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 600px">
+        <canvas class="justified" width="1000" id="salesChart"></canvas>
+      </div>
+    </div>
+    <div class="row">
+      <div style="display: flex; justify-content: center; align-items: center; width: 100%; height: 600px">
+        <canvas class="justified" width="1000" id="pieChart2"></canvas>
+      </div>
+    </div>
+  </div>
+  <div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -86,132 +77,126 @@
 
 <script>
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const ctx = document.getElementById('salesChart').getContext('2d');
+      document.addEventListener("DOMContentLoaded", function () {
+          const ctx = document.getElementById('salesChart').getContext('2d');
 
-        const stats = {{ stats | tojson }};
-        const labels = stats.map(stat => stat[0]);
-        const quantities = stats.map(stat => stat[1]);
-        const percentages = stats.map(stat => stat[3]);
-        const revenues = stats.map(stat => stat[2]/100000);
-
-
-
-
-        // Tạo Group Bar Chart
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Số lượng bán',
-                        data: quantities,
-                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Doanh thu x 100.000 VNĐ',
-                        data: revenues,
-                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Doanh thu và số lượng bán theo thể loại'
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Thể loại'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Giá trị'
-                        },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-
-    const pieCtx = document.getElementById('pieChart2').getContext('2d');
-    function generateRandomColor() {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    const colors = labels.map(() => generateRandomColor());
-
-    // Tạo Pie Chart
-    new Chart(pieCtx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    data: percentages,
-                    backgroundColor: colors,
-                    hoverOffset: 10
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top'
-                },
-                title: {
-                    display: true,
-                    text: 'Tỉ lệ bán hàng theo thể loại'
-                }
-            }
-        }
-    });
-
-
-
-document.getElementById('export-btn').addEventListener('click', function() {
-    fetch('/admin/revenuestatsview/export', { method: 'GET' })
-        .then(response => {
-            if (response.ok) {
-                alert("Báo cáo đã được tạo thành công!");
-            } else {
-                alert("Đã xảy ra lỗi khi tạo báo cáo.");
-            }
-        })
-        .catch(error => {
-            alert("Lỗi kết nối: " + error);
-        });
-});
-
-    });
+          const stats = {{ stats | tojson }};
+          const labels = stats.map(stat => stat[0]);
+          const quantities = stats.map(stat => stat[1]);
+          const percentages = stats.map(stat => stat[3]);
+          const revenues = stats.map(stat => stat[2]/100000);
 
 
 
 
+          // Tạo Group Bar Chart
+          new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: labels,
+                  datasets: [
+                      {
+                          label: 'Số lượng bán',
+                          data: quantities,
+                          backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                          borderColor: 'rgba(54, 162, 235, 1)',
+                          borderWidth: 1
+                      },
+                      {
+                          label: 'Doanh thu x 100.000 VNĐ',
+                          data: revenues,
+                          backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                          borderColor: 'rgba(255, 99, 132, 1)',
+                          borderWidth: 1
+                      }
+                  ]
+              },
+              options: {
+                  responsive: true,
+                  plugins: {
+                      legend: {
+                          position: 'top'
+                      },
+                      title: {
+                          display: true,
+                          text: 'Doanh thu và số lượng bán theo thể loại'
+                      }
+                  },
+                  scales: {
+                      x: {
+                          title: {
+                              display: true,
+                              text: 'Thể loại'
+                          }
+                      },
+                      y: {
+                          title: {
+                              display: true,
+                              text: 'Giá trị'
+                          },
+                          beginAtZero: true
+                      }
+                  }
+              }
+          });
 
 
+      const pieCtx = document.getElementById('pieChart2').getContext('2d');
+      function generateRandomColor() {
+          const letters = '0123456789ABCDEF';
+          let color = '#';
+          for (let i = 0; i < 6; i++) {
+              color += letters[Math.floor(Math.random() * 16)];
+          }
+          return color;
+      }
+
+      const colors = labels.map(() => generateRandomColor());
+
+      // Tạo Pie Chart
+      new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+              labels: labels,
+              datasets: [
+                  {
+                      data: percentages,
+                      backgroundColor: colors,
+                      hoverOffset: 10
+                  }
+              ]
+          },
+          options: {
+              responsive: true,
+              plugins: {
+                  legend: {
+                      position: 'top'
+                  },
+                  title: {
+                      display: true,
+                      text: 'Tỉ lệ bán hàng theo thể loại'
+                  }
+              }
+          }
+      });
+
+
+
+  document.getElementById('export-btn').addEventListener('click', function() {
+      fetch('/admin/revenuestatsview/export', { method: 'GET' })
+          .then(response => {
+              if (response.ok) {
+                  alert("Báo cáo đã được tạo thành công!");
+              } else {
+                  alert("Đã xảy ra lỗi khi tạo báo cáo.");
+              }
+          })
+          .catch(error => {
+              alert("Lỗi kết nối: " + error);
+          });
+  });
+
+      });
 </script>
 
 {% endblock %}
