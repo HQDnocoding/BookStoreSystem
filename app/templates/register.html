@@ -1,109 +1,99 @@
-{% extends 'layout/base.html' %} {% block content %}
+{% extends 'layout/base.html' %}
 
-<div class="d-flex justify-content-center align-items-center" style="height: 100vh">
-  <div class="container border border-dark my-5 py-3">
-    <div class="row"><h1 class="text-center">Đăng ký</h1></div>
+{% block content %}
 
-    {% if err_msg %}
-    <div class="alert alert-danger">{{err_msg}}</div>
-    {% endif %}
 
-    <div class="row">
-      <form method="post" class="needs-validated" enctype="multipart/form-data" action="/register">
-        <div class="form-group mb-3 mt-3">
-          <label for="firstname">Tên:</label>
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="container border border-dark my-5 py-3">
+        <div class="row"><h1 class="text-center">Đăng ký</h1></div>
 
-          <input type="text" class="form-control" required id="firstname" placeholder="Nhập tên" name="firstname" />
-          <div class="valid-feedback">Valid</div>
-          <div class="invalid-feedback">Please fill out this field</div>
+        {% if err_msg %}
+        <div class="alert alert-danger">
+            {{err_msg}}
         </div>
-        <div class="form-group mb-3 mt-3">
-          <label for="lastname">Họ:</label>
+        {% endif %}
 
-          <input type="text" class="form-control" required id="lastname" placeholder="Nhập họ" name="lastname" />
-          <div class="valid-feedback">Valid</div>
-          <div class="invalid-feedback">Please fill out this field</div>
+        <div class="row">
+            <form method="post" class="needs-validated" enctype="multipart/form-data" action="/register">
+                <div class="form-group mb-3 mt-3">
+                    <label for="firstname">Tên:</label>
+
+                    <input type="text" class="form-control" required id="firstname" placeholder="Nhập tên"
+                           name="firstname">
+                    <div class="valid-feedback">Valid</div>
+                    <div class="invalid-feedback">Please fill out this field</div>
+                </div>
+                <div class="form-group mb-3 mt-3">
+                    <label for="lastname">Họ:</label>
+
+                    <input type="text" class="form-control" required id="lastname" placeholder="Nhập họ"
+                           name="lastname">
+                    <div class="valid-feedback">Valid</div>
+                    <div class="invalid-feedback">Please fill out this field</div>
+                </div>
+
+                <div class="form-group mb-3 mt-3">
+                    <label for="username">Tài khoản:</label>
+
+                    <input type="text" class="form-control" required id="username" placeholder="Nhập tài khoản"
+                           name="username">
+                    <div class="valid-feedback">Valid</div>
+                    <div class="invalid-feedback">Please fill out this field</div>
+                </div>
+
+                <div class="form-group mt-3 mb-3">
+                    <label for="password">Mật khẩu:</label>
+
+                    <input type="password" class="form-control" required id="password" placeholder="Nhập mật khẩu"
+                           name="password">
+                    <div class="valid-feedback">Valid</div>
+                    <div class="invalid-feedback">Please fill out this field</div>
+                </div>
+
+                <div class="form-group mt-3 mb-3">
+                    <label for="confirm">Xác nhận mật khẩu:</label>
+
+                    <input type="password" class="form-control" required id="confirm" placeholder="Nhập lại mật khẩu"
+                           name="confirm">
+                    <div class="valid-feedback">Valid</div>
+                    <div class="invalid-feedback">Please fill out this field</div>
+                </div>
+
+                <div class="form-group mt-3 mb-3">
+                    <label for="avatar"> Ảnh đại diện: </label>
+                    <input type="file" class="form-control" id="avatar" name="avatar">
+
+                    <div class="valid-feedback">Valid</div>
+                    <div class="invalid-feedback">Please choose a image</div>
+                </div>
+
+                <div>
+                    <input type="submit" value="Đăng ký" class="btn btn-success">
+                </div>
+            </form>
         </div>
-
-        <div class="form-group mb-3 mt-3">
-          <label for="username">Tài khoản:</label>
-
-          <input type="text" class="form-control" required id="username" placeholder="Nhập tài khoản" name="username" />
-          <div class="valid-feedback">Valid</div>
-          <div class="invalid-feedback">Please fill out this field</div>
-        </div>
-
-        <div class="form-group mt-3 mb-3">
-          <label for="password">Mật khẩu:</label>
-
-          <input
-            type="password"
-            class="form-control"
-            required
-            id="password"
-            placeholder="Nhập mật khẩu"
-            name="password"
-          />
-          <div class="valid-feedback">Valid</div>
-          <div class="invalid-feedback">Please fill out this field</div>
-        </div>
-
-        <div class="form-group mt-3 mb-3">
-          <label for="confirm">Xác nhận mật khẩu:</label>
-
-          <input
-            type="password"
-            class="form-control"
-            required
-            id="confirm"
-            placeholder="Nhập lại mật khẩu"
-            name="confirm"
-          />
-          <div class="valid-feedback">Valid</div>
-          <div class="invalid-feedback">Please fill out this field</div>
-        </div>
-
-        <div class="form-group mt-3 mb-3">
-          <label for="avatar"> Ảnh đại diện: </label>
-          <input type="file" class="form-control" id="avatar" name="avatar" />
-
-          <div class="valid-feedback">Valid</div>
-          <div class="invalid-feedback">Please choose a image</div>
-        </div>
-
-        <div>
-          <input type="submit" value="Đăng ký" class="btn btn-success" />
-        </div>
-      </form>
     </div>
-  </div>
+
+
 </div>
 <script>
-  // Disable form submissions if there are invalid fields
-  (function () {
-    "use strict";
-    window.addEventListener(
-      "load",
-      function () {
+    // Disable form submissions if there are invalid fields
+    (function() {
+      'use strict';
+      window.addEventListener('load', function() {
         // Get the forms we want to add validation styles to
-        var forms = document.getElementsByClassName("needs-validation");
+        var forms = document.getElementsByClassName('needs-validation');
         // Loop over them and prevent submission
-        var validation = Array.prototype.filter.call(forms, function (form) {
-          form.addEventListener(
-            "submit",
-            function (event) {
-              if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-              form.classList.add("was-validated");
-            },
-            false,
-          );
+        var validation = Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
         });
-      },
-      false,
-    );
-  })();
+      }, false);
+    })();
 </script>
 {% endblock %}

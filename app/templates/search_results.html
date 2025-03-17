@@ -1,64 +1,61 @@
-{% extends 'layout/base.html' %} {% block content%}
+{% extends 'layout/base.html' %}
+
+
+{% block content%}
 
 <section class="py-3 py-md-5 py-xl-8 bg-white">
-  <div class="container overflow-hidden">
-    <div class="row justify-content-start gy-4 gy-xxl-5">
-      {% if products %} {% for p in products %}
-      <div class="col-4 col-md-6 col-lg-4 col-xxl-3 d-flex align-items-stretch">
-        <div class="card text-center border-dark overflow-hidden">
-          <div class="card-body p-5 position-relative">
-            <figure class="m-0 p-0">
-              <img class="img-fluid" loading="lazy" src="{{p.bia_sach}}" alt="{{p.ten}}" />
-              <figcaption class="mb-0 mt-4 p-0">
-                <h4 class="mb-2">{{p.ten_sach}}</h4>
-                <p class="d-flex justify-content-center align-items-center gap-2 mb-0">
-                  <span class="text-primary">{{p.don_gia}} VNĐ</span>
-                </p>
-              </figcaption>
-            </figure>
-            <a href="#!" class="btn btn-accent mt-4 d-flex align-items-center justify-content-center gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-cart-plus"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z"
-                ></path>
-                <path
-                  d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"
-                ></path>
-              </svg>
-              <span>Thêm vô giỏ hàng</span>
-            </a>
-          </div>
+    <div class="container overflow-hidden">
+        <div class="row justify-content-start gy-4 gy-xxl-5">
+{% if products %}
+            {% for p in products %}
+            <div class="col-4 col-md-6 col-lg-4 col-xxl-3 d-flex align-items-stretch">
+                <div class="card text-center border-dark overflow-hidden">
+                    <div class="card-body p-5 position-relative">
+                        <figure class="m-0 p-0">
+                            <img class="img-fluid" loading="lazy" src="{{p.bia_sach}}" alt="{{p.ten}}">
+                            <figcaption class="mb-0 mt-4 p-0">
+                                <h4 class="mb-2">{{p.ten_sach}}</h4>
+                                <p class="d-flex justify-content-center align-items-center gap-2 mb-0">
+                                    <span class="text-primary">{{p.don_gia}} VNĐ</span>
+                                </p>
+                            </figcaption>
+                        </figure>
+                        <a href="#!" class="btn btn-accent mt-4 d-flex align-items-center justify-content-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-cart-plus" viewBox="0 0 16 16">
+                                <path d="M9 5.5a.5.5 0 0 0-1 0V7H6.5a.5.5 0 0 0 0 1H8v1.5a.5.5 0 0 0 1 0V8h1.5a.5.5 0 0 0 0-1H9z"></path>
+                                <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1zm3.915 10L3.102 4h10.796l-1.313 7zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0m7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"></path>
+                            </svg>
+                            <span>Thêm vô giỏ hàng</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+{% else %}
+<div class="alert alert-info mt-1">Không có sản phẩm nào!</div>
+{% endif %}
         </div>
-      </div>
-      {% endfor %} {% else %}
-      <div class="alert alert-info mt-1">Không có sản phẩm nào!</div>
-      {% endif %}
     </div>
-  </div>
 </section>
 
 <nav class="navigation paging-navigation text-center padding-medium" role="navigation">
-  <div class="pagination loop-pagination d-flex justify-content-center align-items-center">
-    <a href="#" class="d-flex pe-2">
-      <svg width="24" height="24">
-        <use xlink:href="#angle-left"></use>
-      </svg>
-    </a>
-    {% for i in range(1, pages + 1) %}
-    <a class="page-numbers pe-3" href="/shop/?page={{i}}">{{i}}</a>
-    {% endfor %}
-    <a href="#" class="d-flex ps-2">
-      <svg width="24" height="24">
-        <use xlink:href="#angle-right"></use>
-      </svg>
-    </a>
-  </div>
+    <div class="pagination loop-pagination d-flex justify-content-center align-items-center">
+        <a href="#" class="d-flex pe-2">
+            <svg width="24" height="24">
+                <use xlink:href="#angle-left"></use>
+            </svg>
+        </a>
+        {% for i in range(1, pages + 1) %}
+        <a class="page-numbers pe-3" href="/shop/?page={{i}}">{{i}}</a>
+        {% endfor %}
+        <a href="#" class="d-flex ps-2">
+            <svg width="24" height="24">
+                <use xlink:href="#angle-right"></use>
+            </svg>
+        </a>
+    </div>
 </nav>
 {% endblock %}
+
+

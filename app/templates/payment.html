@@ -1,51 +1,46 @@
-{% extends 'layout/base.html' %} {% block content %}
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
 
 <div class="container mt-5">
-  <h2 class="text-center">Thông Tin Thanh Toán</h2>
+    <h2 class="text-center">Thông Tin Thanh Toán</h2>
 
-  <!-- Form thanh toán -->
-  <form action="{{ url_for('process_payment') }}" method="POST">
-    <div class="form-group">
-      <label for="address">Địa Chỉ:</label>
-      <input type="text" class="form-control" id="address" name="address" required placeholder="Nhập địa chỉ của bạn" />
-    </div>
+    <!-- Form thanh toán -->
+    <form action="{{ url_for('process_payment') }}" method="POST">
+        <div class="form-group">
+            <label for="address">Địa Chỉ:</label>
+            <input type="text" class="form-control" id="address" name="address" required
+                   placeholder="Nhập địa chỉ của bạn">
+        </div>
 
-    <div class="form-group">
-      <label for="phone">Số Điện Thoại:</label>
-      <input
-        type="text"
-        class="form-control"
-        id="phone"
-        name="phone"
-        required
-        placeholder="Nhập số điện thoại của bạn"
-      />
-    </div>
+        <div class="form-group">
+            <label for="phone">Số Điện Thoại:</label>
+            <input type="text" class="form-control" id="phone" name="phone" required
+                   placeholder="Nhập số điện thoại của bạn">
+        </div>
 
-    <div class="form-group">
-      <label for="total_amount">Tổng Tiền:</label>
-      <input
-        type="numbers"
-        class="form-control"
-        id="total_amount"
-        name="total_amount"
-        value=" {{ '{:,.0f}'.format(cart.total_amount) }} VND"
-        readonly
-      />
-    </div>
-    <div class="custom-control custom-switch">
-      <input type="checkbox" class="custom-control-input" id="switch_isThanhToanSau" name="switch_isThanhToanSau" />
-      <label class="custom-control-label" for="switch_isThanhToanSau">Thanh toán sau, chỉ lập đơn</label>
-    </div>
-    <div class="form-group text-center">
-      <button type="submit" class="btn btn-warning">Tiếp tục</button>
-    </div>
-  </form>
+        <div class="form-group">
+            <label for="total_amount">Tổng Tiền:</label>
+            <input type="numbers" class="form-control" id="total_amount" name="total_amount"
+                   value=" {{ '{:,.0f}'.format(cart.total_amount) }} VND" readonly>
+        </div>
+        <div class="custom-control custom-switch">
+            <input type="checkbox" class="custom-control-input" id="switch_isThanhToanSau" name="switch_isThanhToanSau">
+            <label class="custom-control-label" for="switch_isThanhToanSau">Thanh toán sau, chỉ lập đơn</label>
+        </div>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-warning">Tiếp tục</button>
+        </div>
+    </form>
+
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 
 {% endblock %}

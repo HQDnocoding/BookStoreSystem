@@ -1,54 +1,51 @@
-{% extends 'admin/base.html'%} {%block body%} {% if current_user.is_authenticated%} {% if current_user.vai_tro_id == 1
-%}
+{% extends 'admin/base.html'%}
+
+{%block body%}
+{% if current_user.is_authenticated%}
+{% if current_user.vai_tro_id == 1 %}
 <h1 class="text-center text-infor">TRANG QUẢN TRỊ</h1>
-{%endif%} {% if current_user.vai_tro_id == 3 %}
+{%endif%}
+{% if current_user.vai_tro_id == 3 %}
 <h1 class="text-center text-infor">TRANG QUẢN LÝ KHO</h1>
 {%endif%}
 <h2 class="text-danger">Hello {{current_user.username}}</h2>
 {%else %}
 <h1 class="text-center text-infor mt-1">Login</h1>
 <form class="needs-validated" method="post" action="/login-admin">
-  <div class="form-group form-floating mb-3 mt-3">
-    <label for="username">Tên đăng nhập</label>
-    <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" required />
-    <div class="valid-feedback">Valid</div>
-    <div class="invalid-feedback">Please fill out this field</div>
-  </div>
-  <div class="form-group form-floating mb-3 mt-3">
-    <label for="password">Mật khẩu</label>
-    <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" required />
-    <div class="valid-feedback">Valid</div>
-    <div class="invalid-feedback">Please fill out this field</div>
-  </div>
+    <div class="form-group form-floating mb-3 mt-3">
+        <label for="username">Tên đăng nhập</label>
+        <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" required>
+        <div class="valid-feedback">Valid</div>
+        <div class="invalid-feedback">Please fill out this field</div>
+    </div>
+    <div class="form-group form-floating mb-3 mt-3">
+        <label for="password">Mật khẩu</label>
+        <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" required>
+        <div class="valid-feedback">Valid</div>
+        <div class="invalid-feedback">Please fill out this field</div>
+    </div>
 
-  <button type="submit" class="btn btn-primary">Đăng nhập</button>
+    <button type="submit" class="btn btn-primary">Đăng nhập</button>
 </form>
 <script>
-  // Disable form submissions if there are invalid fields
-  (function () {
-    "use strict";
-    window.addEventListener(
-      "load",
-      function () {
+    // Disable form submissions if there are invalid fields
+    (function() {
+      'use strict';
+      window.addEventListener('load', function() {
         // Get the forms we want to add validation styles to
-        var forms = document.getElementsByClassName("needs-validation");
+        var forms = document.getElementsByClassName('needs-validation');
         // Loop over them and prevent submission
-        var validation = Array.prototype.filter.call(forms, function (form) {
-          form.addEventListener(
-            "submit",
-            function (event) {
-              if (form.checkValidity() === false) {
-                event.preventDefault();
-                event.stopPropagation();
-              }
-              form.classList.add("was-validated");
-            },
-            false,
-          );
+        var validation = Array.prototype.filter.call(forms, function(form) {
+          form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
         });
-      },
-      false,
-    );
-  })();
+      }, false);
+    })();
 </script>
-{%endif%} {% endblock%}
+{%endif%}
+{% endblock%}

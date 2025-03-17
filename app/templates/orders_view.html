@@ -1,53 +1,59 @@
-{% extends 'layout/base.html' %} {% block content%}
-<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+{% extends 'layout/base.html' %}
+
+
+{% block content%}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
 <div class="container mt-4">
-  <h2 class="mb-4">Danh sách đơn hàng</h2>
-  <h5 class="mb-4">(!) Các đơn hàng đợi thanh toán quá {{eh}} giờ sẽ bị hủy</h5>
+    <h2 class="mb-4">Danh sách đơn hàng</h2>
+    <h5 class="mb-4">(!) Các đơn hàng đợi thanh toán quá {{eh}} giờ sẽ bị hủy</h5>
 
-  <ul class="pagination">
-    {% for idx in range(1,pages+1) %}
-    <li class="page-item"><a class="page-link" href="{{url_for('orders',page=idx)}}">{{ idx }}</a></li>
-    {% endfor %}
-  </ul>
 
-  <div class="table-responsive">
-    <table class="table table-bordered table-hover">
-      <thead class="thead-dark">
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Ngày tạo</th>
-          <th scope="col">Phương thức thanh toán</th>
-          <th scope="col">Giá tiền</th>
-          <th scope="col">Trạng thái</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Duyệt qua các đơn hàng và hiển thị -->
-        {% for order in orders %}
-        <tr onclick="window.location.href='/order_details/{{order.id}}'">
-          <td>{{ order.id }}</td>
-          <td>{{ order.ngay_tao_don }}</td>
-          <td>{{ order.phuong_thuc }}</td>
-          <td>{{ order.total_price | format_currency}} VNĐ</td>
-          <td>
-            <span
-              class="badge badge-{{
+        <ul class="pagination">
+            {% for idx in range(1,pages+1) %}
+            <li class="page-item"><a class="page-link" href="{{url_for('orders',page=idx)}}">{{ idx }}</a></li>
+            {% endfor %}
+        </ul>
+
+
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Ngày tạo</th>
+                <th scope="col">Phương thức thanh toán</th>
+                <th scope="col">Giá tiền</th>
+                <th scope="col">Trạng thái</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Duyệt qua các đơn hàng và hiển thị -->
+            {% for order in orders %}
+            <tr onclick="window.location.href='/order_details/{{order.id}}'">
+                <td>{{ order.id }}</td>
+                <td>{{ order.ngay_tao_don }}</td>
+                <td>{{ order.phuong_thuc }}</td>
+                <td>{{ order.total_price | format_currency}} VNĐ</td>
+                <td>
+                        <span class="badge badge-{{
                 'success' if order.trang_thai == 'PAID' else
                 'warning' if order.trang_thai == 'WAITING' else
-                'danger' if order.trang_thai == 'FAIL' }}"
-            >
-              {{ order.trang_thai }}
-            </span>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+                'danger' if order.trang_thai == 'FAIL' }}">
+                            {{ order.trang_thai }}
+                        </span>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
 
 {% endblock %}
