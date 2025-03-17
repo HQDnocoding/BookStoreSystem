@@ -201,43 +201,51 @@ class Comment(db.Model):
 if __name__ == "__main__":
     with my_app.app_context():
 
-        # db.drop_all()
-        # db.create_all()
-
-        # db.session.commit()
-
-        # db.session.add_all([vt1,vt2,vt3,vt4])
-
-        # db.session.query(User).delete()
+        db.drop_all()
+        db.create_all()
+        db.session.commit()
+        db.session.query(User).delete()
 
         pw = str(hashlib.md5("123".encode("utf-8")).hexdigest())
 
-        # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
-        # db.session.add(qlk)
+        qlk = User(ho="Le", ten="Huy", username="quanlykho", password=pw, vai_tro_id=3)
+        db.session.add(qlk)
+
+        pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
+        pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
+        db.session.add_all([pt1, pt2])
         #
-        # pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
-        # pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
-        # db.session.add_all([pt1, pt2])
-        # #
-        # tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
-        # tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
-        # tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
-        # db.session.add_all([tt1, tt2, tt3])
-        # #
-        # r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
-        # r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
-        # r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
-        # r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
-        # db.session.add_all([r1,r2,r3,r4])
+        tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
+        tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
+        tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
+        db.session.add_all([tt1, tt2, tt3])
         #
-        # ten_qd1=Rule.SL_NHAP_MIN.value
-        # ten_qd2=Rule.SL_MIN_TO_NHAP.value
-        # ten_qd3=Rule.OUT_OF_TIME_TO_PAY.value
-        # qd1=QuyDinh(ten_quy_dinh=ten_qd1, noi_dung='Số lượng tối thiểu khi nhập sách', gia_tri=150)
-        # qd2=QuyDinh(ten_quy_dinh=ten_qd2,noi_dung='Số lượng tối thiểu của đầu sách để được nhập',gia_tri=300)
-        # qd3=QuyDinh(ten_quy_dinh=ten_qd3,noi_dung='Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán',gia_tri=48)
-        #
-        # db.session.add_all([qd1,qd2,qd3])
+        r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
+        r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
+        r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
+        r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
+        db.session.add_all([r1, r2, r3, r4])
+
+        ten_qd1 = Rule.SL_NHAP_MIN.value
+        ten_qd2 = Rule.SL_MIN_TO_NHAP.value
+        ten_qd3 = Rule.OUT_OF_TIME_TO_PAY.value
+        qd1 = QuyDinh(
+            ten_quy_dinh=ten_qd1,
+            noi_dung="Số lượng tối thiểu khi nhập sách",
+            gia_tri=150,
+        )
+        qd2 = QuyDinh(
+            ten_quy_dinh=ten_qd2,
+            noi_dung="Số lượng tối thiểu của đầu sách để được nhập",
+            gia_tri=300,
+        )
+        qd3 = QuyDinh(
+            ten_quy_dinh=ten_qd3,
+            noi_dung="Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán",
+            gia_tri=48,
+        )
+
+        db.session.add_all([qd1, qd2, qd3])
 
         admin = User(ho="Hứa", ten="Hứa", username="admin1", password=pw, vai_tro_id=1)
         nhan_vien = User(
@@ -245,10 +253,6 @@ if __name__ == "__main__":
         )
         qlk = User(ho="Trump", ten="Donald", username="qlk", password=pw, vai_tro_id=2)
         u = User(ho="Trump", ten="Donald", username="client", password=pw, vai_tro_id=4)
-        #
         db.session.add_all([admin, nhan_vien, qlk, u])
 
-        #
-
-        #
         db.session.commit()
