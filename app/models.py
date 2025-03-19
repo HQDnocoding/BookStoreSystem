@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import json
 from datetime import date
 
 from sqlalchemy import Column, Integer, Text, String, DateTime, Float, Boolean, ForeignKey, UniqueConstraint, Date
@@ -186,53 +187,97 @@ if __name__ == "__main__":
     with my_app.app_context():
 
         # db.drop_all()
-        # db.create_all()
+        db.create_all()
 
-        # db.session.commit()
-
+        db.session.commit()
+        # vt1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
+        # vt2 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
+        # vt3 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
+        # vt4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
+        #
         # db.session.add_all([vt1,vt2,vt3,vt4])
-
+        # db.session.commit()
         # db.session.query(User).delete()
+        #
+
+        pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
+        pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
+        db.session.add_all([pt1, pt2])
+
+        tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
+        tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
+        tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
+        db.session.add_all([tt1, tt2, tt3])
+
+        r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
+        r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
+        r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
+        r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
+        db.session.add_all([r1, r2, r3, r4])
 
         pw = str(hashlib.md5('123'.encode('utf-8')).hexdigest())
+        qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
+        db.session.add(qlk)
 
+        ten_qd1 = Rule.SL_NHAP_MIN.value
+        ten_qd2 = Rule.SL_MIN_TO_NHAP.value
+        ten_qd3 = Rule.OUT_OF_TIME_TO_PAY.value
+        qd1 = QuyDinh(ten_quy_dinh=ten_qd1, noi_dung='Số lượng tối thiểu khi nhập sách', gia_tri=150)
+        qd2 = QuyDinh(ten_quy_dinh=ten_qd2, noi_dung='Số lượng tối thiểu của đầu sách để được nhập', gia_tri=300)
+        qd3 = QuyDinh(ten_quy_dinh=ten_qd3, noi_dung='Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán', gia_tri=48)
 
+        db.session.add_all([qd1, qd2, qd3])
 
-        # qlk = User(ho='Le', ten="Huy", username='quanlykho', password=pw, vai_tro_id=3)
-        # db.session.add(qlk)
-        #
-        # pt1 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.ONLINE_PAY.value)
-        # pt2 = PhuongThucThanhToan(ten_phuong_thuc=PayingMethod.OFFLINE_PAY.value)
-        # db.session.add_all([pt1, pt2])
-        # #
-        # tt1 = TrangThaiDonHang(ten_trang_thai=Status.PAID.value)
-        # tt2 = TrangThaiDonHang(ten_trang_thai=Status.WAITING.value)
-        # tt3 = TrangThaiDonHang(ten_trang_thai=Status.FAIL.value)
-        # db.session.add_all([tt1, tt2, tt3])
-        # #
-        # r1 = VaiTro(ten_vai_tro=Role.QUANLY.value)
-        # r2 = VaiTro(ten_vai_tro=Role.QUAN_LY_KHO.value)
-        # r3 = VaiTro(ten_vai_tro=Role.NHAN_VIEN.value)
-        # r4 = VaiTro(ten_vai_tro=Role.KHACH_HANG.value)
-        # db.session.add_all([r1,r2,r3,r4])
-        #
-        # ten_qd1=Rule.SL_NHAP_MIN.value
-        # ten_qd2=Rule.SL_MIN_TO_NHAP.value
-        # ten_qd3=Rule.OUT_OF_TIME_TO_PAY.value
-        # qd1=QuyDinh(ten_quy_dinh=ten_qd1, noi_dung='Số lượng tối thiểu khi nhập sách', gia_tri=150)
-        # qd2=QuyDinh(ten_quy_dinh=ten_qd2,noi_dung='Số lượng tối thiểu của đầu sách để được nhập',gia_tri=300)
-        # qd3=QuyDinh(ten_quy_dinh=ten_qd3,noi_dung='Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán',gia_tri=48)
-        #
-        # db.session.add_all([qd1,qd2,qd3])
+        admin = User(ho='Hứa', ten="Hứa", username='admin', password=pw, vai_tro_id=1)
+        nhan_vien = User(ho='Trump', ten='Donald', username='nhanvien', password=pw, vai_tro_id=3)
+        qlk = User(ho='Trump', ten='Donald', username='qlk', password=pw, vai_tro_id=2)
+        u = User(ho='Trump', ten='Donald', username='client', password=pw, vai_tro_id=4)
 
-        admin=User(ho='Hứa',ten="Hứa",username='admin1',password=pw,vai_tro_id=1)
-        nhan_vien=User(ho='Trump',ten='Donald',username='nhanvien',password=pw,vai_tro_id=3)
-        qlk=User(ho='Trump',ten='Donald',username='qlk',password=pw,vai_tro_id=2)
-        u=User(ho='Trump',ten='Donald',username='client',password=pw,vai_tro_id=4)
-        #
-        db.session.add_all([admin,nhan_vien,qlk,u])
+        db.session.add_all([admin, nhan_vien, qlk, u])
+        db.session.commit()
 
-        #
+        with open('virtual_data/the_loai.json', 'r', encoding='utf-8') as f:
+            the_loai_data = json.load(f)
 
-        #
+        # Lặp qua từng mục trong dữ liệu the_loai_data và tạo đối tượng TheLoai
+        for item in the_loai_data:
+            the_loai = TheLoai(
+                ten_the_loai=item['ten_the_loai']
+            )
+            db.session.add(the_loai)
+
+        # Lưu tất cả các đối tượng vào cơ sở dữ liệu
+        db.session.commit()
+
+        with open('virtual_data/tac_gia.json', 'r', encoding='utf-8') as f:
+            tac_gia_data = json.load(f)
+
+        # Lặp qua từng mục trong dữ liệu tac_gia_data và tạo đối tượng TacGia
+        for item in tac_gia_data:
+            tac_gia = TacGia(
+                ten_tac_gia=item['ten_tac_gia']
+            )
+            db.session.add(tac_gia)
+
+        # Lưu tất cả các đối tượng vào cơ sở dữ liệu
+        db.session.commit()
+
+        with open('virtual_data/sach.json', 'r', encoding='utf-8') as f:
+            sach_data = json.load(f)
+
+        # Lặp qua từng mục trong dữ liệu sach_data và tạo đối tượng Sach
+        for item in sach_data:
+            sach = Sach(
+                ten_sach=item['ten_sach'],
+                don_gia=item['don_gia'],
+                bia_sach=item['bia_sach'],
+                noi_dung=item['noi_dung'],
+                so_luong=item['so_luong'],
+                nam_phat_hanh=item['nam_phat_hanh'],
+                the_loai_id=item['the_loai_id'],
+                tac_gia_id=item['tac_gia_id']
+            )
+            db.session.add(sach)
+
+        # Lưu tất cả các đối tượng vào cơ sở dữ liệu
         db.session.commit()
