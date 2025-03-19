@@ -1,70 +1,70 @@
 [
-    {
-        "id": 1,
-        "ten_the_loai": "Trinh thám"
-    },
-    {
-        "id": 2,
-        "ten_the_loai": "Tình cảm"
-    },
-    {
-        "id": 3,
-        "ten_the_loai": "Kinh dị"
-    },
-    {
-        "id": 4,
-        "ten_the_loai": "Thiếu nhi"
-    },
-    {
-        "id": 5,
-        "ten_the_loai": "Khoa học"
-    },
-    {
-        "id": 6,
-        "ten_the_loai": "Phiêu lưu"
-    },
-    {
-        "id": 7,
-        "ten_the_loai": "Tâm lý"
-    },
-    {
-        "id": 8,
-        "ten_the_loai": "Truyện ngắn"
-    },
-    {
-        "id": 9,
-        "ten_the_loai": "Luật"
-    },
-    {
-        "id": 10,
-        "ten_the_loai": "Văn học"
-    },
-    {
-        "id": 11,
-        "ten_the_loai": "Toán"
-    },
-    {
-        "id": 12,
-        "ten_the_loai": "Vật lý"
-    },
-    {
-        "id": 13,
-        "ten_the_loai": "Máy tính"
-    },
-    {
-        "id": 14,
-        "ten_the_loai": "Kinh tế"
-    },
-    {
-        "id": 15,
-        "ten_the_loai": "Truyện cổ tích"
-    },
-    {
-        "id": 16,
-        "ten_the_loai": "Tôn giáo"
-    },
-    {
-        "id": 17,
-        "ten_the_loai": "Câu đố"
-    }
+  {
+    "id": 1,
+    "ten_the_loai": "Trinh thám"
+  },
+  {
+    "id": 2,
+    "ten_the_loai": "Tình cảm"
+  },
+  {
+    "id": 3,
+    "ten_the_loai": "Kinh dị"
+  },
+  {
+    "id": 4,
+    "ten_the_loai": "Thiếu nhi"
+  },
+  {
+    "id": 5,
+    "ten_the_loai": "Khoa học"
+  },
+  {
+    "id": 6,
+    "ten_the_loai": "Phiêu lưu"
+  },
+  {
+    "id": 7,
+    "ten_the_loai": "Tâm lý"
+  },
+  {
+    "id": 8,
+    "ten_the_loai": "Truyện ngắn"
+  },
+  {
+    "id": 9,
+    "ten_the_loai": "Luật"
+  },
+  {
+    "id": 10,
+    "ten_the_loai": "Văn học"
+  },
+  {
+    "id": 11,
+    "ten_the_loai": "Toán"
+  },
+  {
+    "id": 12,
+    "ten_the_loai": "Vật lý"
+  },
+  {
+    "id": 13,
+    "ten_the_loai": "Máy tính"
+  },
+  {
+    "id": 14,
+    "ten_the_loai": "Kinh tế"
+  },
+  {
+    "id": 15,
+    "ten_the_loai": "Truyện cổ tích"
+  },
+  {
+    "id": 16,
+    "ten_the_loai": "Tôn giáo"
+  },
+  {
+    "id": 17,
+    "ten_the_loai": "Câu đố"
+  }
 ]
