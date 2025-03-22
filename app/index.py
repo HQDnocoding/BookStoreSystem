@@ -82,22 +82,27 @@ def register():
     return render_template("register.html", err_msg=err_msg)
 
 
-@app.route("/login/", methods=["get", "post"])
+@app.route("/login/", methods=["GET", "POST"])
 # @annonymous_user
 def login_my_user():
     err_msg = ""
     success_msg = request.args.get("success_msg")
     if request.method.__eq__("POST"):
+        print("POST request received")
+        print(f"Form data: {request.form}")
+        print(f"Username from form: {request.form.get('username', 'NOT FOUND')}")
+        print(f"Password from form: {request.form.get('password', 'NOT FOUND')}")
+       
         success_msg = ""
         username = request.form["username"]
         password = request.form["password"]
         user = dao.auth_user(username, password)
         if user:
             login_user(user=user)
-            n = request.args.get("next")
-            return redirect(n if n else "/")
+            next_page = request.args.get("next")
+            return redirect(next_page if next_page else "/")
         else:
-            if not dao.user_exists(request.form["username"]):
+            if not dao.user_exists(username):
                 err_msg = "Tài khoản KHÔNG tồn tại"
             else:
                 err_msg = "SAI mật khẩu"

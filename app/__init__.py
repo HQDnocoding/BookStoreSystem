@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 from urllib.parse import quote
 
@@ -12,17 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.secret_key = "##%#%FGE~EBb$enb?jn##3323290!!@vdv;vd.;ư"
-# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:%s@localhost/bookstoredb?charset=utf8mb4" % quote( "Admin@123")
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "mysql+pymysql://root:@127.0.0.1:3306/test_bookstore_db?charset=utf8mb4"  # Non_password_MySQL
-)
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
-app.config["BABEL_DEFAULT_LOCALE"] = "vi"  # Đặt ngôn ngữ mặc định là tiếng Việt
-app.config["PAGE_SIZE"] = 12
-app.config["DEBUG"] = True
-app.config["CART_KEY"] = "cart"
-app.config["BOOK_IMPORT_CART_KEY"] = "book_import_cart"
-
+app.config.from_pyfile("../config.py")
 
 # VNPAY thông tin cấu hình
 VNPAY_MERCHANT_ID = "BGJVFP3Z"

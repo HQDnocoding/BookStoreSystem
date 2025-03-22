@@ -62,21 +62,29 @@ def create_phuongthucthanhtoan(ten_phuong_thuc):  # Da test
 
 def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
     password = str(hashlib.md5(password.encode("utf-8")).hexdigest())  # Bâm mật khẩu
-    vt = (
+
+    vt_result = (
         VaiTro.query.filter(VaiTro.ten_vai_tro == vai_tro.strip())
         .with_entities(VaiTro.id)
-        .scalar()
+        .first()
     )
+
+    # Kiểm tra xem có tìm thấy vai trò không
+    if not vt_result:
+        raise ValueError(f"Không tìm thấy vai trò: {vai_tro}")
+
     new_user = User(
         ho=ho,
         ten=ten,
         username=username,
         password=password,
         avatar=avatar,
-        vai_tro_id=vt,
+        vai_tro_id=vt_result[0],  # Lấy ID từ kết quả truy vấn
     )
     db.session.add(new_user)
     db.session.commit()
+
+    return new_user  # Trả về user đã tạo để tiện sử dụng
 
 
 # def create_hoadonbansach(ngay_tao_hoa_don,nhanvien_id=None):  # Da test
