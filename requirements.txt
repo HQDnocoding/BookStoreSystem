@@ -7,3 +7,7 @@ flask_sqlalchemy
 pymysql
 flask_wtf
 wtforms_sqlalchemy
+pytest
+pytest_bdd
+black
+isort

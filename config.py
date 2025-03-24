@@ -7,4 +7,4 @@ DEBUG = True
 CART_KEY = "cart"
 BOOK_IMPORT_CART_KEY = "book_import_cart"
 
-ENV = "testing"  # hoặc "development", "production", "testing" v.v.
+ENV = "production"  # hoặc "development", "production", "testing" v.v.

@@ -92,7 +92,7 @@ def login_my_user():
         print(f"Form data: {request.form}")
         print(f"Username from form: {request.form.get('username', 'NOT FOUND')}")
         print(f"Password from form: {request.form.get('password', 'NOT FOUND')}")
-       
+
         success_msg = ""
         username = request.form["username"]
         password = request.form["password"]
