@@ -1,5 +1,5 @@
-Feature: Xác thực và phân quyền
-  Scenario: Nhân viên đăng nhập thành công
-    Given có một người dùng với vai trò nhân viên
-    When người dùng đăng nhập với thông tin đúng
-    Then đăng nhập thành công và vai trò được xác nhận
+Feature: Authentication and Authorization
+  Scenario: Employee successfully logs in
+    Given there is a user with the employee role
+    When the user logs in with correct credentials
+    Then login is successful and the role is verified

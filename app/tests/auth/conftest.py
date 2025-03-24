@@ -2,8 +2,15 @@ import pytest
 
 from app import app, db
 from app.dao import auth_user, create_user
-from app.models import User, VaiTro
+from app.models import VaiTro
 from app.tests.utils.database import setup_database
+
+
+@pytest.fixture
+def client():
+    """Fixture để tạo client Flask test."""
+    with app.test_client() as client:
+        yield client
 
 
 @pytest.fixture
@@ -17,21 +24,7 @@ def app_context():
 
 
 @pytest.fixture
-def roles(app_context):
-    """Fixture tạo các vai trò."""
-    roles = [
-        VaiTro(ten_vai_tro="KHACHHANG"),
-        VaiTro(ten_vai_tro="NHANVIEN"),
-        VaiTro(ten_vai_tro="QUANLYKHO"),
-        VaiTro(ten_vai_tro="QUANLY"),
-    ]
-    db.session.add_all(roles)
-    db.session.commit()
-    return roles
-
-
-@pytest.fixture
-def test_users(app_context, roles):
+def test_users(app_context):
     """Fixture tạo các người dùng với vai trò khác nhau."""
     users = {
         "customer": create_user(
