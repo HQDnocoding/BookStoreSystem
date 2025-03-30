@@ -1,9 +1,14 @@
 import pytest
 
 from app import app, db
-from app.dao import auth_user, create_user
-from app.models import VaiTro
+from app.dao import create_user
 from app.tests.utils.database import setup_database
+
+# Fixtures và bước dữ liệu nền
+@pytest.fixture
+def auth_context():
+    """Tạo context cho quá trình xác thực"""
+    return {"credentials": {}, "response": None, "error": None}
 
 
 @pytest.fixture
@@ -19,8 +24,8 @@ def app_context():
     with app.app_context():
         setup_database()
         yield
-        # db.session.remove()
-        # db.drop_all()
+        db.session.remove()
+        db.drop_all()
 
 
 @pytest.fixture
