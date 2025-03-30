@@ -11,3 +11,5 @@ pytest
 pytest_bdd
 black
 isort
+pytest-cov
+pytest-html
