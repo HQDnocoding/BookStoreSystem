@@ -3,13 +3,14 @@ import pytest
 from app import app, db
 from app.dao import create_sach, create_user, get_id_tac_gia, get_id_the_loai
 from app.models import Sach, TacGia, TheLoai, User, VaiTro
+from app.tests.utils.database import setup_database
 
 
 @pytest.fixture
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
     with app.app_context():
-        db.create_all()
+        setup_database()
         yield
         db.session.remove()
         db.drop_all()
@@ -44,8 +45,8 @@ def book(app_context):
         don_gia=250000,
         the_loai_id=the_loai.id,
         tac_gia_id=tac_gia.id,
+        so_luong=8,  # Số lượng tồn kho ban đầu
     )
-    sach.so_luong = 8  # Số lượng tồn kho ban đầu
     db.session.commit()
     return sach
 
