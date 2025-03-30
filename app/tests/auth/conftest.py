@@ -4,6 +4,7 @@ from app import app, db
 from app.dao import create_user
 from app.tests.utils.database import setup_database
 
+
 # Fixtures và bước dữ liệu nền
 @pytest.fixture
 def auth_context():

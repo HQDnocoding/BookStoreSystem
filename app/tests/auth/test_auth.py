@@ -4,10 +4,8 @@ from flask_login import logout_user
 
 from app import app
 from app.dao import auth_user
-from app.errors import (
-    AuthenticationError, PasswordError, UserNotFoundError, 
-    ValidationError, AccountLockedError
-)
+from app.errors import (AccountLockedError, AuthenticationError, PasswordError,
+                        UserNotFoundError, ValidationError)
 from app.models import User
 
 
@@ -52,27 +50,33 @@ def test_login_with_different_credentials(
     app.config.get("ENV") == "production",
     reason="Không chạy trong môi trường production",
 )
+@pytest.mark.integration
 def test_login_and_access_control_integration(test_users):
     """Kiểm tra đăng nhập và phân quyền truy cập (Integration Test)."""
     with app.test_client() as client:
         # Đăng nhập với vai trò quản trị viên
-        response = auth_user(username="admin1", password="123")
-        if response:
-            response = Response(status=200)
-        assert response.status_code == 200  # Chuyển hướng sau đăng nhập thành công
+        user = auth_user(username="admin1", password="123")
+        assert user is not None
+
+        response = Response(status=200)
+        assert response.status_code == 200
 
         # Truy cập route chỉ dành cho admin
         with client.session_transaction() as sess:
             sess["user_id"] = test_users["admin"].id
+            sess["role"] = "QUANLY"
+
+        # Kiểm tra phân quyền
+        assert user.vai_tro.ten_vai_tro == "QUANLY"
 
         # Đăng xuất
-        response = logout_user()
-        if response:
-            response = Response(status=200)
-        assert response.status_code == 200  # Chuyển hướng vì chưa đăng nhập
+        logout_user()
+        response = Response(status=200)
+        assert response.status_code == 200
 
 
 # Different Types of Assertions => PASSED
+@pytest.mark.unit
 def test_auth_user_invalid(test_users):
     """Kiểm tra xác thực với thông tin không hợp lệ (Unit Test)."""
     with app.app_context():
@@ -84,6 +88,7 @@ def test_auth_user_invalid(test_users):
 
 
 # Passing Command-line Args in Pytest => PASSED
+@pytest.mark.unit
 def test_login_with_custom_role(test_users, pytestconfig):
     """Kiểm tra đăng nhập với vai trò từ cmd (Unit Test)."""
     role = pytestconfig.getoption("--role", default="KHACHHANG")
@@ -96,7 +101,42 @@ def test_login_with_custom_role(test_users, pytestconfig):
 
     with app.app_context():
         user = auth_user(username=username, password="123")
+        assert user is not None
         assert user.vai_tro.ten_vai_tro == role
+
+
+# Test vai trò cụ thể => PASSED
+@pytest.mark.unit
+def test_login_with_role_restriction(test_users):
+    """Kiểm tra đăng nhập với giới hạn vai trò (Unit Test)."""
+    with app.app_context():
+        # Kiểm tra thành công khi vai trò phù hợp
+        user = auth_user(username="employee1", password="123", roles=["NHANVIEN"])
+        assert user is not None, "Đăng nhập thất bại khi vai trò phù hợp"
+
+        # Kiểm tra thất bại khi vai trò không phù hợp
+        user = auth_user(username="employee1", password="123", roles=["QUANLY"])
+        assert user is None
+
+
+# Kiểm tra chuỗi xác thực và phân quyền thành công => PASSED
+@pytest.mark.core
+def test_authorization_chain(test_users):
+    """Kiểm tra chuỗi xác thực và phân quyền (Unit Test)"""
+    with app.app_context():
+        # 1. Đăng nhập thành công
+        admin_user = auth_user(username="admin1", password="123")
+        assert admin_user is not None
+        # 2. Kiểm tra vai trò
+        assert admin_user.vai_tro.ten_vai_tro == "QUANLY"
+        # 3. Kiểm tra quyền truy cập vào nhiều vai trò
+        employee_user = auth_user(
+            username="employee1", password="123", roles=["NHANVIEN", "KHACHHANG"]
+        )
+        assert employee_user is not None
+        # 4. Kiểm tra từ chối quyền truy cập
+        user = auth_user(username="customer1", password="123", roles=["QUANLY"])
+        assert user is None
 
 
 # Pytest-BDD => PASSED
@@ -156,19 +196,23 @@ def user_receives_result(auth_context, expected_result):
     elif "lỗi" in expected_result:
         assert auth_context["error"] is not None
         expected_error_message = expected_result.split('"')[1]
-        assert expected_error_message in auth_context["error"], \
-            f"Lỗi không khớp. Mong đợi: '{expected_error_message}', Thực tế: '{auth_context['error']}'"
+        assert (
+            expected_error_message in auth_context["error"]
+        ), f"Lỗi không khớp. Mong đợi: '{expected_error_message}', Thực tế: '{auth_context['error']}'"
     else:
         pytest.fail(f"Trường hợp không xác định: {expected_result}")
 
 
-# Bổ sung test cho tình huống cụ thể - vai trò người dùng
+# Test vai trò người dùng
 @pytest.fixture
 @given("một người dùng có vai trò là nhân viên")
 def employee_exists(test_users):
     """Kiểm tra tồn tại người dùng có vai trò nhân viên"""
     assert "employee" in test_users
-    return {"user": test_users["employee"]}
+    employee = test_users["employee"]
+    assert employee.vai_tro.ten_vai_tro == "NHANVIEN"
+    return {"user": employee}
+
 
 @pytest.fixture
 @when("người dùng đăng nhập bằng thông tin đăng nhập chính xác")
