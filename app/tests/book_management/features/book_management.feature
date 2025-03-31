@@ -54,3 +54,14 @@ Feature: Quản lý sách
     Then hệ thống từ chối cập nhật và thông báo lỗi:
       | Thông báo lỗi                   |
       | Sách với ID 9999 không tồn tại  |
+
+  Scenario: Quản trị viên chỉ cập nhật tên sách
+  Given có một cuốn sách trong hệ thống với thông tin ban đầu:
+    | Tên sách      | Đơn giá | Số lượng | Thể loại  | Tác giả  |
+    | Original Book | 100000  | 20       | Mystery   | Author D |
+  When quản trị viên cập nhật thông tin sách thành:
+    | Tên sách  | Đơn giá | Số lượng |
+    | New Title | 100000  | 20       |
+  Then thông tin sách được cập nhật trong hệ thống với các giá trị:
+    | Tên sách  | Đơn giá | Số lượng |
+    | New Title | 100000  | 20       |

@@ -95,12 +95,35 @@ def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
 #     return new_hoadonbansach
 
 
-def create_sach(tenSach, donGia, the_loai_id, tac_gia_id):  # Da test
-    new_sach = Sach(
-        tenSach=tenSach, donGia=donGia, the_loai_id=the_loai_id, tac_gia_id=tac_gia_id
-    )
-    db.session.add(new_sach)
-    db.session.commit()
+# Tạo sách với kiểm tra đầu vào và xử lý lỗi
+def create_sach(ten_sach, don_gia, the_loai_id, tac_gia_id, so_luong=1):
+    """Tạo một cuốn sách mới trong cơ sở dữ liệu."""
+    if not ten_sach or not isinstance(ten_sach, str):
+        raise ValueError("Tên sách không được rỗng.")
+    if not isinstance(don_gia, (int, float)) or don_gia < 0:
+        raise ValueError("Đơn giá phải là số không âm.")
+    if not db.session.query(TheLoai).get(the_loai_id):
+        raise ValueError(f"Thể loại với ID {the_loai_id} không tồn tại.")
+    if not db.session.query(TacGia).get(tac_gia_id):
+        raise ValueError(f"Tác giả với ID {tac_gia_id} không tồn tại.")
+    if not isinstance(so_luong, int) or so_luong < 0:
+        raise ValueError("Số lượng phải là số không âm.")
+
+    try:
+        new_sach = Sach(
+            ten_sach=ten_sach.strip(),
+            don_gia=don_gia,
+            the_loai_id=the_loai_id,
+            tac_gia_id=tac_gia_id,
+            so_luong=so_luong,  # Khởi tạo số lượng mặc định
+        )
+        db.session.add(new_sach)
+        db.session.commit()
+        return new_sach
+    except SQLAlchemyError as e:
+        db.session.rollback()
+        app.logger.error(f"Lỗi khi tạo sách: {str(e)}")
+        raise
 
 
 # def create_chitiethoadon(sach_id, hoa_don_id, so_luong, tong_tien):  # Da test

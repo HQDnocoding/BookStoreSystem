@@ -179,15 +179,15 @@ def admin_logged_in(admin_user, role):
 def book_in_system(app_context, datatable):
     """Tạo một cuốn sách trong hệ thống với dữ liệu ban đầu từ bảng."""
     print("\nbook_in_system: ")
-    
+
     # Lấy header và row đầu tiên (dữ liệu thực tế)
     headers = datatable[0]  # ['Tên sách', 'Đơn giá', 'Số lượng', 'Thể loại', 'Tác giả']
-    values = datatable[1]   # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
+    values = datatable[1]  # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
 
     # Chuyển list thành dictionary
     data = dict(zip(headers, values))
     print(data)
-    
+
     the_loai = TheLoai(ten_the_loai=data["Thể loại"])
     tac_gia = TacGia(ten_tac_gia=data["Tác giả"])
     db.session.add_all([the_loai, tac_gia])
@@ -213,12 +213,12 @@ def update_book(app_context, admin_logged_in, book_in_system, datatable):
     print("\nupdate_book: ")
     # Lấy header và row đầu tiên (dữ liệu thực tế)
     headers = datatable[0]  # ['Tên sách', 'Đơn giá', 'Số lượng', 'Thể loại', 'Tác giả']
-    values = datatable[1]   # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
+    values = datatable[1]  # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
 
     # Chuyển list thành dictionary
     data = dict(zip(headers, values))
     print(data)
-    
+
     errors = []
 
     # Kiểm tra dữ liệu hợp lệ
@@ -241,7 +241,7 @@ def update_book(app_context, admin_logged_in, book_in_system, datatable):
     # Nếu có lỗi, không cập nhật dữ liệu
     if errors:
         return {"success": False, "book": book_in_system["book"], "errors": errors}
-    
+
     # Cập nhật sách nếu không có lỗi
     book = book_in_system["book"]
     book.ten_sach = data["Tên sách"]
@@ -257,23 +257,19 @@ def update_book(app_context, admin_logged_in, book_in_system, datatable):
 
 
 # Step: Kiểm tra thông tin sách được cập nhật => PASSED
-@then(
-    parsers.parse(
-        "thông tin sách được cập nhật trong hệ thống với các giá trị:"
-    )
-)
+@then(parsers.parse("thông tin sách được cập nhật trong hệ thống với các giá trị:"))
 def book_info_updated(app_context, update_result, datatable):
     """Kiểm tra thông tin sách đã được cập nhật thành công."""
     print("\nbook_info_updated: ")
-    
+
     # Lấy header và row đầu tiên (dữ liệu thực tế)
     headers = datatable[0]  # ['Tên sách', 'Đơn giá', 'Số lượng', 'Thể loại', 'Tác giả']
-    values = datatable[1]   # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
+    values = datatable[1]  # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
 
     # Chuyển list thành dictionary
     data = dict(zip(headers, values))
     print(data)
-    
+
     assert update_result["success"], "Cập nhật sách thất bại"
     book = update_result["book"]
     assert (
@@ -293,11 +289,13 @@ def check_update_failure(app_context, update_result, datatable):
     """Kiểm tra hệ thống từ chối cập nhật và trả về lỗi chính xác."""
     print("\ncheck_update_failure: ")
     # Kiểm tra nếu datatable có header thì bỏ qua
-    expected_errors = [row[0] for row in datatable[1:]] if len(datatable) > 1 else [] # Bỏ qua dòng đầu tiên
+    expected_errors = (
+        [row[0] for row in datatable[1:]] if len(datatable) > 1 else []
+    )  # Bỏ qua dòng đầu tiên
     print("Expected Errors:", expected_errors)
     print("update_result:", update_result)
 
-    assert not update_result["success"] # Cập nhật lẽ ra phải thất bại
+    assert not update_result["success"]  # Cập nhật lẽ ra phải thất bại
     # Kiểm tra nếu ít nhất một lỗi mong đợi có trong lỗi thực tế
     if any(error in update_result["errors"] for error in expected_errors):
         return True  # Thành công nếu có ít nhất một lỗi mong đợi xuất hiện
@@ -324,9 +322,7 @@ def no_book_in_system(app_context, book_id):
 
 # Step: Cố gắng cập nhật sách không tồn tại
 @when(
-    parsers.parse(
-        'quản trị viên cố gắng cập nhật sách với ID "{book_id}" thành:'
-    ),
+    parsers.parse('quản trị viên cố gắng cập nhật sách với ID "{book_id}" thành:'),
     target_fixture="update_result",
 )
 def update_nonexistent_book(app_context, admin_logged_in, no_book, book_id, datatable):
@@ -334,12 +330,12 @@ def update_nonexistent_book(app_context, admin_logged_in, no_book, book_id, data
     print("\nupdate_nonexistent_book: ")
     # Lấy header và row đầu tiên (dữ liệu thực tế)
     headers = datatable[0]  # ['Tên sách', 'Đơn giá', 'Số lượng', 'Thể loại', 'Tác giả']
-    values = datatable[1]   # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
+    values = datatable[1]  # ['Test Book', '200000', '5', 'Non-Fiction', 'Author B']
 
     # Chuyển list thành dictionary
     data = dict(zip(headers, values))
     print(data)
-    
+
     try:
         book = Sach.query.get(book_id)
         if book is None:
