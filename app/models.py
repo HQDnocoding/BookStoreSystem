@@ -129,12 +129,14 @@ class PhieuNhapSach(db.Model):
 
 
 class ChiTietPhieuNhapSach(db.Model):
+    __tablename__ = "chi_tiet_phieu_nhap_sach"
     id = Column(Integer, primary_key=True, autoincrement=True)
     phieu_nhap_sach_id = Column(
         Integer,
         ForeignKey(PhieuNhapSach.id, ondelete="CASCADE"),
+        index=True
     )
-    sach_id = Column(Integer, ForeignKey(Sach.id))
+    sach_id = Column(Integer, ForeignKey(Sach.id), index=True)
 
     so_luong = Column(Integer, nullable=False)
 

@@ -1,12 +1,13 @@
 import hashlib
 import locale
+import time
 from datetime import datetime
 from xmlrpc.client import DateTime
 
 from flask import flash, jsonify, session
 from flask_login import current_user
 from sqlalchemy import func
-from sqlalchemy.exc import NoResultFound, SQLAlchemyError
+from sqlalchemy.exc import NoResultFound, OperationalError, SQLAlchemyError
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.operators import desc_op
 
@@ -139,17 +140,39 @@ def create_sach(ten_sach, don_gia, the_loai_id, tac_gia_id, so_luong=1):
 
 
 def create_phieunhapsach(quan_ly_kho_id):
-    new_phieunhapsach = PhieuNhapSach(quan_ly_kho_id=quan_ly_kho_id)
-    db.session.add(new_phieunhapsach)
-    db.session.commit()
+    """Tạo một phiếu nhập sách mới."""
+    try:
+        new_phieunhapsach = PhieuNhapSach(quan_ly_kho_id=quan_ly_kho_id,)
+        db.session.add(new_phieunhapsach)
+        db.session.commit()
+        db.session.refresh(new_phieunhapsach)
+        return new_phieunhapsach
+    except Exception as e:
+        db.session.rollback()
+        print(f"Lỗi khi tạo phiếu nhập sách: {e}")
+        return None
 
 
-def create_chitietphieunhapsach(phieu_nhap_sach_id, sach_id, so_luong):
-    new_chitietnhapsach = ChiTietPhieuNhapSach(
-        phieu_nhap_sach_id=phieu_nhap_sach_id, sach_id=sach_id, so_luong=so_luong
-    )
-    db.session.add(new_chitietnhapsach)
-    db.session.commit()
+
+def create_chitietphieunhapsach(phieu_nhap_sach_id, sach_id, so_luong, max_retries=2):
+    retries = 0
+    while retries < max_retries:
+        try:
+            new_chitietnhapsach = ChiTietPhieuNhapSach(
+                phieu_nhap_sach_id=phieu_nhap_sach_id, sach_id=sach_id, so_luong=so_luong
+            )
+            db.session.add(new_chitietnhapsach)
+            db.session.flush()  # Flush thay vì commit ngay lập tức
+            return new_chitietnhapsach
+        except OperationalError as e:
+            db.session.rollback()  # Rollback ngay khi gặp lỗi
+            if "Lock wait timeout exceeded" in str(e):
+                retries += 1
+                time.sleep(2)  # Đợi trước khi thử lại
+            else:
+                raise  # Ném lỗi khác nếu không phải lỗi lock
+    raise Exception("Max retries exceeded for create_chitietphieunhapsach")
+
 
 
 def create_donhang(ngay_tao_don, phuong_thuc_id, trang_thai_id, khach_hang_id):
@@ -440,10 +463,17 @@ def user_exists(username):
     return db.session.query(User).filter_by(username=username).first() is not None
 
 
-def add_so_luong(sach_id, so_luong):
-    sach = Sach.query.get(sach_id)
-    sach.so_luong += so_luong
-    db.session.commit()
+def update_book_quantity(sach_id, so_luong):
+    """Cập nhật số lượng sách trong kho sau khi nhập."""
+    try:
+        sach = Sach.query.get(sach_id)
+        if sach:
+            sach.so_luong = Sach.so_luong + so_luong
+            db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Lỗi khi cập nhật số lượng sách (ID: {sach_id}): {str(e)}")
+        raise
 
 
 def get_id_by_phuong_thuc_name(name):
