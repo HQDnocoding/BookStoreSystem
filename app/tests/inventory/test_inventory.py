@@ -6,8 +6,8 @@ from flask import url_for
 from sqlalchemy.exc import SQLAlchemyError
 
 from app import app, db
-from app.dao import (update_book_quantity, create_chitietphieunhapsach,
-                     create_phieunhapsach)
+from app.dao import (create_chitietphieunhapsach, create_phieunhapsach,
+                     update_book_quantity)
 from app.models import ChiTietPhieuNhapSach, PhieuNhapSach, Sach
 from app.utils import create_pdf_export_nhap_sach
 
@@ -37,7 +37,6 @@ def test_create_import_ticket_success(warehouse_manager, book, inventory_rules):
                 db.session.rollback()  # Rollback ngay nếu có lỗi
                 pytest.fail(f"Transaction error: {str(e)}")
 
-
             # Assertions với thông báo lỗi chi tiết hơn
             assert phieu_nhap is not None
             assert phieu_nhap.quan_ly_kho_id == manager.id
@@ -61,11 +60,22 @@ def test_create_import_ticket_success(warehouse_manager, book, inventory_rules):
         (10, 5, True, None),  # Nhập hợp lệ # Lock wait timeout exceeded
         (25, 5, False, "Số lượng tồn vượt quá SL_MIN_TO_NHAP"),  # Tồn kho đã đủ
         (5, 3, False, "Số lượng nhập dưới SL_NHAP_MIN"),  # Nhập dưới mức tối thiểu
-        (-1, 5, False, "Số lượng tồn không hợp lệ"),  # Thêm trường hợp lỗi # Lock wait timeout exceeded
+        (
+            -1,
+            5,
+            False,
+            "Số lượng tồn không hợp lệ",
+        ),  # Thêm trường hợp lỗi # Lock wait timeout exceeded
     ],
 )
 def test_import_book_with_different_conditions(
-    warehouse_manager, book, inventory_rules, current_stock, import_quantity, expected_success, expected_alert
+    warehouse_manager,
+    book,
+    inventory_rules,
+    current_stock,
+    import_quantity,
+    expected_success,
+    expected_alert,
 ):
     with app.app_context():
         try:
@@ -73,19 +83,26 @@ def test_import_book_with_different_conditions(
             db.session.flush()  # Không commit ngay, tránh giữ khóa lâu
 
             if current_stock >= inventory_rules.SL_MIN_TO_NHAP:
-                result = {"success": False, "alert": "Số lượng tồn vượt quá SL_MIN_TO_NHAP"}
+                result = {
+                    "success": False,
+                    "alert": "Số lượng tồn vượt quá SL_MIN_TO_NHAP",
+                }
             elif import_quantity < inventory_rules.SL_NHAP_MIN:
                 result = {"success": False, "alert": "Số lượng nhập dưới SL_NHAP_MIN"}
             else:
                 phieu_nhap = create_phieunhapsach(quan_ly_kho_id=warehouse_manager.id)
-                db.session.flush()  
+                db.session.flush()
 
                 # ✅ Dùng bulk insert thay vì add từng cái
                 chi_tiet_nhap = [
-                    ChiTietPhieuNhapSach(phieu_nhap_sach_id=phieu_nhap.id, sach_id=book.id, so_luong=import_quantity)
+                    ChiTietPhieuNhapSach(
+                        phieu_nhap_sach_id=phieu_nhap.id,
+                        sach_id=book.id,
+                        so_luong=import_quantity,
+                    )
                 ]
-                db.session.bulk_save_objects(chi_tiet_nhap)  
-                
+                db.session.bulk_save_objects(chi_tiet_nhap)
+
                 update_book_quantity(book.id, import_quantity)
                 db.session.commit()
                 result = {"success": True, "alert": None}
@@ -98,6 +115,7 @@ def test_import_book_with_different_conditions(
         except SQLAlchemyError as e:
             db.session.rollback()
             pytest.fail(f"Database error: {str(e)}")
+
 
 # Skipping Tests and Markers với cleanup
 @pytest.mark.skipif(
@@ -174,7 +192,6 @@ def test_import_with_custom_min_quantity(
                 }
             else:
                 phieu_nhap = create_phieunhapsach(
-                    ngay_nhap=datetime.now(),
                     quan_ly_kho_id=warehouse_manager.id,
                 )
                 create_chitietphieunhapsach(
@@ -219,9 +236,7 @@ def import_book(logged_in, book_data, quantity):
     manager = logged_in["manager"]
     with app.app_context():
         try:
-            phieu_nhap = create_phieunhapsach(
-                ngay_nhap=datetime.now(), quan_ly_kho_id=manager.id
-            )
+            phieu_nhap = create_phieunhapsach(quan_ly_kho_id=manager.id)
             create_chitietphieunhapsach(
                 phieu_nhap_id=phieu_nhap.id,
                 sach_id=book_data["book"].id,
