@@ -2,35 +2,160 @@ import locale
 import textwrap
 from datetime import datetime, timedelta
 
+from flask import jsonify, session
+from flask_login import current_user
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from reportlab.platypus import Table, TableStyle
-from sqlalchemy.testing.config import db_url
 
-from app import Rule, Status, app, db
+from app import PayingMethod, Rule, Status, app, db
 from app.admin import SachForm
-from app.dao import get_quy_dinh, get_sach_by_id, get_trang_thai_by_name
+from app.dao import (create_chitietdonhang, create_donhang,
+                     create_thongtinnhanhang, get_or_create_phuong_thuc_id,
+                     get_or_create_trang_thai_id, get_quy_dinh, get_sach_by_id,
+                     get_trang_thai_by_name)
 from app.models import DonHang, Sach, User
 
 
-def cart_stats(cart):
-    total_amount, total_quantity = 0, 0
+def process_offline_payment(cart_items, phone, address="THANH TOÁN TẠI CỬA HÀNG"):
+    if not cart_items:
+        raise ValueError("Giỏ hàng trống")
 
-    if cart:
-        for c in cart.values():
-            total_quantity += c["so_luong"]
-            total_amount += c["so_luong"] * c["don_gia"]
-    else:
+    # Tạo đơn hàng
+    donhang = create_donhang(
+        ngay_tao_don=datetime.now(),
+        phuong_thuc_id=get_or_create_phuong_thuc_id(PayingMethod.OFFLINE_PAY.value),
+        trang_thai_id=get_or_create_trang_thai_id(Status.WAITING.value),
+        khach_hang_id=current_user.get_id(),
+    )
+
+    # Tạo thông tin nhận hàng
+    create_thongtinnhanhang(
+        id=donhang.id,
+        dien_thoai_nhan_hang=phone,
+        dia_chi_nhan_hang=address,
+    )
+
+    # Tạo chi tiết đơn hàng từ giỏ hàng
+    for ci in cart_items.values():
+        create_chitietdonhang(
+            don_hang_id=donhang.id,
+            sach_id=ci["id"],
+            so_luong=ci["so_luong"],
+            tong_tien=ci["don_gia"] * ci["so_luong"],
+        )
+
+    return donhang.id
+
+
+def cart_stats(cart):
+    """Tính toán thông tin thống kê của giỏ hàng."""
+    if cart is None:
         cart = {}
+    total_quantity = 0
+    total_amount = 0.0
+    updated_cart = cart.copy()
+
+    for book_id, item in updated_cart.items():
+        so_luong = item.get("so_luong", 0)
+        don_gia = item.get("don_gia", 0)
+        total_quantity += so_luong
+        total_amount += don_gia * so_luong
 
     return {
-        "cart": list(cart.values()),
-        "total_amount": total_amount,
         "total_quantity": total_quantity,
+        "total_amount": total_amount,
+        "cart": updated_cart,
     }
+
+
+def add_to_cart(book, so_luong, cart_session):
+    """Hàm xử lý thêm sách vào giỏ hàng."""
+    key = "CART_KEY"
+    so_luong_con_lai = book.so_luong
+
+    # Kiểm tra số lượng hợp lệ
+    if so_luong <= 0:
+        return jsonify({"alert": "Số lượng không hợp lệ"}), 400
+
+    if so_luong > so_luong_con_lai:
+        data = cart_stats(cart_session.get(key, {}))
+        data["alert"] = "Đã HẾT sách hoặc không đủ số lượng trong kho"
+        return jsonify(data), 400
+
+    # Lấy giỏ hàng từ session
+    cart = cart_session.get(key, {})
+
+    if book.id in cart:
+        new_quantity = cart[book.id]["so_luong"] + so_luong
+        if new_quantity > so_luong_con_lai:
+            data = cart_stats(cart)
+            data["alert"] = "KHÔNG đủ sách để mua"
+            return jsonify(data), 400
+        cart[book.id]["so_luong"] = new_quantity
+    else:
+        cart[book.id] = {
+            "id": book.id,
+            "ten_sach": book.ten_sach,
+            "don_gia": book.don_gia,
+            "so_luong": so_luong,
+            "bia_sach": book.bia_sach,
+            "so_luong_con_lai": so_luong_con_lai,
+        }
+
+    cart_session[key] = cart
+    return jsonify(cart_stats(cart)), 200
+
+
+# def get_stats(nam: int, thang: int, ten_the_loai: str) -> list:
+#     try:
+#         start_date = datetime(nam, thang, 1)
+#         end_date = datetime(nam + 1, 1, 1) if thang == 12 else datetime(nam, thang + 1, 1)
+
+#         # Sử dụng with_entities để giảm tải dữ liệu
+#         total_sales = (
+#             db.session.query(func.sum(ChiTietDonHang.tong_tien))
+#             .join(DonHang)
+#             .filter(
+#                 DonHang.ngay_tao_don >= start_date,
+#                 DonHang.ngay_tao_don < end_date,
+#                 DonHang.trang_thai_id == get_id_by_trang_thai(Status.PAID.value),
+#             )
+#             .scalar() or 0
+#         )
+
+#         if total_sales == 0:
+#             return [["Không có dữ liệu", 0, 0.0, 0.0]]
+
+#         query = (
+#             db.session.query(
+#                 TheLoai.ten_the_loai,
+#                 func.sum(ChiTietDonHang.so_luong).label("so_luong_ban"),
+#                 func.sum(ChiTietDonHang.tong_tien).label("doanh_thu"),
+#                 (func.sum(ChiTietDonHang.tong_tien) / total_sales * 100).label("ti_le_ban"),
+#             )
+#             .select_from(ChiTietDonHang)
+#             .join(DonHang)
+#             .join(Sach)
+#             .join(TheLoai)
+#             .filter(
+#                 DonHang.ngay_tao_don >= start_date,
+#                 DonHang.ngay_tao_don < end_date,
+#                 DonHang.trang_thai_id == get_id_by_trang_thai(Status.PAID.value),
+#             )
+#         )
+
+#         if ten_the_loai != "Tất cả":
+#             query = query.filter(TheLoai.ten_the_loai == ten_the_loai)
+
+#         return query.group_by(TheLoai.ten_the_loai).all()
+
+#     except SQLAlchemyError as e:
+#         app.logger.error(f"Lỗi khi lấy thống kê: {str(e)}")
+#         return [["Lỗi hệ thống", 0, 0.0, 0.0]]
 
 
 # Đăng ký font Tahoma
