@@ -1,8 +1,8 @@
 import pytest
 
 from app import app, db
-from app.dao import create_user
-from app.tests.utils.database import setup_database
+from app.dao import auth_user
+from app.database import setup_database
 
 
 # Fixtures và bước dữ liệu nền
@@ -13,7 +13,7 @@ def auth_context():
 
 
 @pytest.fixture
-def client():
+def test_client():
     """Fixture để tạo client Flask test."""
     with app.test_client() as client:
         yield client
@@ -23,47 +23,31 @@ def client():
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
     with app.app_context():
-        setup_database()
+        # setup_database()
         yield
-        db.session.remove()
-        db.drop_all()
+        # db.session.remove()
+        # db.drop_all()
 
 
 @pytest.fixture
 def test_users(app_context):
     """Fixture tạo các người dùng với vai trò khác nhau."""
     users = {
-        "customer": create_user(
-            ho="Nguyen",
-            ten="Van A",
+        "customer": auth_user(
             username="customer1",
             password="123",
-            avatar=None,
-            vai_tro="KHACHHANG",
         ),
-        "employee": create_user(
-            ho="Le",
-            ten="Van B",
+        "employee": auth_user(
             username="employee1",
             password="123",
-            avatar=None,
-            vai_tro="NHANVIEN",
         ),
-        "warehouse": create_user(
-            ho="Tran",
-            ten="Van C",
+        "warehouse": auth_user(
             username="warehouse1",
             password="123",
-            avatar=None,
-            vai_tro="QUANLYKHO",
         ),
-        "admin": create_user(
-            ho="Pham",
-            ten="Van D",
+        "admin": auth_user(
             username="admin1",
             password="123",
-            avatar=None,
-            vai_tro="QUANLY",
         ),
     }
     return users
