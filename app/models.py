@@ -113,6 +113,15 @@ class Sach(db.Model):
     don_hang = relationship("ChiTietDonHang", backref="sach", lazy=True)
     comments = relationship("Comment", backref="sach", lazy=True)
 
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "ten_sach": self.ten_sach,
+            "don_gia": self.don_gia,
+            "so_luong": self.so_luong,
+            "bia_sach": self.bia_sach,
+        }
+
     def __str__(self):
         return self.ten_sach
 
@@ -132,9 +141,7 @@ class ChiTietPhieuNhapSach(db.Model):
     __tablename__ = "chi_tiet_phieu_nhap_sach"
     id = Column(Integer, primary_key=True, autoincrement=True)
     phieu_nhap_sach_id = Column(
-        Integer,
-        ForeignKey(PhieuNhapSach.id, ondelete="CASCADE"),
-        index=True
+        Integer, ForeignKey(PhieuNhapSach.id, ondelete="CASCADE"), index=True
     )
     sach_id = Column(Integer, ForeignKey(Sach.id), index=True)
 
