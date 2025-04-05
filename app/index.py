@@ -14,8 +14,8 @@ from app import (VNPAY_API_KEY, VNPAY_MERCHANT_ID, VNPAY_PAYMENT_URL,
 from app.admin import *
 from app.decorators import customer_login_required
 from app.utils import (cart_stats, check_if_expire_orders,
-                       update_so_luong_by_ct_don_hang)
-
+                       process_offline_payment, update_so_luong_by_ct_don_hang)
+from app.database import setup_database
 # from decorators import annonymous_user, login_required
 
 
@@ -243,78 +243,104 @@ def cart():
     return render_template("cart.html")
 
 
-@app.route("/api/cart", methods=["post"])
+@app.route("/api/cart", methods=["POST"])
 def add_to_cart():
-    data = request.json
-    id = str(data["id"])
+    try:
+        data = request.json
+        if not data or "id" not in data:
+            return jsonify({"error": "Dữ liệu không hợp lệ"}), 400
 
-    # Lấy số lượng từ dữ liệu JSON, mặc định là 1 nếu không có số lượng được cung cấp
-    so_luong_moi = data.get("so_luong", 1)
+        id = str(data["id"])
+        so_luong_moi = data.get("so_luong", 1)
+        so_luong_con_lai = data.get("so_luong_con_lai", 0)
 
-    key = app.config["CART_KEY"]
-    cart = session[key] if key in session else {}
+        # Kiểm tra số lượng hợp lệ
+        if so_luong_moi <= 0:
+            return jsonify({"alert": "Số lượng không hợp lệ"}), 400
+        if so_luong_moi > so_luong_con_lai:
+            response = cart_stats(session.get(app.config["CART_KEY"], {}))
+            response["alert"] = "Đã HẾT sách hoặc không đủ số lượng trong kho"
+            return jsonify(response), 200
 
-    if id in cart:
-        if cart[id]["so_luong"] + so_luong_moi > data["so_luong_con_lai"]:
-            response = utils.cart_stats(cart=cart)
-            response["alert"] = " KHÔNG đủ sách để mua "
-            return jsonify(response)
-        cart[id]["so_luong"] += so_luong_moi
-    else:
-        if so_luong_moi > data["so_luong_con_lai"]:
-            response = utils.cart_stats(cart=cart)
-            response["alert"] = " Đã HẾT sách."
-            return jsonify(response)
-        ten_sach = data["ten_sach"]
-        don_gia = data["don_gia"]
-        bia_sach = data["bia_sach"]
-        so_luong_con_lai = data["so_luong_con_lai"]
+        key = app.config["CART_KEY"]
+        cart = session.get(key, {})
 
-        cart[id] = {
-            "id": id,
-            "ten_sach": ten_sach,
-            "don_gia": don_gia,
-            "so_luong": so_luong_moi,
-            "bia_sach": bia_sach,
-            "so_luong_con_lai": so_luong_con_lai,
-        }
+        if id in cart:
+            new_quantity = cart[id]["so_luong"] + so_luong_moi
+            if new_quantity > so_luong_con_lai:
+                response = cart_stats(cart)
+                response["alert"] = "KHÔNG đủ sách để mua"
+                return jsonify(response), 200
+            cart[id]["so_luong"] = new_quantity
+        else:
+            cart[id] = {
+                "id": id,
+                "ten_sach": data.get("ten_sach", ""),
+                "don_gia": data.get("don_gia", 0),
+                "so_luong": so_luong_moi,
+                "bia_sach": data.get("bia_sach", ""),
+                "so_luong_con_lai": so_luong_con_lai,
+            }
 
-    session[key] = cart
-    return jsonify(utils.cart_stats(cart=cart))
+        session[key] = cart
+        return jsonify(cart_stats(cart)), 200
+
+    except Exception as e:
+        return jsonify({"error": f"Lỗi hệ thống: {str(e)}"}), 500
 
 
-@app.route("/api/cart/<product_id>", methods=["put"])
+@app.route("/api/cart/<product_id>", methods=["PUT"])
 def update_cart(product_id):
-    data = request.json
-    key = app.config["CART_KEY"]
-    cart = session.get(key)
+    try:
+        data = request.json
+        if not data or "so_luong" not in data:
+            return jsonify({"error": "Dữ liệu không hợp lệ"}), 400
 
-    if cart and product_id in cart:
+        key = app.config["CART_KEY"]
+        cart = session.get(key, {})
+        product_id = str(product_id)
 
-        if int(data["so_luong"]) > cart[product_id]["so_luong_con_lai"]:
-            response = utils.cart_stats(cart=cart)
+        if product_id not in cart:
+            return jsonify({"error": "Sản phẩm không có trong giỏ hàng"}), 404
+
+        so_luong_moi = int(data["so_luong"])
+        so_luong_con_lai = cart[product_id]["so_luong_con_lai"]
+
+        if so_luong_moi <= 0:
+            return jsonify({"alert": "Số lượng phải lớn hơn 0"}), 400
+        if so_luong_moi > so_luong_con_lai:
+            response = cart_stats(cart)
             response["old_quantity"] = cart[product_id]["so_luong"]
             response["p_id"] = product_id
-            return jsonify(response)
+            response["alert"] = "KHÔNG đủ sách trong kho"
+            return jsonify(response), 200
 
-        cart[product_id]["so_luong"] = int(data["so_luong"])
+        cart[product_id]["so_luong"] = so_luong_moi
+        session[key] = cart
+        return jsonify(cart_stats(cart)), 200
 
-    session[key] = cart
+    except ValueError:
+        return jsonify({"error": "Số lượng phải là số nguyên"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Lỗi hệ thống: {str(e)}"}), 500
 
-    return jsonify(utils.cart_stats(cart=cart))
 
-
-@app.route("/api/cart/<product_id>", methods=["delete"])
+@app.route("/api/cart/<product_id>", methods=["DELETE"])
 def delete_cart(product_id):
-    key = app.config["CART_KEY"]
-    cart = session.get(key)
+    try:
+        key = app.config["CART_KEY"]
+        cart = session.get(key, {})
+        product_id = str(product_id)
 
-    if cart and product_id in cart:
+        if product_id not in cart:
+            return jsonify({"error": "Sản phẩm không có trong giỏ hàng"}), 404
+
         del cart[product_id]
+        session[key] = cart
+        return jsonify(cart_stats(cart)), 200
 
-    session[key] = cart
-
-    return jsonify(utils.cart_stats(cart=cart))
+    except Exception as e:
+        return jsonify({"error": f"Lỗi hệ thống: {str(e)}"}), 500
 
 
 @app.context_processor
@@ -468,40 +494,26 @@ def payment_offline():
     return render_template("payment_offline.html")
 
 
-@app.route("/payment_offline_done", methods=["get"])
+@app.route("/payment_offline_done", methods=["GET"])
 @login_required
 def payment_offline_done():
-    cart_key = app.config["CART_KEY"]
-    dien_thoai_nhan_hang = request.args["phone"]
-    dia_chi_nhan_hang = "THANH TOÁN TẠI CỬA HÀNG"
-    # print(dia_chi_nhan_hang,dien_thoai_nhan_hang)
-    # print('user_id : ',current_user.get_id())
-    donhang = create_donhang(
-        ngay_tao_don=datetime.now(),
-        phuong_thuc_id=get_or_create_phuong_thuc_id(PayingMethod.OFFLINE_PAY.value),
-        trang_thai_id=get_or_create_trang_thai_id(Status.WAITING.value),
-        khach_hang_id=current_user.get_id(),
-    )
-    cart_items = session[cart_key]
+    try:
+        cart_key = app.config["CART_KEY"]
+        cart_items = session.get(cart_key)
 
-    # print(donhang)
-    thongtinnhanhang = create_thongtinnhanhang(
-        id=donhang.id,
-        dien_thoai_nhan_hang=dien_thoai_nhan_hang,
-        dia_chi_nhan_hang=dia_chi_nhan_hang,
-    )
+        if not cart_items:
+            return jsonify({"error": "Giỏ hàng trống hoặc đã thanh toán."}), 400
 
-    for ci in cart_items.values():
-        create_chitietdonhang(
-            don_hang_id=donhang.id,
-            sach_id=ci["id"],
-            so_luong=ci["so_luong"],
-            tong_tien=ci["don_gia"] * ci["so_luong"],
-        )
+        phone = request.args.get("phone", "")
+        order_id = process_offline_payment(cart_items, phone)
 
-    session["order_id"] = donhang.id
-    session.pop("cart", None)
-    return redirect("/")
+        session["order_id"] = order_id
+        session.pop(cart_key, None)
+
+        return redirect("/")
+
+    except Exception as e:
+        return jsonify({"error": f"Lỗi hệ thống: {str(e)}"}), 500
 
 
 @app.route("/payment/")
@@ -682,4 +694,5 @@ def format_price_filter(price):
 
 if __name__ == "__main__":
     with app.app_context():
-        app.run(debug=True, port=5001)
+        setup_database()
+    app.run(debug=True, port=5001)
