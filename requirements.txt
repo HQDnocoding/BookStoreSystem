@@ -9,7 +9,9 @@ flask_wtf
 wtforms_sqlalchemy
 pytest
 pytest_bdd
+pytest-mock
 black
 isort
 pytest-cov
 pytest-html
+requests

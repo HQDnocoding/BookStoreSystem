@@ -1,12 +1,16 @@
-# tạo url expose ra internet để đăng ký vnpay
+# Tạo URL Expose ra Internet để Đăng Ký VNPay
 
-## chạy để cài npm
+## Cài đặt LocalTunnel
+
+Trước tiên, bạn cần cài đặt LocalTunnel bằng npm:
 
 ```bash
 npm install -g localtunnel
 ```
 
-## chạy này tạo link mở web bằng link này (tắt firewall, 1.1.1.1 )
+## Tạo URL Public
+
+Chạy lệnh sau để tạo một liên kết public, đảm bảo rằng firewall đã được tắt và không sử dụng 1.1.1.1:
 
 ```bash
 lt --port 5001 --subdomain huymanhdatbookstoresystemcnpm
