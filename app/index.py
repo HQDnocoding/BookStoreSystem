@@ -12,10 +12,11 @@ from app import (VNPAY_API_KEY, VNPAY_MERCHANT_ID, VNPAY_PAYMENT_URL,
                  VNPAY_RETURN_URL, PayingMethod, Role, Rule, Status, app,
                  login, utils)
 from app.admin import *
+from app.database import setup_database
 from app.decorators import customer_login_required
 from app.utils import (cart_stats, check_if_expire_orders,
                        process_offline_payment, update_so_luong_by_ct_don_hang)
-from app.database import setup_database
+
 # from decorators import annonymous_user, login_required
 
 

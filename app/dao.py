@@ -77,7 +77,7 @@ def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
         ho=ho,
         ten=ten,
         username=username,
-        password=hash_password(password), # Bâm mật khẩu
+        password=hash_password(password),  # Bâm mật khẩu
         avatar=avatar,
         vai_tro_id=vt_result[0],  # Lấy ID từ kết quả truy vấn
     )
@@ -255,15 +255,18 @@ def get_user_by_id(user_id):
 
 import bcrypt
 
+
 def auth_user(username, password, roles=None):
     username = username.strip()
-    password = password.strip().encode('utf-8')
+    password = password.strip().encode("utf-8")
 
     user = User.query.filter(User.username == username).first()
 
-    if user and bcrypt.checkpw(password, user.password.encode('utf-8')):
+    if user and bcrypt.checkpw(password, user.password.encode("utf-8")):
         if roles:
-            queried_roles = VaiTro.query.filter(VaiTro.ten_vai_tro.in_([role.strip() for role in roles])).all()
+            queried_roles = VaiTro.query.filter(
+                VaiTro.ten_vai_tro.in_([role.strip() for role in roles])
+            ).all()
             valid_role_ids = {role.id for role in queried_roles}
             if valid_role_ids and user.vai_tro_id in valid_role_ids:
                 return user
@@ -273,8 +276,11 @@ def auth_user(username, password, roles=None):
             return user
     return None
 
+
 def hash_password(password):
-    return bcrypt.hashpw(password.strip().encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    return bcrypt.hashpw(password.strip().encode("utf-8"), bcrypt.gensalt()).decode(
+        "utf-8"
+    )
 
 
 def update_user_password(user_id, new_password):

@@ -16,3 +16,7 @@ pytest-cov
 pytest-html
 requests
 bcrypt
+pytest-base-url
+selenium
+webdriver-manager
+undetected-chromedriver
