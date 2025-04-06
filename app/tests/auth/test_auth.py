@@ -222,8 +222,8 @@ def login_with_correct_credentials(test_client):
 
 
 @then("đăng nhập thành công và vai trò đã được xác minh")
-def login_successful_with_role_verification(test_client,
-    login_with_correct_credentials, employee_exists
+def login_successful_with_role_verification(
+    test_client, login_with_correct_credentials, employee_exists
 ):
     """Kiểm tra đăng nhập thành công và xác minh vai trò"""
     assert login_with_correct_credentials["response"] is not None
