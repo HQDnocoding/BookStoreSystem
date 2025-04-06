@@ -36,7 +36,6 @@ def test_search_binh_duong_facility_of_open_university(driver):
 
     assert "ou.edu.vn" in driver.current_url
 
-    # Chờ đến khi phần tử 'Cơ sở 5' xuất hiện
     dia_diem_5 = WebDriverWait(driver, 10).until(
         EC.element_to_be_clickable(
             (
@@ -51,7 +50,6 @@ def test_search_binh_duong_facility_of_open_university(driver):
 
     time.sleep(10)
 
-    # Kiểm tra xem đã đến đúng trang Cơ sở 5 chưa
     WebDriverWait(driver, 10).until(EC.url_contains("/co-so-5/"))
     assert "/co-so-5/" in driver.current_url, "Không chuyển đến đúng trang Cơ sở 5"
 
@@ -60,28 +58,24 @@ def test_download_third_slide_image(driver):
     driver.get("https://ou.edu.vn")
 
     time.sleep(10)
-    # Chờ tất cả slide được load
     WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located(
             (By.CSS_SELECTOR, ".ms-slide .ms-slide-bgcont img")
         )
     )
 
-    # Lấy tất cả ảnh trong các slide
     imgs = driver.find_elements(By.CSS_SELECTOR, ".ms-slide .ms-slide-bgcont img")
 
     print(f"Tổng số ảnh tìm được: {len(imgs)}")
     for i, img in enumerate(imgs):
         print(f"Ảnh {i+1}: {img.get_attribute('src')}")
 
-    # Lọc ảnh thật
     valid_imgs = [img for img in imgs if "blank.gif" not in img.get_attribute("src")]
     assert len(valid_imgs) >= 1, f"Không đủ ảnh hợp lệ. Chỉ có {len(valid_imgs)}"
 
     img_url = valid_imgs[2].get_attribute("src")
     print(f"✅ Ảnh slide thứ 3 (hợp lệ): {img_url}")
 
-    # Tải ảnh về
     response = requests.get(img_url)
     assert response.status_code == 200, f"Lỗi tải ảnh: {response.status_code}"
 
