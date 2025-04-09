@@ -221,7 +221,7 @@ def test_process_offline_payment_empty_cart():
 
 
 # Pytest-BDD để kiểm thử chức năng giỏ hàng
-from pytest_bdd import scenarios, given, when, then, parsers
+from pytest_bdd import given, parsers, scenarios, then, when
 
 # Tải tất cả các kịch bản từ tệp tính năng
 # scenarios("./features/ordering.feature")

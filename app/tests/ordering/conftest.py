@@ -8,7 +8,7 @@ from app.database import setup_database
 @pytest.fixture
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
     with app.app_context():
         # setup_database()
         yield  # Allow test to run
@@ -41,21 +41,20 @@ def setup_test_data(app_context):
 
 
 @pytest.fixture
-def customer_user(test_client,setup_test_data):
+def customer_user(test_client, setup_test_data):
     return setup_test_data["user"]
 
 
 @pytest.fixture
-def book(test_client,setup_test_data):
+def book(test_client, setup_test_data):
     return setup_test_data["book"]
 
 
 @pytest.fixture
-def payment_method(test_client,setup_test_data):
+def payment_method(test_client, setup_test_data):
     return setup_test_data["payment_method"]
 
 
 @pytest.fixture
-def order_status(test_client,setup_test_data):
+def order_status(test_client, setup_test_data):
     return setup_test_data["order_status"]
-
