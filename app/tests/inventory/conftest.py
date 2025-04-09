@@ -4,7 +4,8 @@ import pytest
 from sqlalchemy.exc import SQLAlchemyError
 
 from app import app, db
-from app.dao import auth_user, create_sach, create_user, get_quy_dinh
+from app.dao import (auth_user, create_sach, create_user, get_quy_dinh,
+                     get_sach_by_id)
 from app.database import setup_database
 from app.models import QuyDinh, VaiTro
 
@@ -36,13 +37,7 @@ def warehouse_manager(app_context):
 
 @pytest.fixture
 def book(app_context):
-    book = create_sach(
-        ten_sach="Book X",
-        don_gia=200000,
-        the_loai_id=10,
-        tac_gia_id=1,
-        so_luong=1,
-    )
+    book = get_sach_by_id(sach_id=1)
     return book
 
 
@@ -54,7 +49,7 @@ def inventory_rules(app_context):
         rules = {
             "SL_NHAP_MIN": get_quy_dinh("SL_NHAP_MIN"),
             "SL_MIN_TO_NHAP": get_quy_dinh("SL_MIN_TO_NHAP"),
-            "OUT_OF_TIME_TO_PAY": get_quy_dinh("OUT_OF_TIME_TO_PAY")
+            "OUT_OF_TIME_TO_PAY": get_quy_dinh("OUT_OF_TIME_TO_PAY"),
         }
 
         # Trả về object với các thuộc tính tương ứng
