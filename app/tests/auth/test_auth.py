@@ -34,13 +34,12 @@ def test_login_with_different_credentials(
     test_users, username, password, role, expected_success
 ):
     """Kiểm tra đăng nhập với các thông tin khác nhau (Unit Test)."""
-    with app.app_context():
-        user = auth_user(username=username, password=password)
+    user = auth_user(username=username, password=password)
 
-        # Assertions
-        assert (user is not None) == expected_success
-        if expected_success:
-            assert user.vai_tro.ten_vai_tro == role
+    # Assertions
+    assert (user is not None) == expected_success
+    if expected_success:
+        assert user.vai_tro.ten_vai_tro == role
 
 
 # Skipping Tests and Markers => SKIPPED
@@ -76,12 +75,11 @@ def test_login_and_access_control_integration(test_users, test_client):
 @pytest.mark.unit
 def test_auth_user_invalid(test_users):
     """Kiểm tra xác thực với thông tin không hợp lệ (Unit Test)."""
-    with app.app_context():
-        user = auth_user(username="invaliduser", password="wrongpass")
-        # Assertions
-        assert user is None  # Kiểm tra không tồn tại
-        assert isinstance(user, User) is False  # Kiểm tra kiểu dữ liệu
-        assert user != test_users["customer"]  # Kiểm tra không bằng user khác
+    user = auth_user(username="invaliduser", password="wrongpass")
+    # Assertions
+    assert user is None  # Kiểm tra không tồn tại
+    assert isinstance(user, User) is False  # Kiểm tra kiểu dữ liệu
+    assert user != test_users["customer"]  # Kiểm tra không bằng user khác
 
 
 # Passing Command-line Args in Pytest => PASSED
@@ -96,10 +94,9 @@ def test_login_with_custom_role(test_users, pytestconfig):
         "QUANLY": "admin1",
     }[role]
 
-    with app.app_context():
-        user = auth_user(username=username, password="123")
-        assert user is not None
-        assert user.vai_tro.ten_vai_tro == role
+    user = auth_user(username=username, password="123")
+    assert user is not None
+    assert user.vai_tro.ten_vai_tro == role
 
 
 # Test vai trò cụ thể => PASSED
