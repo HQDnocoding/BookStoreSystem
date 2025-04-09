@@ -247,21 +247,20 @@ def cart():
 @app.route("/api/cart", methods=["POST"])
 def add_to_cart():
     try:
-        data = request.json
+        data = request.get_json()
         if not data or "id" not in data:
             return jsonify({"error": "Dữ liệu không hợp lệ"}), 400
 
         id = str(data["id"])
-        so_luong_moi = data.get("so_luong", 1)
-        so_luong_con_lai = data.get("so_luong_con_lai", 0)
+        so_luong_moi = int(data.get("so_luong", 1))
+        so_luong_con_lai = int(data.get("so_luong_con_lai", 0))
 
-        # Kiểm tra số lượng hợp lệ
         if so_luong_moi <= 0:
             return jsonify({"alert": "Số lượng không hợp lệ"}), 400
         if so_luong_moi > so_luong_con_lai:
             response = cart_stats(session.get(app.config["CART_KEY"], {}))
             response["alert"] = "Đã HẾT sách hoặc không đủ số lượng trong kho"
-            return jsonify(response), 200
+            return jsonify(response), 409
 
         key = app.config["CART_KEY"]
         cart = session.get(key, {})
@@ -271,7 +270,7 @@ def add_to_cart():
             if new_quantity > so_luong_con_lai:
                 response = cart_stats(cart)
                 response["alert"] = "KHÔNG đủ sách để mua"
-                return jsonify(response), 200
+                return jsonify(response), 409
             cart[id]["so_luong"] = new_quantity
         else:
             cart[id] = {
@@ -284,10 +283,14 @@ def add_to_cart():
             }
 
         session[key] = cart
-        return jsonify(cart_stats(cart)), 200
+        session.modified = True
+        return jsonify(cart_stats(cart=cart)), 200
 
+    except KeyError as e:
+        return jsonify({"error": f"Thiếu trường: {str(e)}"}), 400
     except Exception as e:
-        return jsonify({"error": f"Lỗi hệ thống: {str(e)}"}), 500
+        app.logger.error(f"Lỗi hệ thống: {str(e)}")
+        return jsonify({"error": "Lỗi hệ thống"}), 500
 
 
 @app.route("/api/cart/<product_id>", methods=["PUT"])
@@ -511,7 +514,7 @@ def payment_offline_done():
         session["order_id"] = order_id
         session.pop(cart_key, None)
 
-        return redirect("/")
+        return redirect("/"), 302
 
     except Exception as e:
         return jsonify({"error": f"Lỗi hệ thống: {str(e)}"}), 500

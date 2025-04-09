@@ -8,7 +8,7 @@ pymysql
 flask_wtf
 wtforms_sqlalchemy
 pytest
-pytest_bdd
+pytest-bdd
 pytest-mock
 black
 isort

@@ -8,6 +8,7 @@ from app.database import setup_database
 @pytest.fixture
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
+    app.config['TESTING'] = True
     with app.app_context():
         # setup_database()
         yield  # Allow test to run
@@ -18,7 +19,7 @@ def app_context():
 @pytest.fixture
 def test_client():
     """Fixture để tạo client Flask test."""
-    with app.test_client() as client:
+    with app.test_request_context(), app.test_client() as client:
         yield client
 
 
@@ -40,29 +41,21 @@ def setup_test_data(app_context):
 
 
 @pytest.fixture
-def customer_user(setup_test_data):
+def customer_user(test_client,setup_test_data):
     return setup_test_data["user"]
 
 
 @pytest.fixture
-def book(setup_test_data):
+def book(test_client,setup_test_data):
     return setup_test_data["book"]
 
 
 @pytest.fixture
-def payment_method(setup_test_data):
+def payment_method(test_client,setup_test_data):
     return setup_test_data["payment_method"]
 
 
 @pytest.fixture
-def order_status(setup_test_data):
+def order_status(test_client,setup_test_data):
     return setup_test_data["order_status"]
 
-
-def pytest_addoption(parser):
-    parser.addoption(
-        "--payment-method",
-        action="store",
-        default="OFFLINE_PAY",
-        help="Tên phương thức thanh toán muốn test (OFFLINE, MOMO, ZALOPAY)",
-    )
