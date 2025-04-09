@@ -19,8 +19,8 @@ class VaiTro(db.Model):
     ten_vai_tro = Column(String(50), nullable=True)
     user = relationship("User", backref="vai_tro", lazy=True)
 
-    # def __int__(self):
-    #     return int(self.id)
+    def __int__(self):
+        return int(self.id)
 
 
 class QuyDinh(db.Model):
@@ -69,7 +69,7 @@ class User(db.Model, UserMixin):
     ho = Column(String(50), nullable=False)
     ten = Column(String(50), nullable=False)
     username = Column(String(225), nullable=False, unique=True)
-    password = Column(String(50), nullable=False)
+    password = db.Column(db.String(128), nullable=False)
     ngay_tao = Column(DateTime, nullable=False, default=datetime.now())
     avatar = Column(String(225))
     vai_tro_id = Column(Integer, ForeignKey(VaiTro.id), nullable=False)
@@ -84,6 +84,17 @@ class User(db.Model, UserMixin):
     comments = relationship("Comment", backref="user", lazy=True)
 
     # hoa_don_ban_sach=relationship('HoaDonBanSach',backref='user',lazy=True)
+    def to_dict(self):
+        return {
+            "id": str(self.id),
+            "ho": self.ho,
+            "ten": self.ten,
+            "username": self.username,
+            "password": self.password,
+            "ngay_tao": self.ngay_tao,
+            "vai_tro_id": self.vai_tro_id,
+        }
+
     def __str__(self):
         return self.ten
 
