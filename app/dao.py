@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Optional
 from xmlrpc.client import DateTime
 
+import bcrypt
 from flask import flash, jsonify, session
 from flask_login import current_user
 from sqlalchemy import func
@@ -27,7 +28,7 @@ def create_vaitro(ten_vai_tro):  # Da test
     db.session.commit()
 
 
-def create_quydinh(ten_quy_dinh, noi_dung, gia_tri, is_active):  # Da test
+def create_quydinh(ten_quy_dinh, noi_dung, gia_tri, is_active=1):  # Da test
     new_quydinh = QuyDinh(
         ten_quy_dinh=ten_quy_dinh,
         noi_dung=noi_dung,
@@ -99,9 +100,7 @@ def create_user(ho, ten, username, password, avatar, vai_tro):  # Da test
 from typing import Optional
 
 
-def create_sach(
-    ten_sach: str, don_gia: float, the_loai_id: int, tac_gia_id: int, so_luong: int = 1
-) -> Optional[Sach]:
+def create_sach(ten_sach, don_gia, the_loai_id, tac_gia_id, so_luong=1):
     """Tạo một cuốn sách mới trong cơ sở dữ liệu."""
     if not ten_sach or not isinstance(ten_sach, str):
         raise ValueError("Tên sách không được rỗng và phải là chuỗi.")
@@ -253,27 +252,41 @@ def get_user_by_id(user_id):
     return User.query.get(user_id)
 
 
-import bcrypt
+def is_bcrypt_hash(value: str) -> bool:
+    """Kiểm tra xem chuỗi có phải là bcrypt hash không."""
+    return isinstance(value, str) and value.startswith("$2")
 
 
 def auth_user(username, password, roles=None):
     username = username.strip()
-    password = password.strip().encode("utf-8")
+    password_bytes = password.strip().encode("utf-8")
 
     user = User.query.filter(User.username == username).first()
 
-    if user and bcrypt.checkpw(password, user.password.encode("utf-8")):
-        if roles:
-            queried_roles = VaiTro.query.filter(
-                VaiTro.ten_vai_tro.in_([role.strip() for role in roles])
-            ).all()
-            valid_role_ids = {role.id for role in queried_roles}
-            if valid_role_ids and user.vai_tro_id in valid_role_ids:
-                return user
-            elif not roles:
-                return user
-        elif not roles:
-            return user
+    if user:
+        stored_password = user.password
+
+        if stored_password and is_bcrypt_hash(stored_password):
+            try:
+                if bcrypt.checkpw(password_bytes, stored_password.encode("utf-8")):
+                    # Kiểm tra roles nếu có
+                    if roles:
+                        queried_roles = VaiTro.query.filter(
+                            VaiTro.ten_vai_tro.in_([role.strip() for role in roles])
+                        ).all()
+                        valid_role_ids = {role.id for role in queried_roles}
+                        if valid_role_ids and user.vai_tro_id in valid_role_ids:
+                            return user
+                        return None
+                    return user
+            except ValueError as e:
+                # Ghi log nếu cần: bcrypt.checkpw failed
+                print("Lỗi bcrypt.checkpw:", e)
+                return None
+        else:
+            print("Mật khẩu không hợp lệ hoặc không được mã hóa bằng bcrypt.")
+            return None
+
     return None
 
 
@@ -408,42 +421,18 @@ def get_the_loai():
     return TheLoai.query.order_by("id").all()
 
 
-# def load_products(cate_id=None, kw=None, sort_by=None, page=1):
-#     query = Sach.query
-
-#     if kw:
-#         query = query.filter(Sach.ten_sach.contains(kw))
-
-#     if cate_id:
-#         query = query.filter(Sach.the_loai_id == cate_id)
-
-#     if sort_by == "price_asc":
-#         query = query.order_by(Sach.don_gia.asc())
-#     elif sort_by == "price_desc":
-#         query = query.order_by(Sach.don_gia.desc())
-#         print(query)
-#     elif sort_by == "newest":
-#         query = query.order_by(Sach.nam_phat_hanh.desc())
-#     elif sort_by == "oldest":
-#         query = query.order_by(Sach.nam_phat_hanh.asc())
-
-#     page_size = app.config.get("PAGE_SIZE")
-#     start = (page - 1) * page_size
-#     query = query.slice(start, start + page_size)
-
-
-#     return query.all()
 def load_products(cate_id=None, kw=None, sort_by=None, page=1):
-    """Phiên bản tối ưu của hàm load_products với eager loading."""
-    query = Sach.query.options(joinedload(Sach.tac_gia), joinedload(Sach.the_loai))
+    query = Sach.query
 
+    # Lọc theo từ khóa
     if kw:
-        query = query.filter(Sach.ten_sach.contains(kw))
+        query = query.filter(Sach.ten_sach.ilike(f"%{kw.strip()}%"))
 
-    if cate_id:
+    # Lọc theo thể loại
+    if cate_id is not None:
         query = query.filter(Sach.the_loai_id == cate_id)
 
-    # Sử dụng switch case thông qua dictionary để sắp xếp
+    # Tùy chọn sắp xếp
     sort_options = {
         "price_asc": Sach.don_gia.asc(),
         "price_desc": Sach.don_gia.desc(),
@@ -454,12 +443,40 @@ def load_products(cate_id=None, kw=None, sort_by=None, page=1):
     if sort_by in sort_options:
         query = query.order_by(sort_options[sort_by])
 
-    page_size = app.config.get(
-        "PAGE_SIZE", 10
-    )  # Giá trị mặc định nếu không có PAGE_SIZE
+    # Phân trang
+    page_size = app.config.get("PAGE_SIZE", 10)
+    query = query.offset((page - 1) * page_size).limit(page_size)
 
-    # Sử dụng paginate thay vì slice để tận dụng tính năng phân trang
-    return query.paginate(page=page, per_page=page_size, error_out=False)
+    return query.all()
+
+
+# def load_products(cate_id=None, kw=None, sort_by=None, page=1):
+#     """Phiên bản tối ưu của hàm load_products với eager loading."""
+#     query = Sach.query
+
+#     if kw:
+#         query = query.filter(Sach.ten_sach.contains(kw))
+
+#     if cate_id:
+#         query = query.filter(Sach.the_loai_id == cate_id)
+
+#     # Sử dụng switch case thông qua dictionary để sắp xếp
+#     sort_options = {
+#         "price_asc": Sach.don_gia.asc(),
+#         "price_desc": Sach.don_gia.desc(),
+#         "newest": Sach.nam_phat_hanh.desc(),
+#         "oldest": Sach.nam_phat_hanh.asc(),
+#     }
+
+#     if sort_by in sort_options:
+#         query = query.order_by(sort_options[sort_by])
+
+#     page_size = app.config.get(
+#         "PAGE_SIZE", 10
+#     )  # Giá trị mặc định nếu không có PAGE_SIZE
+
+#     # Sử dụng paginate thay vì slice để tận dụng tính năng phân trang
+#     return query.paginate(page=page, per_page=page_size, error_out=False)
 
 
 def count_sach(kw=None, the_loai_id=None):
@@ -509,19 +526,6 @@ def load_sach(ten_the_loai=None, ten_tac_gia=None):
 
 def user_exists(username):
     return db.session.query(User).filter_by(username=username).first() is not None
-
-
-def update_book_quantity(sach_id, so_luong):
-    """Cập nhật số lượng sách trong kho sau khi nhập."""
-    try:
-        sach = Sach.query.get(sach_id)
-        if sach:
-            sach.so_luong = Sach.so_luong + so_luong
-            db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(f"Lỗi khi cập nhật số lượng sách (ID: {sach_id}): {str(e)}")
-        raise
 
 
 def get_id_by_phuong_thuc_name(name):
