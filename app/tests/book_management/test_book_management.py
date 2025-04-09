@@ -7,24 +7,23 @@ from app.models import Sach, TacGia, TheLoai
 
 
 # Test Naming and Test Discovery => PASSED
-def test_create_book_success(admin_user, category_and_author):
+def test_create_book_success(admin_user, test_client, category_and_author):
     """Kiểm tra thêm sách mới thành công (Unit Test)."""
-    with app.app_context():
-        sach = create_sach(
-            ten_sach="New Book",
-            don_gia=300000,
-            the_loai_id=category_and_author["the_loai"].id,
-            tac_gia_id=category_and_author["tac_gia"].id,
-            so_luong=10,
-        )
+    sach = create_sach(
+        ten_sach="New Book",
+        don_gia=300000,
+        the_loai_id=category_and_author["the_loai"],
+        tac_gia_id=category_and_author["tac_gia"],
+        so_luong=10,
+    )
 
-        # Assertions
-        assert sach is not None
-        assert sach.ten_sach == "New Book"
-        assert sach.don_gia == 300000
-        assert sach.so_luong == 10
-        assert sach.the_loai_id == category_and_author["the_loai"].id
-        assert sach.tac_gia_id == category_and_author["tac_gia"].id
+    # Assertions
+    assert sach is not None
+    assert sach.ten_sach == "New Book"
+    assert sach.don_gia == 300000
+    assert sach.so_luong == 10
+    assert sach.the_loai_id == category_and_author["the_loai"]
+    assert sach.tac_gia_id == category_and_author["tac_gia"]
 
 
 # Parametrized Testing => PASSED
@@ -38,6 +37,7 @@ def test_create_book_success(admin_user, category_and_author):
     ],
 )
 def test_create_book_with_different_inputs(
+    test_client,
     admin_user,
     category_and_author,
     book_name,
@@ -47,29 +47,28 @@ def test_create_book_with_different_inputs(
     expected_error,
 ):
     """Kiểm tra thêm sách với các đầu vào khác nhau (Unit Test)."""
-    with app.app_context():
-        try:
-            the_loai_id = category_and_author["the_loai"].id
-            tac_gia_id = category_and_author["tac_gia"].id
+    try:
+        the_loai_id = category_and_author["the_loai"]
+        tac_gia_id = category_and_author["tac_gia"]
 
-            create_sach(
-                ten_sach=book_name,
-                don_gia=price,
-                the_loai_id=the_loai_id,
-                tac_gia_id=tac_gia_id,
-                so_luong=amount,
-            )
-            result = True
-        except expected_error:
-            result = False
-        except Exception as e:
-            pytest.fail(f"Lỗi không mong đợi: {str(e)}")
+        create_sach(
+            ten_sach=book_name,
+            don_gia=price,
+            the_loai_id=the_loai_id,
+            tac_gia_id=tac_gia_id,
+            so_luong=amount,
+        )
+        result = True
+    except expected_error:
+        result = False
+    except Exception as e:
+        pytest.fail(f"Lỗi không mong đợi: {str(e)}")
 
-        # Assertions
-        assert result == expected_success
-        if expected_success:
-            fetched_sach = Sach.query.filter_by(ten_sach=book_name).first()
-            assert fetched_sach is not None
+    # Assertions
+    assert result == expected_success
+    if expected_success:
+        fetched_sach = Sach.query.filter_by(ten_sach=book_name).first()
+        assert fetched_sach is not None
 
 
 # Skipping Tests and Markers => SKIPPED
@@ -77,80 +76,76 @@ def test_create_book_with_different_inputs(
     app.config.get("ENV") == "production",
     reason="Không chạy trong môi trường production",
 )
-def test_update_and_delete_book_integration(login_admin, book):
+def test_update_and_delete_book_integration(login_admin, test_client, book):
     """Kiểm tra cập nhật và xóa sách (Integration Test)."""
-    with app.app_context():
-        # Cập nhật sách
-        book.ten_sach = "Updated Book"
-        book.don_gia = 275000
-        db.session.commit()
+    # Cập nhật sách
+    book.ten_sach = "Updated Book"
+    book.don_gia = 275000
+    db.session.commit()
 
-        book_id = book.id
-        updated_book = Sach.query.get(book_id)
-        assert updated_book.ten_sach == "Updated Book"
-        assert updated_book.don_gia == 275000
+    book_id = book.id
+    updated_book = Sach.query.get(book_id)
+    assert updated_book.ten_sach == "Updated Book"
+    assert updated_book.don_gia == 275000
 
-        # Xóa sách
-        db.session.delete(book)
-        db.session.commit()
-        assert Sach.query.get(book_id) is None
+    # Xóa sách
+    db.session.delete(book)
+    db.session.commit()
+    assert Sach.query.get(book_id) is None
 
 
 # Different Types of Assertions => PASSED
-def test_search_books(admin_user, book):
+def test_search_books(app_context, test_client, book):
     """Kiểm tra tìm kiếm sách (Unit Test)."""
-    with app.app_context():
-        books = load_products(kw="Book Y")
+    books = load_products(kw="Conan")
 
-        # Assertions
-        assert isinstance(books, list)  # Kiểm tra kiểu dữ liệu
-        assert len(books) == 1  # Kiểm tra số lượng kết quả
-        assert books[0].ten_sach == "Book Y"  # Kiểm tra giá trị
-        assert books[0].id == book.id  # Kiểm tra định danh
+    # Assertions
+    assert isinstance(books, list)  # Kiểm tra kiểu dữ liệu
+    assert len(books) == 1  # Kiểm tra số lượng kết quả
+    assert books[0].ten_sach == "Conan"  # Kiểm tra giá trị
+    assert books[0].id == book.id  # Kiểm tra định danh
 
 
 # Test đếm sách => PASSED
-def test_count_sach(admin_user, book):
+def test_count_sach(test_client, book):
     """Kiểm tra chức năng đếm số lượng sách."""
-    with app.app_context():
-        count = count_sach(kw="Book Y")
-        assert count == 1  # Số lượng sách tìm thấy không đúng
+    count = count_sach(kw="Conan")
+    assert count == 1  # Số lượng sách tìm thấy không đúng
 
-        count_all = count_sach()
-        assert count_all >= 1  # Tổng số sách phải lớn hơn hoặc bằng 1
+    count_all = count_sach()
+    assert count_all >= 1  # Tổng số sách phải lớn hơn hoặc bằng 1
 
 
 # Passing Command-line Args in Pytest => PASSED
-def test_create_book_with_custom_category(admin_user, pytestconfig):
+def test_create_book_with_custom_category(test_client, admin_user, pytestconfig):
     """Kiểm tra thêm sách với thể loại từ cmd (Unit Test)."""
     category_name = pytestconfig.getoption("--category", default="Fiction")
-    with app.app_context():
-        the_loai = TheLoai(ten_the_loai=category_name)
-        tac_gia = TacGia(ten_tac_gia="Author C")
-        db.session.add_all([the_loai, tac_gia])
-        db.session.commit()
 
-        sach = create_sach(
-            ten_sach="Cmd Book",
-            don_gia=180000,
-            the_loai_id=the_loai.id,
-            tac_gia_id=tac_gia.id,
-            so_luong=15,
-        )
+    the_loai = TheLoai(ten_the_loai=category_name)
+    tac_gia = TacGia(ten_tac_gia="Author C")
+    db.session.add_all([the_loai, tac_gia])
+    db.session.commit()
 
-        assert (
-            sach.the_loai_id
-            == TheLoai.query.filter_by(ten_the_loai=category_name).first().id
-        )
+    sach = create_sach(
+        ten_sach="Cmd Book",
+        don_gia=180000,
+        the_loai_id=the_loai.id,
+        tac_gia_id=tac_gia.id,
+        so_luong=15,
+    )
+
+    assert (
+        sach.the_loai_id
+        == TheLoai.query.filter_by(ten_the_loai=category_name).first().id
+    )
 
 
 # Tìm kiếm không có kết quả => PASSED
-def test_search_books_no_results(admin_user):
+def test_search_books_no_results(app_context, test_client):
     """Kiểm tra tìm kiếm sách khi không có kết quả."""
-    with app.app_context():
-        books = load_products(kw="NonExistentBook")
-        assert isinstance(books, list)  # Kết quả phải là danh sách
-        assert len(books) == 0  # Không nên tìm thấy sách nào
+    books = load_products(kw="NonExistentBook")
+    assert isinstance(books, list)  # Kết quả phải là danh sách
+    assert len(books) == 0  # Không nên tìm thấy sách nào
 
 
 # Pytest-BDD
@@ -188,10 +183,19 @@ def book_in_system(app_context, datatable):
     data = dict(zip(headers, values))
     print(data)
 
-    the_loai = TheLoai(ten_the_loai=data["Thể loại"])
-    tac_gia = TacGia(ten_tac_gia=data["Tác giả"])
-    db.session.add_all([the_loai, tac_gia])
-    db.session.commit()
+    # Lấy hoặc tạo thể loại
+    the_loai = TheLoai.query.filter_by(ten_the_loai=data["Thể loại"]).first()
+    if not the_loai:
+        the_loai = TheLoai(ten_the_loai=data["Thể loại"])
+        db.session.add(the_loai)
+        db.session.commit()
+
+    # Lấy hoặc tạo tác giả
+    tac_gia = TacGia.query.filter_by(ten_tac_gia=data["Tác giả"]).first()
+    if not tac_gia:
+        tac_gia = TacGia(ten_tac_gia=data["Tác giả"])
+        db.session.add(tac_gia)
+        db.session.commit()
 
     book = create_sach(
         ten_sach=data["Tên sách"],
