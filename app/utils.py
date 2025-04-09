@@ -20,6 +20,20 @@ from app.dao import (create_chitietdonhang, create_donhang,
 from app.models import DonHang, Sach, User
 
 
+def update_book_quantity(sach_id, so_luong):
+    """Cập nhật số lượng sách trong kho sau khi nhập."""
+    try:
+        sach = Sach.query.get(sach_id)
+        if sach:
+            sach.so_luong = Sach.so_luong + so_luong
+            db.session.commit()
+        return sach
+    except Exception as e:
+        db.session.rollback()
+        print(f"Lỗi khi cập nhật số lượng sách (ID: {sach_id}): {str(e)}")
+        raise
+
+
 def process_offline_payment(cart_items, phone, address="THANH TOÁN TẠI CỬA HÀNG"):
     if not cart_items:
         raise ValueError("Giỏ hàng trống")
