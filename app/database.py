@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from app import PayingMethod, Role, Rule, Status, db
+from app.dao import create_user
 from app.models import (PhuongThucThanhToan, QuyDinh, Sach, TacGia, TheLoai,
                         TrangThaiDonHang, User, VaiTro)
 
@@ -32,17 +33,17 @@ def setup_database():
     ten_qd3 = Rule.OUT_OF_TIME_TO_PAY.value
     qd1 = QuyDinh(
         ten_quy_dinh=ten_qd1,
-        noi_dung="Số lượng tối thiểu khi nhập sách",
-        gia_tri=150,
+        noi_dung="Số lượng tối thiểu khi nhập",
+        gia_tri=5,
     )
     qd2 = QuyDinh(
         ten_quy_dinh=ten_qd2,
-        noi_dung="Số lượng tối thiểu của đầu sách để được nhập",
-        gia_tri=300,
+        noi_dung="Số lượng tồn tối thiểu trước khi nhập",
+        gia_tri=20,
     )
     qd3 = QuyDinh(
         ten_quy_dinh=ten_qd3,
-        noi_dung="Số giờ tối đa kể từ khi đặt hàng đến lúc thanh toán",
+        noi_dung="Thời gian quá hạn thanh toán",
         gia_tri=48,
     )
 
@@ -81,42 +82,39 @@ def setup_database():
         )
         db.session.add(sach)
 
-    password = str(hashlib.md5("123".encode("utf-8")).hexdigest())
-
     # Tạo người dùng admin, kho, nhân viên, khách hàng
-    customer = User(
+    customer = create_user(
         ho="Nguyen",
         ten="Van A",
         username="customer1",
-        password=password,
+        password="123",
         avatar=None,
-        vai_tro_id=4,
+        vai_tro="KHACHHANG",
     )
-    employee = User(
+    employee = create_user(
         ho="Le",
         ten="Van B",
         username="employee1",
-        password=password,
+        password="123",
         avatar=None,
-        vai_tro_id=3,
+        vai_tro="NHANVIEN",
     )
-    warehouse = User(
+    warehouse = create_user(
         ho="Tran",
         ten="Van C",
         username="warehouse1",
-        password=password,
+        password="123",
         avatar=None,
-        vai_tro_id=2,
+        vai_tro="QUANLYKHO",
     )
-    admin = User(
-        ho="Pham",
-        ten="Van D",
+    admin = create_user(
+        ho="Hoang",
+        ten="Van H",
         username="admin1",
-        password=password,
+        password="123",
         avatar=None,
-        vai_tro_id=1,
+        vai_tro="QUANLY",
     )
-    db.session.add_all([admin, warehouse, employee, customer])
 
     # Lưu tất cả các đối tượng vào cơ sở dữ liệu
     db.session.commit()

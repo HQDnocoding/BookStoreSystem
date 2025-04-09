@@ -695,5 +695,6 @@ def format_price_filter(price):
 
 if __name__ == "__main__":
     with app.app_context():
+        print("Thiết lập cơ sở dữ liệu nội dung ban đầu của cơ sở dữ liệu.")
         setup_database()
     app.run(debug=True, port=5001)

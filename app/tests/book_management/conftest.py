@@ -9,10 +9,10 @@ from app.database import setup_database
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
     with app.app_context():
-        setup_database()
+        # setup_database()
         yield
-        db.session.remove()
-        db.drop_all()
+        # db.session.remove()
+        # db.drop_all()
 
 
 @pytest.fixture
