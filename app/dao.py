@@ -757,6 +757,12 @@ def get_sach_by_id(sach_id):
     return Sach.query.get(sach_id)
 
 
+def get_the_loai_by_id(id):
+    if id is not None:
+        return TheLoai.query.filter_by(id=id).first()
+    return None
+
+
 def get_id_the_loai(name):
     if name is not None:
         the_loai = TheLoai.query.filter_by(ten_the_loai=name).first()
