@@ -1,62 +1,53 @@
+import os
+
 import pytest
 
 from app import app, db
-from app.dao import (create_chitietdonhang, create_donhang, create_sach,
-                     create_user)
-from app.models import (ChiTietDonHang, DonHang, PhuongThucThanhToan, Sach,
-                        TheLoai, TrangThaiDonHang, User, VaiTro)
+from app.dao import (auth_user, create_chitietdonhang, create_donhang,
+                     get_phuong_thuc_by_id, get_sach_by_id, get_the_loai_by_id,
+                     get_trang_thai_by_id)
+from app.database import setup_database
 
 
 @pytest.fixture
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
     with app.app_context():
-        db.create_all()
+        setup_database()
         yield
         db.session.remove()
         db.drop_all()
 
 
 @pytest.fixture
+def test_client():
+    """Fixture để tạo client Flask test."""
+    with app.test_request_context(), app.test_client() as client:
+        yield client
+
+
+@pytest.fixture
 def admin_user(app_context):
     """Fixture tạo một quản trị viên."""
-    vai_tro = VaiTro(ten_vai_tro="QUANLY")
-    db.session.add(vai_tro)
-    db.session.commit()
-    user = create_user(
-        ho="Nguyen",
-        ten="Van F",
-        username="admin2",
-        password="123",
-        avatar=None,
-        vai_tro="QUANLY",
-    )
+    user = auth_user(username="admin1", password="123")
     return user
 
 
 @pytest.fixture
 def sales_data(app_context):
     """Fixture tạo dữ liệu bán hàng cho báo cáo."""
-    the_loai = TheLoai(ten_the_loai="Fiction")
-    customer = create_user(
-        ho="Le",
-        ten="Van G",
-        username="customer3",
+    the_loai = get_the_loai_by_id(id=6)
+    customer = auth_user(
+        username="customer1",
         password="123",
-        avatar=None,
-        vai_tro="KHACHHANG",
     )
-    pt = PhuongThucThanhToan(ten_phuong_thuc="OFFLINE_PAY")
-    tt = TrangThaiDonHang(ten_trang_thai="PAID")
-    db.session.add_all([the_loai, pt, tt])
-    db.session.commit()
+    pt = get_phuong_thuc_by_id(phuong_thuc_id=2)
+    tt = get_trang_thai_by_id(trang_thai_id=1)
 
-    sach1 = create_sach(
-        ten_sach="Book 1", don_gia=100000, the_loai_id=the_loai.id, tac_gia_id=1
-    )
-    sach2 = create_sach(
-        ten_sach="Book 2", don_gia=150000, the_loai_id=the_loai.id, tac_gia_id=1
-    )
+    sach1 = get_sach_by_id(3)
+    sach2 = get_sach_by_id(4)
+    sach3 = get_sach_by_id(10)
+
     order = create_donhang(
         ngay_tao_don="2025-03-01",
         phuong_thuc_id=pt.id,
@@ -64,10 +55,24 @@ def sales_data(app_context):
         khach_hang_id=customer.id,
     )
     create_chitietdonhang(
-        don_hang_id=order.id, sach_id=sach1.id, so_luong=2, tong_tien=200000
+        don_hang_id=order.id, sach_id=sach1.id, so_luong=2, tong_tien=(50000.0 * 2)
     )
     create_chitietdonhang(
-        don_hang_id=order.id, sach_id=sach2.id, so_luong=1, tong_tien=150000
+        don_hang_id=order.id, sach_id=sach2.id, so_luong=1, tong_tien=50000.0
     )
-    db.session.commit()
+    create_chitietdonhang(
+        don_hang_id=order.id, sach_id=sach3.id, so_luong=1, tong_tien=84000.0
+    )
     return {"order": order, "sach1": sach1, "sach2": sach2, "the_loai": the_loai}
+
+
+@pytest.fixture
+def output_dir():
+    """Fixture tạo thư mục output cho báo cáo và dọn dẹp sau test."""
+    output_dir = "test_statistics_form"
+    os.makedirs(output_dir, exist_ok=True)
+    yield output_dir
+    # Dọn dẹp thư mục sau khi tất cả các test trong module hoàn thành
+    # Lưu ý: Nếu bạn muốn dọn dẹp sau mỗi test, hãy di chuyển đoạn này vào teardown của test function
+    # import shutil
+    # shutil.rmtree(output_dir)
