@@ -4,8 +4,9 @@ import json
 from datetime import date, datetime
 
 from flask_login import UserMixin
-from sqlalchemy import (Boolean, Column, Date, DateTime, Float, ForeignKey,
-                        Integer, String, Text, UniqueConstraint)
+from sqlalchemy import (Boolean, CheckConstraint, Column, Date, DateTime,
+                        Float, ForeignKey, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.orm import backref, relationship
 
 from app import PayingMethod, Role, Rule, Status
@@ -30,6 +31,8 @@ class QuyDinh(db.Model):
     gia_tri = Column(Integer, nullable=False, default=0)
     ngay_tao = Column(DateTime, nullable=False, default=datetime.now())
     is_active = Column(Boolean, nullable=False, default=True)
+
+    __table_args__ = (CheckConstraint("gia_tri >= 0", name="check_value_non_negative"),)
 
 
 class TacGia(db.Model):

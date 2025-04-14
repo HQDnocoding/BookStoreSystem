@@ -1,6 +1,6 @@
 import pytest
 from flask import Response
-from flask_login import logout_user
+from flask_login import login_user, logout_user
 
 from app import app
 from app.dao import auth_user
@@ -54,13 +54,10 @@ def test_login_and_access_control_integration(test_users, test_client):
     user = auth_user(username="admin1", password="123")
     assert user is not None
 
+    login_user(user)
+
     response = Response(status=200)
     assert response.status_code == 200
-
-    # Truy cập route chỉ dành cho admin
-    with test_client.session_transaction() as sess:
-        sess["user_id"] = test_users["admin"].id
-        sess["role"] = "QUANLY"
 
     # Kiểm tra phân quyền
     assert user.vai_tro.ten_vai_tro == "QUANLY"

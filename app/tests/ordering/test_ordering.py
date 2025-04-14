@@ -108,7 +108,7 @@ def test_add_to_cart_with_different_quantities(
 # Skipping Tests and Markers => SKIPPED
 @pytest.mark.skipif(
     app.config.get("ENV") == "production",
-    reason="Login Required không hoạt động bên trong request context.",
+    reason="Login Required không hoạt động bên trong request context. => FAILED",
 )
 def test_create_order_integration(
     customer_user, book, payment_method, order_status, test_client

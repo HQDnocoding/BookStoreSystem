@@ -18,23 +18,7 @@ Dựa trên các **use case quan trọng** trong đặc tả (Đặt sách, Bán
     - Thiếu thông tin nhận hàng → Thông báo lỗi và không lập đơn.
   - **Luồng ngoại lệ**: Lỗi hệ thống → Hiển thị thông báo lỗi.
 
-#### 2. `selling` (Bán sách)
-
-- **Mô tả**: Kiểm thử chức năng nhân viên bán sách tại cửa hàng hoặc xử lý đơn hàng đã đặt trước.
-- **Use case liên quan**: "Bán sách".
-- **File liên quan**:
-  - Các tuyến đường trong `app.py`: Chưa có tuyến đường cụ thể cho "Bán hàng" (có thể cần bổ sung như `/sell`).
-  - Hàm trong `dao.py`: `create_invoice_from_cart`, `create_hoa_don_from_don_hang`, `get_don_hang`.
-  - Hàm trong `utils.py`: `create_invoice_pdf`, `update_so_luong_by_ct_don_hang`.
-- **Kiểm thử**:
-  - **Luồng chính**: Chọn "Bán hàng" → Tìm sách/mã đơn hàng → Nhập số tiền → Thanh toán → Xuất hóa đơn.
-  - **Luồng thay thế**:
-    - Không tìm thấy sách/mã đơn hàng → Báo không tìm thấy.
-    - Số tiền không đủ → Không cho thanh toán.
-    - Đơn hàng quá hạn/sách không đủ → Không thanh toán.
-  - **Luồng ngoại lệ**: Lỗi hệ thống → Báo lỗi và quay về giao diện bán hàng.
-
-#### 3. `inventory` (Nhập sách)
+#### 2. `inventory` (Nhập sách)
 
 - **Mô tả**: Kiểm thử chức năng quản lý kho nhập sách và cập nhật số lượng tồn kho.
 - **Use case liên quan**: "Nhập sách".
@@ -49,7 +33,7 @@ Dựa trên các **use case quan trọng** trong đặc tả (Đặt sách, Bán
     - Số lượng sách dưới quy định (`SL_MIN_TO_NHAP`) → Báo lỗi và không nhập.
   - **Luồng ngoại lệ**: Lỗi hệ thống → Quay về giao diện nhập sách.
 
-#### 4. `book_management` (Quản lý sách)
+#### 3. `book_management` (Quản lý sách)
 
 - **Mô tả**: Kiểm thử chức năng quản trị viên thêm, xóa, cập nhật, và tìm kiếm sách.
 - **Use case liên quan**: "Quản lý sách".
@@ -63,7 +47,7 @@ Dựa trên các **use case quan trọng** trong đặc tả (Đặt sách, Bán
     - Tìm kiếm sách → Nhập từ khóa → Hiển thị kết quả.
   - **Luồng ngoại lệ**: Lỗi hệ thống → Báo lỗi và không thực hiện thao tác.
 
-#### 5. `reports` (Xem thống kê báo cáo)
+#### 4. `reports` (Xem thống kê báo cáo)
 
 - **Mô tả**: Kiểm thử chức năng xem và xuất báo cáo tần suất bán sách/doanh thu.
 - **Use case liên quan**: "Xem thống kê báo cáo".
@@ -75,7 +59,7 @@ Dựa trên các **use case quan trọng** trong đặc tả (Đặt sách, Bán
   - **Luồng thay thế**: Không có dữ liệu → Hiển thị thông báo và các giá trị bằng 0.
   - **Luồng ngoại lệ**: Lỗi hệ thống → Thông báo lỗi.
 
-#### 6. `rules_management` (Thay đổi quy định)
+#### 5. `rules_management` (Thay đổi quy định)
 
 - **Mô tả**: Kiểm thử chức năng quản trị viên thay đổi các quy định của hệ thống.
 - **Use case liên quan**: "Thay đổi quy định".
@@ -87,7 +71,7 @@ Dựa trên các **use case quan trọng** trong đặc tả (Đặt sách, Bán
   - **Luồng thay thế**: Lỗi khi thay đổi → Không lưu và thông báo.
   - **Luồng ngoại lệ**: Lỗi hệ thống → Báo lỗi và không thực hiện thay đổi.
 
-#### 7. `auth` (Xác thực và phân quyền)
+#### 6. `auth` (Xác thực và phân quyền)
 
 - **Mô tả**: Kiểm thử đăng nhập và phân quyền cho các vai trò (khách hàng, nhân viên, quản lý kho, quản trị viên).
 - **Use case liên quan**: Điều kiện tiên quyết của tất cả use case.
@@ -101,43 +85,25 @@ Dựa trên các **use case quan trọng** trong đặc tả (Đặt sách, Bán
 
 ---
 
-### Tổng cộng: 7 thư mục
+### Giải thích cách sử dụng các chủ đề
 
-Với **7 thư mục** này, tôi đã bao quát toàn bộ các use case quan trọng trong đặc tả, đồng thời đảm bảo mỗi thư mục tập trung vào một nhóm chức năng cụ thể. So với lần phân nhánh trước (10 thư mục), cách này gộp một số chức năng liên quan để phù hợp hơn với đặc tả:
+1. **Test Naming and Test Discovery**:
+   - Tên test như `test_create_invoice_from_cart_success`, `test_sell_preordered_with_timeout` rõ ràng, bắt đầu bằng `test_` để Pytest tự động phát hiện.
 
-- Gộp `cart` và `orders` vào `ordering`.
-- Gộp `comments` vào `ordering` (vì liên quan đến chi tiết sách).
-- Gộp `payment` vào `ordering` và `selling` (tùy ngữ cảnh).
-- Tập trung vào các use case chính thay vì phân chia quá chi tiết.
+2. **Different Types of Assertions**:
+   - Sử dụng `assert` để kiểm tra sự tồn tại (`is not None`), giá trị bằng (`==`), chứa chuỗi (`in`), và kích thước file (`> 0`).
 
----
+3. **Skipping Tests and Markers**:
+   - `@pytest.mark.skip` được dùng để bỏ qua test `test_sell_at_store` vì hiện tại chưa có tuyến đường cụ thể trong mã nguồn.
 
-### Cấu trúc thư mục kiểm thử
+4. **Parametrized or Data-Driven Testing**:
+   - `@pytest.mark.parametrize` kiểm tra `test_sell_book_with_different_conditions` với các trường hợp: đủ tiền/đủ sách, không đủ sách, không đủ tiền.
 
-```
-tests/
-├── auth/
-├── ordering/
-├── selling/
-├── inventory/
-├── book_management/
-├── reports/
-└── rules_management/
-```
+5. **Fixtures**:
+   - Các fixture như `employee_user`, `book`, `customer_order` chuẩn bị dữ liệu nhân viên, sách, và đơn hàng đã đặt trước.
 
-- **Công cụ**: Sử dụng `pytest` hoặc `unittest` để viết test case.
-- **Ví dụ test case**:
-  - `tests/ordering/test_ordering.py`: Kiểm tra đặt sách với số lượng đủ/thiếu.
-  - `tests/selling/test_selling.py`: Kiểm tra bán sách với đơn hàng hợp lệ/quá hạn.
-  - `tests/reports/test_reports.py`: Kiểm tra xuất báo cáo với dữ liệu có/không.
+6. **Passing Command-line Args in Pytest**:
+   - `pytestconfig.getoption("--max-hours")` lấy thời gian tối đa từ dòng lệnh để kiểm tra đơn hàng quá hạn (chạy: `pytest --max-hours=24`).
 
----
-
-### Gợi ý kiểm thử chi tiết
-
-1. **ordering**: Kiểm tra toàn bộ luồng đặt sách, bao gồm cả thanh toán qua VNPay và offline.
-2. **selling**: Thêm tuyến đường `/sell` nếu chưa có để khớp với đặc tả.
-3. **inventory**: Đảm bảo quy định `SL_NHAP_MIN` và `SL_MIN_TO_NHAP` được áp dụng đúng.
-4. **reports**: Kiểm tra xuất PDF với font tiếng Việt và dữ liệu trống.
-
-Bạn thấy cách phân nhánh này có phù hợp với đặc tả không? Nếu cần tôi viết test case mẫu cho một thư mục cụ thể hoặc điều chỉnh gì thêm, hãy cho tôi biết nhé!
+7. **Pytest-BDD**:
+   - Sử dụng Gherkin syntax trong `selling.feature` để mô tả hành vi bán sách tại cửa hàng, triển khai các bước `given`, `when`, `then`.

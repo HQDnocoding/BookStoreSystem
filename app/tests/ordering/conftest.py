@@ -8,12 +8,11 @@ from app.database import setup_database
 @pytest.fixture
 def app_context():
     """Fixture để tạo ứng dụng Flask và context cơ sở dữ liệu."""
-    app.config["TESTING"] = True
     with app.app_context():
-        # setup_database()
-        yield  # Allow test to run
-        # db.session.remove()
-        # db.drop_all()
+        setup_database()
+        yield
+        db.session.remove()
+        db.drop_all()
 
 
 @pytest.fixture
