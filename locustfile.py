@@ -8,7 +8,7 @@ class WebsiteUser(HttpUser):
 
     def on_start(self):
         """Mô phỏng đăng nhập khi người dùng bắt đầu"""
-        self.client.post("/login/", data={"username": "admin1", "password": "123"})
+        self.client.post("/login", data={"username": "admin1", "password": "123"})
 
     @task(3)
     def view_homepage(self):
@@ -52,4 +52,50 @@ class WebsiteUser(HttpUser):
     @task(1)
     def view_cart(self):
         """Xem giỏ hàng"""
-        self.client.get("/cart/")
+        self.client.get("/cart")
+
+
+class CustomLoadShape(LoadTestShape):
+    """Tăng giảm người dùng theo các giai đoạn mô phỏng hành vi người dùng thực tế."""
+
+    stages = [
+        {"duration": 30, "users": 10, "spawn_rate": 2},  # * Start with 10 users
+        {"duration": 60, "users": 50, "spawn_rate": 5},  # * Ramp up to 50 users
+        {"duration": 30, "users": 20, "spawn_rate": 2},  # * Drop to 20 users
+        {"duration": 40, "users": 80, "spawn_rate": 10},  # * Spike to 80 users
+        {"duration": 20, "users": 30, "spawn_rate": 3},  # * Drop to 30 users
+        {"duration": 30, "users": 0, "spawn_rate": 5},  # * Gradual shutdown
+    ]
+
+    def tick(self):
+        """Determines how many users should be active at a given time."""
+        run_time = self.get_run_time()
+
+        for stage in self.stages:
+            if run_time < stage["duration"]:
+                return stage["users"], stage["spawn_rate"]
+            run_time -= stage["duration"]
+
+        return None  # Dừng test khi hoàn thành toàn bộ stages
+
+
+class BreakpointStressShape(LoadTestShape):
+    """
+    Stress test để xác định điểm phá vỡ của hệ thống.
+    Tăng đều người dùng theo từng chu kỳ, không có giai đoạn nghỉ.
+    """
+
+    step_time = 60  # Tăng mỗi 60 giây
+    step_load = 200  # Mỗi lần tăng thêm 200 người dùng
+    spawn_rate = 50  # Tốc độ sinh người dùng
+    max_users = 5000  # Tối đa để test điểm gãy
+
+    def tick(self):
+        run_time = self.get_run_time()
+        current_step = run_time // self.step_time
+        user_count = (current_step + 1) * self.step_load
+
+        if user_count > self.max_users:
+            return None  # Dừng test khi đạt ngưỡng
+
+        return int(user_count), self.spawn_rate
