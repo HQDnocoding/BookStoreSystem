@@ -1,59 +1,55 @@
-from locust import HttpUser, between, events, task
-from locust.runners import MasterRunner
+import random
+
+from locust import HttpUser, LoadTestShape, between, task
 
 
-class BookstoreUser(HttpUser):
-    # Thời gian chờ giữa các tác vụ (từ 1 đến 5 giây)
-    wait_time = between(1, 5)
+class WebsiteUser(HttpUser):
+    wait_time = between(1, 5)  # Thời gian chờ giữa các tác vụ (1-5 giây)
 
-    # Giả lập đăng nhập khi người dùng bắt đầu
     def on_start(self):
-        self.client.post("/login", json={"username": "customer1", "password": "123"})
+        """Mô phỏng đăng nhập khi người dùng bắt đầu"""
+        self.client.post("/login/", data={"username": "admin1", "password": "123"})
 
-    # Tác vụ 1: Tìm kiếm sách
-    @task(3)  # Tỷ lệ chạy cao hơn (3 lần thường xuyên hơn các task khác)
-    def search_books(self):
-        self.client.get("/books/search?q=python")
+    @task(3)
+    def view_homepage(self):
+        """Truy cập trang chủ"""
+        self.client.get("/")
 
-    # Tác vụ 2: Thêm sách vào giỏ hàng
+    @task(3)
+    def view_item(self):
+        """Xem chi tiết ngẫu nhiên của sách"""
+        for item_id in range(10):
+            self.client.get(f"/books/{item_id}", name="/books")
+
     @task(2)
-    def add_to_cart(self):
-        self.client.post("/cart/add", json={"book_id": 1, "quantity": 1})
+    def browse_shop(self):
+        """Duyệt cửa hàng với tham số danh mục ngẫu nhiên"""
+        categories = ["Trinh thám", "Tình cảm", "Kinh tế"]
+        category = random.choice(categories)
+        self.client.get(f"/shop/{category}")
 
-    # Tác vụ 3: Thanh toán
+    @task(2)
+    def view_profile(self):
+        """Truy cập trang thông tin cá nhân"""
+        self.client.get("/profile")
+
     @task(1)
-    def checkout(self):
+    def add_to_cart(self):
+        """Thêm sản phẩm vào giỏ hàng"""
+        product_id = 1
         self.client.post(
-            "/payment/checkout", json={"method": "OFFLINE_PAY", "total": 150000}
+            "/api/cart",
+            json={
+                "id": product_id,
+                "ten_sach": "Conan",
+                "don_gia": 25000,
+                "so_luong": 1,
+                "bia_sach": "https://res.cloudinary.com/dmbvjjg5a/image/upload/v1735027448/upload/bia_sach/c5aaxgoimjhiv5uqi1md.jpg",
+                "so_luong_con_lai": 10,
+            },
         )
 
-    # Tác vụ 4: Xem báo cáo (chỉ dành cho quản trị viên)
     @task(1)
-    def view_report(self):
-        self.client.get("/admin/reports?month=3&year=2025")
-
-
-# Sự kiện ghi lại khi hệ thống bắt đầu lỗi
-@events.request.add_listener
-def my_request_handler(name, response, exception):
-    if exception:
-        print(f"Request to {name} failed with exception {exception}")
-    else:
-        print(f"Successfully made a request to: {name}")
-        print(f"The response was {response.text}")
-
-
-@events.test_start.add_listener
-def on_test_start(environment, **kwargs):
-    if not isinstance(environment.runner, MasterRunner):
-        print("Beginning test setup")
-    else:
-        print("Started test from Master node")
-
-
-@events.test_stop.add_listener
-def on_test_stop(environment, **kwargs):
-    if not isinstance(environment.runner, MasterRunner):
-        print("Cleaning up test data")
-    else:
-        print("Stopped test from Master node")
+    def view_cart(self):
+        """Xem giỏ hàng"""
+        self.client.get("/cart/")
